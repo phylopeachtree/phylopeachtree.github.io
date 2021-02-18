@@ -36,24 +36,24 @@ public class Scaling {
 	
 	
 	/**
-	 * Scale X and round to integer
+	 * Scale X and round to 1dp
 	 * @param x
 	 * @return
 	 */
 	public double scaleX(double x) {
 		x = (x - xmin) / (xmax - xmin) * (canvasMaxX - canvasMinX) + canvasMinX;
-		return Math.round(x);
+		return Math.round(x * 100) / 100;
 	}
 	
 	
 	/**
-	 * Scale Y and round to integer
+	 * Scale Y and round to 1dp
 	 * @param y
 	 * @return
 	 */
 	public double scaleY(double y) {
 		y = (y - ymin) / (ymax - ymin) * (canvasMaxY - canvasMinY) + canvasMinY;
-		return Math.round(y);
+		return Math.round(y * 100) / 100;
 	}
 
 

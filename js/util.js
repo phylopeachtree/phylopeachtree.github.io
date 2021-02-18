@@ -103,10 +103,33 @@ function renderOptions(){
 	cjCall("peachtree.options.OptionsAPI", "getOptions").then(function(val){
 						
 			
-		var val = JSON.parse(cjStringJavaToJs(val));
-		console.log("options", val);
+		var options = JSON.parse(cjStringJavaToJs(val));
+		console.log("options", options);
+
+
+		var optionsDiv = $("#options_div");
+
+		if (options.err != null){
+			alert(options.err);
+			return;
+		}
+
+		// Get the unique list of sections
+		var sections = [];
+		for (var i = 0; i < options.length; i ++){
+			var s = options[i].section;
+			if (!sections.includes(s)) sections.push(s);
+
+		}
+		console.log("sections", sections);
+
+		// Create one tab per section
+		for (var i = 0; i < sections.length; i++){
+			optionsDiv.html(optionsDiv.html() + sections[i] + "<br>")
+		}
+
 		
-		$("#options_div").html(JSON.stringify(val));
+		//.html(JSON.stringify(options));
 				
 	});
 	

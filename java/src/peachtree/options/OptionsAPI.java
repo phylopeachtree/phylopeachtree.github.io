@@ -3,53 +3,75 @@ package peachtree.options;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+//import org.reflections.Reflections;
 
 import peachtree.aln.AlignmentAPI;
+import peachtree.aln.colourings.ClustalAminoColouring;
+import peachtree.aln.colourings.Colouring;
+import peachtree.aln.colourings.JalviewNucleotideColouring;
 
 
 
 public class OptionsAPI {
 	
-	static List<Option> options;
+
 	
-	static Option canvasWidth  = new NumericalOption("width", "general", "Width of canvas", 1000, 100, 2000);
-	static Option canvasHeight  = new NumericalOption("height", "general", "Height of canvas", 700, 100, 2000);
-	static Option division  = new NumericalOption("division", "general", "Relative position of the tree/alignment boundary", 0, 0, 1);
+	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
+	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 700, 100, 2000);
+	static Option division  = new NumericalOption("division", "General", "Relative position of the tree/alignment boundary", 0, 0, 1);
+	static Option colourings;
+	
 		
-	
+	static List<Class<? extends Colouring>> colouringClasses;
 	static final long CHUNK_SIZE = 30000;
 	static JSONArray graphicalObjects = null;
 	
-	public static void init() {
+	public static void init() throws Exception {
 		
 		graphicalObjects = null;
 		
-		// Introspectively find all options and add them to the list of options
-		options = new ArrayList<>();
-		Field[] fields = OptionsAPI.class.getDeclaredFields();
-		for (Field field: fields) {
-			
-			
-			if (field.getType().equals(Option.class)) {
-				
-				try {
-					Option option = (Option) field.get(null);
-					options.add(option);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-			}
+		
+
+		
+		
+		
+		
+	}
+	
+
+	
+	
+	/**
+	 * Prepares the colouring option so that only colour schemes applicable to the current alignment (aa or nt) are included
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 */
+	private static void prepareColourings() throws Exception {
+		
+		
+		// Find all colour classes. Reflections are not working in cheerpj so adding classes manually
+		
+		//Reflections reflections = new Reflections("peachtree.aln.colourings");
+		//Set<Class<? extends Colouring>> classes = reflections.getSubTypesOf(Colouring.class);
+		colouringClasses = new ArrayList<>();
+		colouringClasses.add(ClustalAminoColouring.class);
+		colouringClasses.add(JalviewNucleotideColouring.class);
+		
+		
+		List<Colouring> classes = new ArrayList<>();
+		for (Class<? extends Colouring> colClass : colouringClasses) {
+	        Colouring col = colClass.newInstance();
+	        if (AlignmentAPI.colouringIsApplicable(col)) {
+	        	 System.out.println(colClass.getName() + " is applicable");
+	        	 classes.add(col);
+	        }
+	       
 		}
-		
-		
-		
-		
-		
-		
-		
+		colourings = new DiscreteOption("colourings", "Alignment", "Colour scheme of the alignment", classes.get(0), classes);
 	}
 	
 	
@@ -83,6 +105,12 @@ public class OptionsAPI {
 			if (AlignmentAPI.isReady()) {
 				JSONArray alignment = AlignmentAPI.getGraphics(xdivide*width, width, 0, height);
 				objs.putAll(alignment);
+				
+				json.put("nsites", AlignmentAPI.getNsites());
+				json.put("nsitesdisplayed", AlignmentAPI.getNsitesDisplayed());
+				json.put("ntaxa", AlignmentAPI.getNtaxa());
+				
+				
 			}
 			
 			graphicalObjects = objs;
@@ -153,11 +181,37 @@ public class OptionsAPI {
 	 */
 	public static String getOptions() {
 		
-		JSONArray arr = new JSONArray();
-		for (Option option : options) {
-			arr.put(option.toJSON());
+		try {
+			prepareColourings();
+			
+			
+			// Introspectively find all options and add them to the list of options
+			List<Option> options = new ArrayList<>();
+			Field[] fields = OptionsAPI.class.getDeclaredFields();
+			for (Field field: fields) {
+				
+				if (field.getType().equals(Option.class)) {
+					try {
+						Option option = (Option) field.get(null);
+						options.add(option);
+					} catch (Exception e) {
+						e.printStackTrace();
+					} 
+				}
+			}
+			
+			
+			
+			JSONArray arr = new JSONArray();
+			for (Option option : options) {
+				arr.put(option.toJSON());
+			}
+			return arr.toString();
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+			return getErrorJSON(e);
 		}
-		return arr.toString();
 	}
 	
 	

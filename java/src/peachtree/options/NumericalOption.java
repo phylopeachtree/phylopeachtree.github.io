@@ -32,7 +32,7 @@ public class NumericalOption extends Option {
 	@Override
 	public JSONObject toJSON() {
 		JSONObject json = new JSONObject().put("name", name).put("section", section).put("title", title)
-						.put("value", value).put("min", min).put("max", max).put("type", this.getClass().getName());
+						.put("value", value).put("min", min).put("max", max).put("type", this.getClass().getSimpleName());
 		return json;
 	}
 	

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import peachtree.aln.colourings.Colouring;
 import peachtree.options.Scaling;
 
 public class Sequence {
@@ -67,9 +68,7 @@ public class Sequence {
 		}
 	}
 	
-	public boolean isAmbiguousCharOrGap(String symbol) {
-		return symbol.equals("N") || symbol.equals("-");
-	}
+
 
 	public StringBuilder getSeq() {
 		return this.sequence;
@@ -124,11 +123,13 @@ public class Sequence {
 		int seqLen = this.sequence.length();
 		int numSites = filtering == null ? seqLen : filtering.getNumSites();
 		
-		System.out.println("Displaying " + numSites + " sites");
+		//System.out.println("Displaying " + numSites + " sites");
 		
 		
 		
 		double dx = (scaling.xmax() - scaling.xmin()) / numSites;
+		double dxScaled = scaling.scaleX(dx) + 1; // Add 1 to avoid white space between sites
+		double heightScaled = scaling.scaleY(height) + 1;
 		double x = scaling.xmin();
 		
 		JSONObject nt_bg, nt_font;
@@ -141,15 +142,14 @@ public class Sequence {
 			
 			// Background colour
 			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc)
-								.put("width", scaling.scaleX(dx)).put("height", scaling.scaleY(height));
+								.put("width", dxScaled).put("height", heightScaled);
 			if (colouring != null) {
 				nt_bg.put("bg", colouring.getColour(symbol));
 			}
 			//nt_bg.put("bg", "#008cba");
 			//nt_bg.put("col", "white");
 			
-			// Meta info
-			nt_bg.put("title", "Site " + (site+1));
+			
 			
 			arr.put(nt_bg);
 			
@@ -159,6 +159,8 @@ public class Sequence {
 			yc = scaling.scaleY(y + height/2);
 			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc);
 			nt_font.put("value", symbol);
+			nt_font.put("title", "Site " + (site+1));
+			
 			arr.put(nt_font);
 			
 			x += dx;

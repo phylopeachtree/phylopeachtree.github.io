@@ -10,6 +10,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import peachtree.aln.colourings.Colouring;
+import peachtree.aln.colourings.JalviewNucleotideColouring;
 import peachtree.options.Scaling;
 
 public class Alignment {
@@ -29,6 +31,8 @@ public class Alignment {
 	static public String[] nt_ids;
 	static public Map<String, Integer> alpha_chars = null;
 	static public String[] alpha_ids;
+	static private int ambiguousNtIndex = -1;
+	static private int ambiguousAlphaIndex = -1;
 
 	
 	public Alignment(String fasta) throws Exception{
@@ -139,7 +143,7 @@ public class Alignment {
 		this.filtering = new Filtering(true, null, this);
 		
 		// Default colouring
-		this.colouring = new NucleotideColouring();
+		this.colouring = new JalviewNucleotideColouring();
 		
 		
 		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites and " + this.sequences.size() + " taxa");
@@ -244,6 +248,30 @@ public class Alignment {
 	
 	
 	
+	
+	/**
+	 * Is the symbol ambiguous or a gap?
+	 * @param symbol
+	 * @return
+	 */
+	public static boolean isAmbiguousOrGap(String symbol, boolean isNT) {
+		
+		
+		if (isNT) {
+			Integer index = nt_chars.get(symbol);
+			if (index == null) return true;
+			if (index > ambiguousNtIndex) return true;
+		}else {
+			Integer index = alpha_chars.get(symbol);
+			if (index == null) return true;
+			if (index > ambiguousAlphaIndex) return true;
+		}
+		
+		
+		return false;
+	}
+	
+	
 	/**
 	 * Prepare datatype maps
 	 */
@@ -260,7 +288,21 @@ public class Alignment {
 		nt_chars.put("G", ++i);
 		nt_chars.put("T", ++i);
 		nt_chars.put("U", ++i);
-		nt_chars.put("N", ++i);
+		
+		// Ambiguous nucleotides / gaps
+		ambiguousNtIndex = i;
+		nt_chars.put("R", ++i); // Purine (AG)
+		nt_chars.put("Y", ++i); // Pyrimidine (TC)
+		nt_chars.put("K", ++i); // Keto (GT)
+		nt_chars.put("M", ++i); // Amino (AC)
+		nt_chars.put("S", ++i); // Strong (GC)
+		nt_chars.put("W", ++i); // Weak (AT)
+		nt_chars.put("B", ++i); // not A
+		nt_chars.put("D", ++i); // not C
+		nt_chars.put("H", ++i); // not G
+		nt_chars.put("V", ++i); // not T/U
+		
+		nt_chars.put("N", ++i); // Ambiguous
 		nt_chars.put("-", ++i);
 		
 		// Reverse mapping
@@ -275,7 +317,6 @@ public class Alignment {
 		// General case (including aa)
 		i = -1;
 		alpha_chars.put("A", ++i);
-		alpha_chars.put("B", ++i);
 		alpha_chars.put("C", ++i);
 		alpha_chars.put("D", ++i);
 		alpha_chars.put("E", ++i);
@@ -283,22 +324,26 @@ public class Alignment {
 		alpha_chars.put("G", ++i);
 		alpha_chars.put("H", ++i);
 		alpha_chars.put("I", ++i);
-		alpha_chars.put("J", ++i);
 		alpha_chars.put("K", ++i);
 		alpha_chars.put("L", ++i);
 		alpha_chars.put("M", ++i);
 		alpha_chars.put("N", ++i);
-		alpha_chars.put("O", ++i);
 		alpha_chars.put("P", ++i);
 		alpha_chars.put("Q", ++i);
 		alpha_chars.put("R", ++i);
 		alpha_chars.put("S", ++i);
 		alpha_chars.put("T", ++i);
-		alpha_chars.put("U", ++i);
 		alpha_chars.put("V", ++i);
 		alpha_chars.put("W", ++i);
-		alpha_chars.put("X", ++i);
 		alpha_chars.put("Y", ++i);
+		
+		// Ambiguous aas / gaps
+		ambiguousAlphaIndex = i;
+		alpha_chars.put("B", ++i);
+		alpha_chars.put("J", ++i);
+		alpha_chars.put("O", ++i);
+		alpha_chars.put("U", ++i);
+		alpha_chars.put("X", ++i);
 		alpha_chars.put("Z", ++i);
 		alpha_chars.put("-", ++i);
 
@@ -313,6 +358,21 @@ public class Alignment {
 		
 		
 		
+	}
+
+
+	public boolean isNucleotide() {
+		return this.isNucleotide;
+	}
+
+
+	/**
+	 * Number of sites being displayed
+	 * @return
+	 */
+	public int getNsitesDisplayed() {
+		if (this.filtering == null) return 0;
+		return this.filtering.getNumSites();
 	}
 	
 	

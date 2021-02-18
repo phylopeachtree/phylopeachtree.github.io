@@ -16,7 +16,9 @@ public class Filtering {
 	
 	boolean variantSitesOnly;
 	Map<Integer, Boolean> taxaIDsToInclude;
-	Map<Integer, Boolean> sitesToInclude;
+	Map<Integer, Boolean> sitesToIncludeMap;
+	List<Integer> sitesToIncludeList;
+	
 	int numSites;
 	
 	public Filtering(boolean variantSitesOnly, List<Taxon> taxaToInclude, Alignment alignment) {
@@ -34,7 +36,8 @@ public class Filtering {
 		
 
 		// Which sites to include?
-		this.sitesToInclude = new HashMap<>();
+		this.sitesToIncludeMap = new HashMap<>();
+		this.sitesToIncludeList = new ArrayList<>();
 		if (this.variantSitesOnly) {
 			for (int site = 0; site < alignment.getLength(); site ++) {
 				
@@ -51,9 +54,10 @@ public class Filtering {
 					
 					// What is the symbol?
 					String symbol = sequence.getSymbol(site);
+					if (Alignment.isAmbiguousOrGap(symbol, sequence.isNucleotide())) continue;
 					
 					if (uniqueSymbol == null) {
-						if (!sequence.isAmbiguousCharOrGap(symbol)) uniqueSymbol = symbol;
+						uniqueSymbol = symbol;
 					}
 					else if (!uniqueSymbol.equals(symbol)) {
 						includeSite = true;
@@ -68,7 +72,8 @@ public class Filtering {
 				// Include the site
 				if (includeSite) {
 					//System.out.println("including site " + site);
-					this.sitesToInclude.put(site, true);
+					this.sitesToIncludeMap.put(site, true);
+					this.sitesToIncludeList.add(site);
 				}
 				
 				
@@ -76,11 +81,14 @@ public class Filtering {
 				
 			}
 			
-			numSites = sitesToInclude.size();
+			numSites = sitesToIncludeMap.size();
 			if (numSites == 0) numSites = alignment.getLength();
 		
 		}else {
 			numSites = alignment.getLength();
+			for (int i = 0; i < numSites; i ++) {
+				this.sitesToIncludeList.add(i);
+			}
 		}
 		
 	}
@@ -106,17 +114,19 @@ public class Filtering {
 	 */
 	public boolean includeSite(int site) {
 		if (!this.variantSitesOnly) return true;
-		if (this.sitesToInclude == null) return true;
-		if (this.sitesToInclude.isEmpty()) return true;
-		return this.sitesToInclude.containsKey(site);
+		if (this.sitesToIncludeMap == null) return true;
+		if (this.sitesToIncludeMap.isEmpty()) return true;
+		return this.sitesToIncludeMap.containsKey(site);
 	}
 	
 	
-	public int[] getSites() {
+	public List<Integer> getSites() {
+		return this.sitesToIncludeList;
+		/*
 		int[] sites = new int[this.getNumSites()];
-		if (this.sitesToInclude != null && this.sitesToInclude.size() > 0) {
+		if (this.sitesToIncludeMap != null && this.sitesToIncludeMap.size() > 0) {
 			int i = 0;
-			for (int site : this.sitesToInclude.keySet()) {
+			for (int site : this.sitesToIncludeMap.keySet()) {
 				//System.out.println("including site " + site);
 				sites[i] = site;
 				i++;
@@ -128,6 +138,7 @@ public class Filtering {
 			}
 		}
 		return sites;
+		*/
 	}
 
 

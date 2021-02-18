@@ -14,15 +14,22 @@ public class MainApplication {
 		
 		System.out.println("Initialising peatree...");
 		
-		OptionsAPI.init();
-		AlignmentAPI.init();
+		try {
+			OptionsAPI.init();
+			AlignmentAPI.init();
+			System.out.println("Done!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Error!");
+		}
+		
 		
 		
 		//Exception e = new Exception("test exception");
 		
 		//System.out.println(OptionsAPI.getErrorJSON(e));
 		
-		System.out.println("Done!");
+		
 	}
 
 }

@@ -50,7 +50,27 @@ function renderGraphics(){
 				svg.html("");
 				svg.height(initialVal.height);
 				svg.width(initialVal.width);
-		
+
+
+				// Other meta info
+				if (initialVal.ntaxa != null){
+					$("#ntaxa_div").html("There are " + initialVal.ntaxa + " individuals");
+				}else{
+					$("#ntaxa_div").html("");
+				}
+
+				if (initialVal.nsites != null){
+					$("#nsites_div").html("There are " + initialVal.nsites + " sites in the alignment");
+				}else{
+					$("#nsites_div").html("");
+				}
+
+				if (initialVal.nsitesdisplayed != null){
+					$("#nsitesdisplayed_div").html("There are " + initialVal.nsitesdisplayed + " sites in the alignment being displayed");
+				}else{
+					$("#nsitesdisplayed_div").html("");
+				}
+
 
 
 				// Plot json objects 1 chunk at a time
@@ -78,7 +98,7 @@ function plotNextObject(iteration = 0){
 
 			//console.log("graphics", cjStringJavaToJs(val));
 			var objects = JSON.parse(cjStringJavaToJs(val));
-			console.log("iteration", iteration, "graphics", objects);
+			//console.log("iteration", iteration, "graphics", objects);
 
 
 			if (objects.length == 0){
@@ -121,14 +141,17 @@ function drawSVGobj(svg, object){
 	var newObj = document.createElementNS('http://www.w3.org/2000/svg', type);
 
 
-
 	// Set attributes
 	for (var a in object){
 		if (a == "ele") continue;
-		else if (a == "value") newObj.innerHTML = object[a];
+		else if (a == "value") newObj.innerHTML += object[a];
 		else if (a == "bg") newObj.setAttribute("fill", object[a]);
 		else if (a == "col") newObj.setAttribute("color", object[a]);
-		else if (a == "title") newObj.append("<title>" + object[a] + "</title>");
+		else if (a == "title") {
+			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
+			title.innerHTML += object[a];
+			newObj.append(title);
+		}
 		
 		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
 		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);

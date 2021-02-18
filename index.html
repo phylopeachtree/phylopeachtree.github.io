@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>PEACHTree</title>
+	<link rel="stylesheet" href="css/styles.css">
+    <script src="https://cjrtnc.leaningtech.com/2.1/loader.js"></script>
+	<!--<script src="https://cjrtnc.leaningtech.com/20200727/loader.js"></script>-->
+	
+	
+	<script language='JavaScript' type='text/JavaScript' src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"> </script>
+	
+	<script language='JavaScript' type='text/JavaScript' src="js/util.js"></script>
+	<script language='JavaScript' type='text/JavaScript' src="js/graphics.js"></script>
+	<script language='JavaScript' type='text/JavaScript' src="js/lib/dropzone.js"></script>
+	
+		
+  </head>
+  <body>
+  </body>
+  <script>
+  
+		FADE_IN_TIME = 100;
+  
+		function init() {
+		
+
+			cheerpjInit();
+			initGraphics();
+
+
+			cheerpjRunJar("/app/peachtree.jar", 1);
+			//cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar");
+		  
+			//console.log("Loaded!");
+			
+			
+			// Initialise js
+			initUtil();
+
+			
+		
+	  
+	  
+	  }
+  </script>
+  
+  <body onload="init()">
+  
+  
+  
+	<div id="main">
+	
+		
+		<h1 style="text-align:center"> PEACHTree </h1>
+		
+		
+		
+		
+		<div id="upload_div" />
+		
+		
+			
+			
+			<div id="phy_upload" class="uploader" title="Accepted formats: nexus, newick">
+				<div>Drag and drop a phylogenetic tree</div>
+				<div class="usermsg mediumfont"></div>
+			</div>
+			
+			OR
+			
+			<div id="aln_upload" class="uploader"  title="Accepted format: fasta">
+				<div>Drag and drop a multiple sequence alignment</div>
+				<div class="usermsg mediumfont"></div>
+				<div class="smallfont">(And we will make a tree for you!)</div>
+				
+			</div>
+			
+			
+			
+			<br><br>
+			Upload one or more of the above to begin
+			<br><br>
+			
+				<span id="renderBtn" onclick="renderGraphics();" class="button large disabled" title="Upload one or more of the above to begin">Display</span>
+			
+			
+			
+		</div>
+		
+		
+		
+		<div id="graphics_div" style="display:none"/>
+		
+			<svg id="svg">
+			
+			
+			
+			</svg>
+			
+			
+			<h2>Options</h2>
+			<div id="options_div"/>
+			
+				
+			
+			</div>
+		
+		</div>
+		
+		
+		
+		
+			
+	
+	</div>
+  
+	
+  
+  </body>
+  
+</html>

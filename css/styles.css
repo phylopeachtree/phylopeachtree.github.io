@@ -1,0 +1,151 @@
+
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
+
+
+body {
+	font-family: "Source Sans Pro", "Arial"; 
+	background-color:white;
+	width:100%;
+	min-width:500px;
+	height:300px;
+	min-height:100%;
+	margin:0;
+	padding:0;
+	
+
+	@media screen and (orientation:portrait) {
+		text-size-adjust: 160%;
+	}
+	@media screen and (orientation:landscape) {
+		text-size-adjust: 100%;
+	}
+
+	
+}
+
+
+#svg text{
+	dominant-baseline:middle; 
+	text-anchor:middle;
+}
+
+
+.mediumfont{
+	font-size: 80%!important;
+}
+
+.smallfont {
+	font-size: 70%!important;
+}
+
+
+
+#main {
+	
+	padding: 2em;
+	
+}
+
+
+
+
+.uploader {
+	height:10em;
+	border-style:dashed;
+	border-radius: 1em;
+	text-align:center;
+	vertical-align:middle;
+	margin: 1em;
+	overflow-y:auto;
+	overflow-x:auto;
+}
+
+
+
+
+.uploader.dz-drag-hover, .uploader:hover {
+	background-color:#8eab12;
+	color: white;
+}
+
+.uploader > div {
+	text-size-adjust:200%;
+	font-size:200%;
+	margin-top: 1em;
+	padding: 10;
+
+	
+}
+
+
+.dz-preview, .dz-file-preview {
+    display: none;
+}
+
+#upload_div, #graphics_div{
+	text-align:center;
+	margin: 1em 5em;
+}
+
+
+
+
+.button{
+	transition: all 0.2s ease 0s;
+	border-radius:0.5em;
+	padding: 0.25em;
+	margin: 0.5em;
+	border-color:black;
+	border-style:solid;
+	border-width:1px;
+	cursor:pointer;
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+	color:black;
+
+
+}
+
+
+.button.large{
+	font-size:150%;
+	padding: 0.5em;
+}
+
+.button.disabled {
+	background-color:#696969;
+	cursor:auto;
+	color:white;
+}
+
+
+
+
+
+
+.button:hover{
+	color:white;
+	background-color:#8eab12;
+}
+
+.button.disabled:hover {
+	background-color:#696969;
+}
+
+
+
+
+#svg{
+	border-width:2px;
+	border-style: solid;
+}
+
+
+#svg text{
+	font-family:'Courier New';
+}
+
+
+

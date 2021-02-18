@@ -34,7 +34,7 @@ function initUtil(){
 						throw {message: "Cannot open file"};
 					}
 					var contents = e.target.result;
-					cjCall("peatree.aln.AlignmentAPI", "uploadAlignment", contents).then(function(val){
+					cjCall("peachtree.aln.AlignmentAPI", "uploadAlignment", contents).then(function(val){
 						
 						try {
 							var val = JSON.parse(cjStringJavaToJs(val));
@@ -100,7 +100,7 @@ function plotUploadSuccessMsg(filename, uploadSelector){
 */
 function renderOptions(){
 	
-	cjCall("peatree.options.OptionsAPI", "getOptions").then(function(val){
+	cjCall("peachtree.options.OptionsAPI", "getOptions").then(function(val){
 						
 			
 		var val = JSON.parse(cjStringJavaToJs(val));
@@ -140,7 +140,7 @@ function updateRenderBtn(){
 */
 function isReadyToRender(callback = function(response) { }){
 	
-	cjCall("peatree.options.OptionsAPI", "isReady").then(function(val){
+	cjCall("peachtree.options.OptionsAPI", "isReady").then(function(val){
 		val =  val.value0 == 1;
 		console.log("ready", val);
 		//var val = cjStringJavaToJs(val);

@@ -34,7 +34,7 @@ function renderGraphics(){
 
 
 		// Generate the graphics objects
-		cjCall("peatree.options.OptionsAPI", "initGraphics").then(function(initialVal){
+		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
 
 
 			
@@ -71,7 +71,7 @@ function renderGraphics(){
 
 function plotNextObject(iteration = 0){
 
-	cjCall("peatree.options.OptionsAPI", "getGraphics").then(function(val){
+	cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
 								
 
 

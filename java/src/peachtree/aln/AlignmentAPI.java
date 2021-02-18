@@ -41,7 +41,10 @@ public class AlignmentAPI {
 			THE_ALIGNMENT = new Alignment(str);
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
-			return "{}";
+			
+			JSONObject json = new JSONObject().put("time", (finish-start));
+			return json.toString();
+			
 		}catch (Exception e){
 			THE_ALIGNMENT = null;
 			e.printStackTrace();

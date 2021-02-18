@@ -22,7 +22,7 @@ public class OptionsAPI {
 	
 	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
 	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 700, 100, 2000);
-	static Option division  = new NumericalOption("division", "General", "Relative position of the tree/alignment boundary", 0, 0, 1);
+	static Option division  = new NumericalOption("division", "General", "Relative position of the tree/alignment boundary", 0.2, 0, 1);
 	static Option colourings;
 	
 		

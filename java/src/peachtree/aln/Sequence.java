@@ -131,17 +131,23 @@ public class Sequence {
 		double dxScaled = scaling.scaleX(dx) + 1; // Add 1 to avoid white space between sites
 		double heightScaled = scaling.scaleY(height) + 1;
 		double x = scaling.xmin();
+		double yc_rect = scaling.scaleY(y);
+		double yc_text = scaling.scaleY(y + height/2);
 		
+		
+		
+		
+		// Plot sites
 		JSONObject nt_bg, nt_font;
 		for (int site : filtering.getSites()) {
 			
 			String symbol = this.getSymbol(site);
 			
 			double xc = scaling.scaleX(x);
-			double yc = scaling.scaleY(y);
+			
 			
 			// Background colour
-			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc)
+			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect)
 								.put("width", dxScaled).put("height", heightScaled);
 			if (colouring != null) {
 				nt_bg.put("bg", colouring.getColour(symbol));
@@ -156,9 +162,9 @@ public class Sequence {
 			
 			// Text
 			xc = scaling.scaleX(x + dx/2);
-			yc = scaling.scaleY(y + height/2);
-			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc);
+			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text);
 			nt_font.put("value", symbol);
+			nt_font.put("text_anchor", "middle"); // Right alignment
 			nt_font.put("title", "Site " + (site+1));
 			
 			arr.put(nt_font);
@@ -168,6 +174,13 @@ public class Sequence {
 			
 		}
 		
+		
+		/// Plot accession
+		JSONObject acc_json = new JSONObject();
+		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_text);
+		acc_json.put("text_anchor", "end"); // Right alignment
+		acc_json.put("value", this.getAcc());
+		arr.put(acc_json);
 		
 		
 		return arr;

@@ -40,6 +40,7 @@
 			initUtil();
 
 			
+			//addLoader("#aln_upload_title");
 		
 	  
 	  
@@ -64,7 +65,7 @@
 			
 			
 			<div id="phy_upload" class="uploader" title="Accepted formats: nexus, newick">
-				<div>Drag and drop a phylogenetic tree</div>
+				<div id="phy_upload_title">Drag and drop a phylogenetic tree</div>
 				<div class="usermsg mediumfont"></div>
 				<div class="mediumfont">Out of order</div>
 			</div>
@@ -72,7 +73,7 @@
 			OR
 			
 			<div id="aln_upload" class="uploader"  title="Accepted format: fasta">
-				<div>Drag and drop a multiple sequence alignment</div>
+				<div id="aln_upload_title">Drag and drop a multiple sequence alignment</div>
 				<div class="usermsg mediumfont"></div>
 				<div class="smallfont">(And we will make a tree for you!)</div>
 				
@@ -94,7 +95,7 @@
 		
 		<div id="graphics_div" style="display:none"/>
 		
-			<svg id="svg">
+			<svg id="svg" overflow="auto">
 			
 			
 			

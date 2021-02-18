@@ -27,11 +27,7 @@ function renderGraphics(){
 		// Options
 		renderOptions();
 		
-		// Hide the upload menu
-		$("#graphics_div").show(FADE_IN_TIME);
-		$("#upload_div").hide(0);
-
-
+	
 
 		// Generate the graphics objects
 		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
@@ -44,6 +40,11 @@ function renderGraphics(){
 			if (initialVal.err != null){
 				alert(initialVal.err);
 			}else{
+
+
+				// Hide the upload menu
+				$("#graphics_div").show(FADE_IN_TIME);
+				$("#upload_div").hide(0);
 
 				// Prepare svg width/height
 				var svg = $("#svg");
@@ -156,8 +157,10 @@ function drawSVGobj(svg, object){
 		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
 		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
 		//else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
-		else newObj.setAttribute(a, object[a]);
+		else newObj.setAttribute(a.replace("_", "-"), object[a]);
 	}
+
+
 
 
 	// Set some of the styles as attributes because safari and IE do not like styles for svgs

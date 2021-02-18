@@ -1,7 +1,10 @@
 
 @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
 
-
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
 
 body {
 	font-family: "Source Sans Pro", "Arial"; 
@@ -25,12 +28,6 @@ body {
 }
 
 
-#svg text{
-	dominant-baseline:middle; 
-	text-anchor:middle;
-}
-
-
 .mediumfont{
 	font-size: 80%!important;
 }
@@ -48,6 +45,20 @@ body {
 }
 
 
+.loader {
+	%border: 0.1em solid white; 
+	border-top: 0.25em solid white; 
+	border-bottom: 0.25em solid white; 
+	border-left: 0.25em solid #8eab12; 
+	border-right: 0.25em solid #8eab12; 
+	border-radius: 100%;
+	width: 0.5em;
+	height: 0.5em;
+	animation: spin 2.5s linear infinite;
+	%text-align:center;
+	margin: auto;
+	%float:right;
+}
 
 
 .uploader {
@@ -145,6 +156,7 @@ body {
 
 #svg text{
 	font-family:'Courier New';
+	dominant-baseline:middle; 
 }
 
 

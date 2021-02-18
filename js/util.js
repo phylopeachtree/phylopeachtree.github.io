@@ -22,7 +22,7 @@ function initUtil(){
 		// Closure to capture the file information.
 		reader.onload = (function(theFile) {
 			
-			
+			addLoader("#aln_upload_title");
 			
 			return function(e) {
 				
@@ -46,7 +46,7 @@ function initUtil(){
 							 return plotUploadErrorMsg(err, "#aln_upload");
 							 
 						}
-						return plotUploadSuccessMsg(file.name, "#aln_upload");
+						return plotUploadSuccessMsg(file.name, val.time, "#aln_upload");
 					});
 					
 					
@@ -81,6 +81,7 @@ function initUtil(){
 function plotUploadErrorMsg(err, uploadSelector){
 	console.log("caught", err);
 	$(uploadSelector + " .usermsg").html("<b>Error: </b>" + err.message);
+	removeLoader(uploadSelector + "_title");
 	return false;
 }
 
@@ -88,10 +89,24 @@ function plotUploadErrorMsg(err, uploadSelector){
 /*
 	Clear error message on success
 */
-function plotUploadSuccessMsg(filename, uploadSelector){
-	$(uploadSelector + " .usermsg").html(filename + " successfully uploaded!");
+function plotUploadSuccessMsg(filename, time, uploadSelector){
+	if (time == "0" || time == 0) time = "<1";
+	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + time + "ms!");
 	updateRenderBtn();
+	removeLoader(uploadSelector + "_title");
 	return true;
+}
+
+
+/*
+	Adds a loading icon
+*/
+function addLoader(selector){
+	$(selector).append(`<div title="Loading..." class="loader"></div>`);
+}
+
+function removeLoader(selector){
+	$(selector + " .loader").remove();
 }
 
 

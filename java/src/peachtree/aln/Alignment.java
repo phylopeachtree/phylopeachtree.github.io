@@ -206,6 +206,8 @@ public class Alignment {
 	public JSONArray getGraphics(Scaling scaling) {
 		
 		
+		
+		
 		JSONArray objs = new JSONArray();
 		
 		double dy = (scaling.ymax() - scaling.ymin()) / this.sequences.size();

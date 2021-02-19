@@ -64,7 +64,9 @@ body {
 .uploader {
 	height:10em;
 	border-style:dashed;
+	color:#333;
 	border-radius: 1em;
+	border-color:#bbb;
 	text-align:center;
 	vertical-align:middle;
 	margin: 1em;
@@ -138,7 +140,7 @@ body {
 
 .button:hover{
 	color:white;
-	background-color:#8eab12;
+	background-color:#8eab12; %green
 }
 
 .button.disabled:hover {
@@ -159,5 +161,100 @@ body {
 	dominant-baseline:middle; 
 }
 
+#svg #draggableG{
+	cursor:ew-resize;
+}
+
+/* Tabs
+	http://jsfiddle.net/csDP9/9/s 
+*/
+ul.tabs {
+    list-style: none;
+    margin: 0;
+    z-index: 5;
+}
+ul.tabs li {
+    color: #666;
+    background: #fefefe;
+    padding: 14px 24px 10px;
+    margin: 0px -6px 0 10px;
+    position: relative;
+    float: left;
+    text-align: center;
+    z-index: 1;
+    cursor:pointer;
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+}
+ul.tabs li::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+    width: 70%;
+    height: 100%;
+    border-style: solid;
+    border-color: #bbb;
+    border-width: 2px 0 2px 2px;
+    border-radius: 8px 0 0 0;
+    -webkit-transform: skewX(-15deg);
+       -moz-transform: skewX(-15deg);
+         -o-transform: skewX(-15deg);
+            transform: skewX(-15deg);
+    background-color: inherit;    z-index: -1;
+}
+ul.tabs li::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0; right: 0;
+    width: 70%;
+    height: 100%;
+    border-style: solid;
+    border-color: #bbb;
+    border-width: 2px 2px 2px 0;
+    border-radius: 0 8px 0 0;
+    -webkit-transform: skewX(15deg);
+       -moz-transform: skewX(15deg);
+         -o-transform: skewX(15deg);
+            transform: skewX(15deg);
+    background-color: inherit;
+    z-index: -1;
+}
+ul.tabs li.active {
+    color: white;
+    z-index: 10;
+    %font-weight: bold;
+}
+ul.tabs li.active::before,
+ul.tabs li.active::after {
+    background-color: #333; 
+    border-color: #444;
+}
+ul.tabs li:not([class='active']):hover::before,
+ul.tabs li:not([class='active']):hover::after {
+    background-color: #bbb; 
+}
 
 
+ul.tabs li.active:hover::before,
+ul.tabs li.active:hover::after {
+    background-color: #bbb; 
+    border-color: #bbb;
+}
+
+
+#options_tabs{
+	%position:fixed;
+}
+
+.optionsSlideIn {
+
+	width:100%;
+	background-color:red;
+	height:200px;
+	padding:5px;
+	margin-top:18px;
+
+}

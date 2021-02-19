@@ -53,6 +53,22 @@ function renderGraphics(){
 				svg.width(initialVal.width);
 
 
+
+				// Create top layer draggable
+				var draggable = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				svg.append(mainGroup);
+				svg.append(draggable);
+				draggable.setAttribute("id", "draggableG")
+
+
+
+				// Sticks
+				var taxonAlignmentBoundary = initialVal.taxon_alignment_boundary
+				var stick = {ele: "line", x1: taxonAlignmentBoundary, y1: 0, x2: taxonAlignmentBoundary, y2: initialVal.height, stroke:"#666", stroke_width:1.5};
+				drawSVGobj(draggable, stick);
+
+
 				// Other meta info
 				if (initialVal.ntaxa != null){
 					$("#ntaxa_div").html("There are " + initialVal.ntaxa + " individuals");
@@ -75,7 +91,7 @@ function renderGraphics(){
 
 
 				// Plot json objects 1 chunk at a time
-				plotNextObject();
+				plotNextObject(mainGroup);
 			}
 
 
@@ -87,10 +103,24 @@ function renderGraphics(){
 	
 }
 
+/*
+function makeDraggable(evt) {
+	var svg = evt.target;
+	svg.addEventListener('mousedown', startDrag);
+	svg.addEventListener('mousemove', drag);
+	svg.addEventListener('mouseup', endDrag);
+	svg.addEventListener('mouseleave', endDrag);
+	function startDrag(evt) {
+	}
+	function drag(evt) {
+	}
+	function endDrag(evt) {
+	}
+}
+*/
 
 
-
-function plotNextObject(iteration = 0){
+function plotNextObject(svg, iteration = 0){
 
 	cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
 								
@@ -109,7 +139,7 @@ function plotNextObject(iteration = 0){
 				
 
 				// Repeat
-				plotNextObject(iteration + 1)
+				plotNextObject(svg, iteration + 1)
 
 				// And render thes objects asynchronously...
 				for (var i = 0; i < objects.length; i ++){
@@ -146,8 +176,8 @@ function drawSVGobj(svg, object){
 	for (var a in object){
 		if (a == "ele") continue;
 		else if (a == "value") newObj.innerHTML += object[a];
-		else if (a == "bg") newObj.setAttribute("fill", object[a]);
-		else if (a == "col") newObj.setAttribute("color", object[a]);
+		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
+		//else if (a == "col") newObj.setAttribute("color", object[a]);
 		else if (a == "title") {
 			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
 			title.innerHTML += object[a];

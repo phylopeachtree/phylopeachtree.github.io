@@ -150,10 +150,10 @@ public class Sequence {
 			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect)
 								.put("width", dxScaled).put("height", heightScaled);
 			if (colouring != null) {
-				nt_bg.put("bg", colouring.getColour(symbol));
+				nt_bg.put("fill", colouring.getColour(symbol));
 			}
-			//nt_bg.put("bg", "#008cba");
-			//nt_bg.put("col", "white");
+			//nt_bg.put("fill", "#008cba");
+			//nt_bg.put("color", "white");
 			
 			
 			

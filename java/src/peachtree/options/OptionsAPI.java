@@ -23,7 +23,11 @@ public class OptionsAPI {
 	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
 	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 700, 100, 2000);
 	static Option division  = new NumericalOption("division", "General", "Relative position of the tree/alignment boundary", 0.2, 0, 1);
+	
+	static Option siteDim = new NumericalOption("siteDim", "Alignment", "Width and height of an aligned site", 20, 1, 100);
 	static Option colourings;
+	
+	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 20, 1, 100);
 	
 		
 	static List<Class<? extends Colouring>> colouringClasses;
@@ -97,13 +101,20 @@ public class OptionsAPI {
 			double height = ((NumericalOption)canvasHeight).getVal();
 			json.put(canvasWidth.getName(), width);
 			json.put(canvasHeight.getName(), height);
+			json.put("taxon_alignment_boundary", xdivide*width);
 			
 			
 			JSONArray objs = new JSONArray();
 			
 			// Alignment?
 			if (AlignmentAPI.isReady()) {
-				JSONArray alignment = AlignmentAPI.getGraphics(xdivide*width, width, 0, height);
+				
+				double ntWidth = ((NumericalOption)siteDim).getVal();
+				if (ntWidth > 0) {
+					height = ntWidth * AlignmentAPI.getNtaxa();
+				}
+				
+				JSONArray alignment = AlignmentAPI.getGraphics(xdivide*width, width, 0, height, ntWidth);
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());

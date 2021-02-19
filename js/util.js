@@ -123,6 +123,10 @@ function renderOptions(){
 
 
 		var optionsDiv = $("#options_div");
+		var optionsTabs = $("#options_tabs");
+		var slideIns = $("#slideIns");
+		optionsTabs.html("");
+		slideIns.html("");
 
 		if (options.err != null){
 			alert(options.err);
@@ -140,7 +144,19 @@ function renderOptions(){
 
 		// Create one tab per section
 		for (var i = 0; i < sections.length; i++){
-			optionsDiv.html(optionsDiv.html() + sections[i] + "<br>")
+
+
+			var slideInID = "options_" + sections[i];
+
+			// Tab
+			optionsTabs.append("<li onClick='toggleTab(this)' title='Open/close tab' slide='" + slideInID + "'>" + sections[i] + "</li>")
+
+
+			// Slide in
+			var div = $("<div class='optionsSlideIn' style='display:none'>" + sections[i] + "</div>")
+			div.attr("id", slideInID);
+			slideIns.append(div)
+
 		}
 
 		
@@ -150,6 +166,23 @@ function renderOptions(){
 	
 }
 
+
+/*
+	Opens or closes a tab
+*/
+function toggleTab(ele){
+
+
+	// Update css
+	$(ele).siblings("li").removeClass("active");
+	$(ele).toggleClass("active");
+
+	var slideid = $(ele).attr("slide");
+	//$("#" + slideid).show(100);
+
+
+
+}
 
 
 /*

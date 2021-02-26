@@ -9,10 +9,10 @@ package peachtree.options;
 public class Scaling {
 
 	
-	double xmin;
-	double xmax;
-	double ymin;
-	double ymax;
+	double xmin = 0;
+	double xmax = 1;
+	double ymin = 0;
+	double ymax = 1;
 	double canvasMinX;
 	double canvasMaxX;
 	double canvasMinY;
@@ -20,19 +20,35 @@ public class Scaling {
 
 	
 	
-	public Scaling(double xmin, double xmax, double ymin, double ymax, 
-					double canvasMinX, double canvasMaxX, double canvasMinY, double canvasMaxY) {
+	public Scaling(double canvasMinX, double canvasMaxX, double canvasMinY, double canvasMaxY) {
 		
-		this.xmin = xmin;
-		this.xmax = xmax;
-		this.ymin = ymin;
-		this.ymax = ymax;
 		this.canvasMinX = canvasMinX;
 		this.canvasMaxX = canvasMaxX;
 		this.canvasMinY = canvasMinY;
 		this.canvasMaxY = canvasMaxY;
 		
 	}
+	
+	
+	
+	/**
+	 * Check if this scaled value is in range
+	 * @param x
+	 * @return
+	 */
+	public boolean inRangeX(double x) {
+		return x >= canvasMinX && x < canvasMaxX;
+	}
+	
+	/**
+	 * Check if this scaled value is in range
+	 * @param x
+	 * @return
+	 */
+	public boolean inRangeY(double y) {
+		return y >= canvasMinY && y < canvasMaxY;
+	}
+	
 	
 	
 	/**
@@ -72,5 +88,23 @@ public class Scaling {
 	public double xmin() {
 		return xmin;
 	}
+	
+	
+	public double canvasMinX() {
+		return canvasMinX;
+	}
+	
+	public double canvasMinY() {
+		return canvasMinY;
+	}
+	
+	public double canvasMaxX() {
+		return canvasMaxX;
+	}
+	
+	public double canvasMaxY() {
+		return canvasMaxY;
+	}
+	
 	
 }

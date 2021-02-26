@@ -25,7 +25,8 @@ public class OptionsAPI {
 	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.1, 0, 1);
 	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.3, 0, 1);
 	
-	static Option siteDim = new NumericalOption("siteDim", "Alignment", "Width and height of an aligned site", 20, 1, 100);
+	static Option siteHeight = new NumericalOption("siteHeight", "Alignment", "Height of an aligned site", 20, 1, 100);
+	static Option siteMinWidth = new NumericalOption("siteDim", "siteMinWidth", "Minimum width of an aligned site", 15, 1, 100);
 	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50);
 	static Option colourings;
 	
@@ -131,6 +132,8 @@ public class OptionsAPI {
 		
 		if (!isReady()) return "{}";
 		
+		// Clear it so it stops rendering
+		graphicalObjects = null;
 		
 		try {
 		
@@ -159,26 +162,26 @@ public class OptionsAPI {
 			JSONArray objs = new JSONArray();
 			
 			
-			double ntWidth = ((NumericalOption)siteDim).getVal();
-			if (ntWidth > 0) {
-				height = ntWidth * AlignmentAPI.getNtaxa();
+			// Height of taxa
+			double ntHeight = ((NumericalOption)siteHeight).getVal();
+			if (ntHeight > 0) {
+				height = ntHeight * AlignmentAPI.getNtaxa();
 			}
 			
-			// Taxa?
+			// Width of taxa
 			if (AlignmentAPI.isReady()) {
 				
+			
+			
+				// Taxa
 				double x0 = xdivide1*width + ((NumericalOption)taxaSpacing).getVal();
-				
 				JSONArray taxa = AlignmentAPI.getTaxaGraphics(x0, xdivide2*width, 0, height);
 				objs.putAll(taxa);
 				
-			}
-			
-			// Alignment?
-			if (AlignmentAPI.isReady()) {
-				
-				
-				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height);
+	
+				// Alignment
+				double minWidth = ((NumericalOption)siteMinWidth).getVal();
+				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth);
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());
@@ -206,8 +209,8 @@ public class OptionsAPI {
 	 * @return
 	 */
 	public static String getGraphics() {
-		if (graphicalObjects == null || graphicalObjects.length() == 0) return new JSONArray().toString();
 		
+		if (graphicalObjects == null || graphicalObjects.length() == 0) return new JSONArray().toString();
 
 		
 		// Keep adding to the string until the string is too large

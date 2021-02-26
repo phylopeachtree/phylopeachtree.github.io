@@ -199,7 +199,7 @@ public class Alignment {
 	 * Get graphics of the alignment
 	 * @return
 	 */
-	public JSONArray getAlignmentGraphics(Scaling scaling) {
+	public JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth) {
 		
 		
 		
@@ -210,11 +210,11 @@ public class Alignment {
 		double y = scaling.ymin();
 		System.out.println("sequence: " + dy);
 		for (Sequence sequence : sequences) {
-			
+
 			
 			//long start = Calendar.getInstance().getTimeInMillis();
 			
-			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, colouring, filtering));
+			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, minNtWidth, colouring, filtering));
 			
 			//long finish = Calendar.getInstance().getTimeInMillis();
 			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");

@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.colourings.Colouring;
+import peachtree.options.NumericalOption;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 
@@ -102,13 +103,27 @@ public class AlignmentAPI {
 	 * @param xmin
 	 * @return
 	 */
-	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax) {
+	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth) {
+		
+		
+		
+		// Ensure that sites do not go below the minimum width
+		double ntWidth = (xmax - xmin) / AlignmentAPI.getNsitesDisplayed();
+		if (ntWidth < minNtWidth) {
+			
+			// How many sites can fit?
+			//int nsites = (int) Math.floor((xmax - xmin) / minNtWidth);
+			//System.out.println("can fit " + nsites + " sites at " + minNtWidth + " each in a box of width " + (xmax - xmin));
+			
+			//xmax = xmin + minNtWidth*nsites;
+		}
+		
 		
 		// Switch ymax and ymin for js
-		Scaling scaling = new Scaling(0, 1, 0, 1, xmin, xmax, ymin, ymax);
+		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 		
-		return THE_ALIGNMENT.getAlignmentGraphics(scaling);
+		return THE_ALIGNMENT.getAlignmentGraphics(scaling, minNtWidth);
 	}
 	
 	
@@ -124,7 +139,7 @@ public class AlignmentAPI {
 	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax) {
 		
 		// Switch ymax and ymin for js
-		Scaling scaling = new Scaling(0, 1, 0, 1, xmin, xmax, ymin, ymax);
+		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 				
 		return THE_ALIGNMENT.getTaxaGraphics(scaling);

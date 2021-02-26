@@ -123,6 +123,9 @@ public class Sequence {
 		
 		double yc_text = scaling.scaleY(y + height/2);
 		
+		// Do not plot beyond the edge
+		if (!scaling.inRangeY(yc_text)) return arr;
+		
 		/// Plot accession
 		JSONObject acc_json = new JSONObject();
 		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_text);
@@ -144,7 +147,7 @@ public class Sequence {
 	 * @param y
 	 * @return
 	 */
-	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, Colouring colouring, Filtering filtering) {
+	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, double minNtWidth, Colouring colouring, Filtering filtering) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -160,21 +163,35 @@ public class Sequence {
 		
 		
 		double dx = (scaling.xmax() - scaling.xmin()) / numSites;
-		double dxScaled = scaling.scaleX(dx) + 1; // Add 1 to avoid white space between sites
+		double dxScaled = (scaling.scaleX(dx*2) - scaling.scaleX(dx)) + 1; // Add 1 to avoid white space between sites
+		if (dxScaled < minNtWidth) {
+			numSites = (int) Math.floor((scaling.canvasMaxX() - scaling.canvasMinX()) / minNtWidth);
+			dx = (scaling.xmax() - scaling.xmin()) / numSites;
+			dxScaled =  (scaling.scaleX(dx*2) - scaling.scaleX(dx)) + 1;
+			//System.out.println("nsites = " + numSites + " at width " + minNtWidth + " dx " + dx + " scaled " + dxScaled);
+		}
 		double heightScaled = scaling.scaleY(height) + 1;
 		double x = scaling.xmin();
 		double yc_rect = scaling.scaleY(y);
 		double yc_text = scaling.scaleY(y + height/2);
+		
+		if (!scaling.inRangeY(yc_rect)) return arr;
 		
 		
 		
 		// Plot sites
 		JSONObject nt_bg, nt_font;
 		for (int site : filtering.getSites()) {
+
+			
 			
 			String symbol = this.getSymbol(site);
 			
 			double xc = scaling.scaleX(x);
+			
+			
+			// Do not plot beyond the edge
+			if (!scaling.inRangeX(xc)) break;
 			
 			
 			// Background colour

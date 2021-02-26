@@ -1,6 +1,9 @@
 
 
 
+CANCEL_GRAPHICS = false;
+
+
 function initGraphics(){
 	
 	
@@ -173,6 +176,7 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 			svg.addClass("resizing");
 	};
 	options.stop = function(event, ui){
+		CANCEL_GRAPHICS = true;
 		svg.removeClass("resizing");
  		var newValue;
  		if (xAxis) {
@@ -192,6 +196,7 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 
 
 			//console.log("done", val);
+			CANCEL_GRAPHICS = false;
 			renderGraphics();
 			
 		});
@@ -227,6 +232,11 @@ function makeDraggable(evt) {
 
 
 function plotNextObject(svg, iteration = 0){
+
+	if (CANCEL_GRAPHICS){
+		CANCEL_GRAPHICS = false;
+		return;
+	}
 
 	cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
 								

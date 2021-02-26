@@ -50,34 +50,36 @@ function renderGraphics(){
 				var svg = $("#svg");
 				const padding = 0;
 
-				svg.html("");
-				svg.height(initialVal.height);
-				svg.width(initialVal.width);
 
-				svg.parent().height(initialVal.height + padding);
-				svg.parent().width(initialVal.width + padding);
+				var width = initialVal.xboundaries.width;
+				var height = initialVal.yboundaries.height;
+
+				svg.html("");
+				svg.height(height);
+				svg.width(width);
+
+				svg.parent().height(height + padding);
+				svg.parent().width(width + padding);
 
 
 				// Create top layer draggable
-				var draggable = document.createElementNS('http://www.w3.org/2000/svg', "g");
 				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
 				svg.append(mainGroup);
-				svg.append(draggable);
-				draggable.setAttribute("id", "draggableG")
-
-				
-				
 
 
+				// Add the boundaries
+				for (var xboundary in initialVal.xboundaries){
+					console.log("x", xboundary);
+					var contained = xboundary != "width";
+					createDraggableStick(svg, initialVal.xboundaries[xboundary], xboundary, true, contained);
+				}
+				for (var yboundary in initialVal.yboundaries){
+					console.log("y", yboundary);
+					var contained = yboundary != "height";
+					createDraggableStick(svg, initialVal.yboundaries[yboundary], yboundary, false, contained);
+				}
 
-				// 2 draggable stick canvases
-				var treeTaxonBoundary = initialVal.division1;
-				var taxonAlignmentBoundary = initialVal.division2;
-				createDraggableStick(svg, treeTaxonBoundary, "division1");
-				createDraggableStick(svg, taxonAlignmentBoundary, "division2");
 
-				
-		
 
 
 
@@ -121,17 +123,37 @@ function renderGraphics(){
 /*
 	Create a draggable division within the svg
 */
-function createDraggableStick(svg, xPos, id){
+function createDraggableStick(svg, pos, id, xAxis, contained){
 
 
 	$("#" + id).remove();
+	const axis = xAxis ? "x" : "y";
 	const divisionWidth = 2;
+	const padding = 3;
 
 
-	var left = svg.offset().left + xPos;
-	var top = svg.offset().top;
 
-	var stick = $('<canvas/>',{'id':id, 'class':'draggableDivision'}).width(divisionWidth).height(svg.height() + 2);
+	let left, top, height, width;
+
+
+	// Vertical 
+	if (xAxis) {
+		left = svg.offset().left + pos;
+		top = svg.offset().top - padding;
+		width = divisionWidth;
+		height = svg.height() + padding;
+	}
+
+	// Horizontal
+	else{
+		left = svg.offset().left - padding;
+		top = svg.offset().top + pos;
+		width = svg.width() +  padding;
+		height = divisionWidth;
+	}
+	
+
+	var stick = $('<canvas/>',{'id':id, 'class':'draggableDivision ' + axis}).width(width).height(height);
 	stick.offset({left: left, top: top});
 
 	$("#graphics_div").append(stick)
@@ -140,35 +162,46 @@ function createDraggableStick(svg, xPos, id){
 	// Get the canvas
 	var canvas = document.getElementById(id);
 	var ctx = canvas.getContext('2d');
-	ctx.fillStyle = '#696969';
+	ctx.fillStyle = '#aaaaaa';
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-	// Make it draggable
-	$("#" + id).draggable({
-		axis: "x", 
-		containment: svg.parent(),
-		start: function(){
+
+	// Draggable options
+	const options = {axis: axis}
+	if (contained) options.cotainment = svg.parent();
+	options.start = function(){
 			svg.addClass("resizing");
-		},
-		stop: function(event, ui){
-			svg.removeClass("resizing");
-     		var x = $(this).offset().left - svg.offset().left;
-     		x = x / svg.width();
-     		console.log('new value', x);
+	};
+	options.stop = function(event, ui){
+		svg.removeClass("resizing");
+ 		var newValue;
+ 		if (xAxis) {
+ 			newValue = $(this).offset().left - svg.offset().left;
+ 		}else{
+ 			newValue = $(this).offset().top - svg.offset().top;
+ 		}
 
-     		// Set options
-			cjCall("peachtree.options.OptionsAPI", "setOption", id, x).then(function(val){
-				
+ 		
+ 		if (contained && xAxis) newValue = newValue / svg.width();
+ 		if (contained && !xAxis) newValue = newValue / svg.height();
+ 		console.log('new value', newValue);
+
+ 		// Set options
+		cjCall("peachtree.options.OptionsAPI", "setOption", id, newValue).then(function(val){
+			
 
 
-				//console.log("done", val);
-				renderGraphics();
-				
-			});
+			//console.log("done", val);
+			renderGraphics();
+			
+		});
 
-     		
-		} 
-	});
+ 		
+	} 
+
+
+	// Make it draggable
+	$("#" + id).draggable(options);
 
 
 

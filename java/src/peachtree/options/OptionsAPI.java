@@ -141,10 +141,19 @@ public class OptionsAPI {
 			JSONObject json = new JSONObject();
 			double width = ((NumericalOption)canvasWidth).getVal();
 			double height = ((NumericalOption)canvasHeight).getVal();
-			json.put(canvasWidth.getName(), width);
-			json.put(canvasHeight.getName(), height);
-			json.put(division1.getName(), xdivide1*width);
-			json.put(division2.getName(), xdivide2*width);
+			
+			
+			// x-boundary objects
+			JSONObject xboundaries = new JSONObject();
+			xboundaries.put(canvasWidth.getName(), width);
+			xboundaries.put(division1.getName(), xdivide1*width);
+			xboundaries.put(division2.getName(), xdivide2*width);
+			json.put("xboundaries", xboundaries);
+			
+			// y-boundary objects
+			JSONObject yboundaries = new JSONObject();
+			yboundaries.put(canvasHeight.getName(), height);
+			json.put("yboundaries", yboundaries);
 			
 			
 			JSONArray objs = new JSONArray();

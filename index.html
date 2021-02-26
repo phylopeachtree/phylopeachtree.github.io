@@ -7,9 +7,15 @@
     <script src="https://cjrtnc.leaningtech.com/2.1/loader.js"></script>
 	<!--<script src="https://cjrtnc.leaningtech.com/20200727/loader.js"></script>-->
 	
-	
+	<!--
 	<script language='JavaScript' type='text/JavaScript' src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"> </script>
+	-->
+
+  	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
 	
 	<script language='JavaScript' type='text/JavaScript' src="js/util.js"></script>
 	<script language='JavaScript' type='text/JavaScript' src="js/graphics.js"></script>
@@ -41,6 +47,8 @@
 
 			
 			//addLoader("#aln_upload_title");
+
+			 
 		
 	  
 	  
@@ -53,9 +61,9 @@
   
 	<div id="main">
 	
-		
-		<h1 style="text-align:center"> PEACHTree </h1>
-		
+		<div id="mainHeader"  style="text-align:center">
+			<h1> PEACHTree </h1>
+		</div>
 		
 		
 		
@@ -97,11 +105,13 @@
 		
 		<div id="graphics_div" style="display:none"/>
 		
-			<svg id="svg" overflow="auto">
+			<div id="svgouter">
+				<svg id="svg">
 			
 			
 			
-			</svg>
+				</svg>
+			</div>
 
 
 			<h2>Fun facts</h2>

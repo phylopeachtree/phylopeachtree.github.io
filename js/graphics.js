@@ -48,10 +48,14 @@ function renderGraphics(){
 
 				// Prepare svg width/height
 				var svg = $("#svg");
+				const padding = 0;
+
 				svg.html("");
 				svg.height(initialVal.height);
 				svg.width(initialVal.width);
 
+				svg.parent().height(initialVal.height + padding);
+				svg.parent().width(initialVal.width + padding);
 
 
 				// Create top layer draggable
@@ -61,12 +65,21 @@ function renderGraphics(){
 				svg.append(draggable);
 				draggable.setAttribute("id", "draggableG")
 
+				
+				
 
 
-				// Sticks
-				var taxonAlignmentBoundary = initialVal.taxon_alignment_boundary
-				var stick = {ele: "line", x1: taxonAlignmentBoundary, y1: 0, x2: taxonAlignmentBoundary, y2: initialVal.height, stroke:"#666", stroke_width:1.5};
-				drawSVGobj(draggable, stick);
+
+				// 2 draggable stick canvases
+				var treeTaxonBoundary = initialVal.division1;
+				var taxonAlignmentBoundary = initialVal.division2;
+				createDraggableStick(svg, treeTaxonBoundary, "division1");
+				createDraggableStick(svg, taxonAlignmentBoundary, "division2");
+
+				
+		
+
+
 
 
 				// Other meta info
@@ -102,6 +115,66 @@ function renderGraphics(){
 	
 	
 }
+
+
+
+/*
+	Create a draggable division within the svg
+*/
+function createDraggableStick(svg, xPos, id){
+
+
+	$("#" + id).remove();
+	const divisionWidth = 2;
+
+
+	var left = svg.offset().left + xPos;
+	var top = svg.offset().top;
+
+	var stick = $('<canvas/>',{'id':id, 'class':'draggableDivision'}).width(divisionWidth).height(svg.height() + 2);
+	stick.offset({left: left, top: top});
+
+	$("#graphics_div").append(stick)
+	
+
+	// Get the canvas
+	var canvas = document.getElementById(id);
+	var ctx = canvas.getContext('2d');
+	ctx.fillStyle = '#696969';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	// Make it draggable
+	$("#" + id).draggable({
+		axis: "x", 
+		containment: svg.parent(),
+		start: function(){
+			svg.addClass("resizing");
+		},
+		stop: function(event, ui){
+			svg.removeClass("resizing");
+     		var x = $(this).offset().left - svg.offset().left;
+     		x = x / svg.width();
+     		console.log('new value', x);
+
+     		// Set options
+			cjCall("peachtree.options.OptionsAPI", "setOption", id, x).then(function(val){
+				
+
+
+				//console.log("done", val);
+				renderGraphics();
+				
+			});
+
+     		
+		} 
+	});
+
+
+
+
+}
+
 
 /*
 function makeDraggable(evt) {

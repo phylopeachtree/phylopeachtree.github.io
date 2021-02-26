@@ -105,6 +105,38 @@ public class Sequence {
 	}
 
 	
+	
+	/**
+	 * Get taxon graphics
+	 * @param scaling
+	 * @param y
+	 * @param height
+	 * @param filtering
+	 * @return
+	 */
+	public JSONArray getTaxonGraphics(Scaling scaling, double y, double height, Filtering filtering) {
+		
+		JSONArray arr = new JSONArray();
+		
+		// Should this sequence be included?
+		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
+		
+		double yc_text = scaling.scaleY(y + height/2);
+		
+		/// Plot accession
+		JSONObject acc_json = new JSONObject();
+		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_text);
+		acc_json.put("text_anchor", "start"); 
+		acc_json.put("value", this.getAcc());
+		acc_json.put("title", this.getAcc());
+		arr.put(acc_json);
+		
+		
+		return arr;
+		
+	}
+	
+	
 	/**
 	 * Create JSON object of all elements in this sequence
 	 * @param xmin
@@ -112,7 +144,7 @@ public class Sequence {
 	 * @param y
 	 * @return
 	 */
-	public JSONArray getGraphics(Scaling scaling, double y, double height, Colouring colouring, Filtering filtering) {
+	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, Colouring colouring, Filtering filtering) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -133,7 +165,6 @@ public class Sequence {
 		double x = scaling.xmin();
 		double yc_rect = scaling.scaleY(y);
 		double yc_text = scaling.scaleY(y + height/2);
-		
 		
 		
 		
@@ -174,13 +205,7 @@ public class Sequence {
 			
 		}
 		
-		
-		/// Plot accession
-		JSONObject acc_json = new JSONObject();
-		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_text);
-		acc_json.put("text_anchor", "end"); // Right alignment
-		acc_json.put("value", this.getAcc());
-		arr.put(acc_json);
+	
 		
 		
 		return arr;

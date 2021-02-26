@@ -22,9 +22,11 @@ public class OptionsAPI {
 	
 	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
 	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 700, 100, 2000);
-	static Option division  = new NumericalOption("division", "General", "Relative position of the tree/alignment boundary", 0.2, 0, 1);
+	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.1, 0, 1);
+	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.3, 0, 1);
 	
 	static Option siteDim = new NumericalOption("siteDim", "Alignment", "Width and height of an aligned site", 20, 1, 100);
+	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50);
 	static Option colourings;
 	
 	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 20, 1, 100);
@@ -37,11 +39,6 @@ public class OptionsAPI {
 	public static void init() throws Exception {
 		
 		graphicalObjects = null;
-		
-		
-
-		
-		
 		
 		
 	}
@@ -81,6 +78,50 @@ public class OptionsAPI {
 	
 	
 	/**
+	 * Set the value of this option
+	 * @param id
+	 * @param value
+	 */
+	public static String setOption(String id, String value) {
+		
+		
+		try {
+			
+			// Find the option
+			Option option = null;
+			for (Option o : getOptionList()) {
+				if (o.getName().equals(id)) {
+					option = o;
+					break;
+				}
+			}
+			
+			if (option == null) {
+				System.out.println("Cannot find option " + id);
+			}else {
+				
+				
+				if (option instanceof NumericalOption) {
+					((NumericalOption)option).setVal(Double.parseDouble(value));
+				}
+				
+				// TODO
+				
+				
+			}
+				
+		}catch(Exception e){
+			e.printStackTrace();
+			return getErrorJSON(e);
+		}
+		
+		
+		return "{}";
+		
+	}
+	
+	
+	/**
 	 * Generate all objects. Now ready - to render onto the svg
 	 * Return canvas width and height but do not return any of the objects until getGraphics is called
 	 * @return
@@ -94,27 +135,41 @@ public class OptionsAPI {
 		try {
 		
 			// Bounds
-			double xdivide = ((NumericalOption)division).getVal();
+			double xdivide1 = ((NumericalOption)division1).getVal();
+			double xdivide2 = ((NumericalOption)division2).getVal();
 			
 			JSONObject json = new JSONObject();
 			double width = ((NumericalOption)canvasWidth).getVal();
 			double height = ((NumericalOption)canvasHeight).getVal();
 			json.put(canvasWidth.getName(), width);
 			json.put(canvasHeight.getName(), height);
-			json.put("taxon_alignment_boundary", xdivide*width);
+			json.put(division1.getName(), xdivide1*width);
+			json.put(division2.getName(), xdivide2*width);
 			
 			
 			JSONArray objs = new JSONArray();
 			
+			
+			double ntWidth = ((NumericalOption)siteDim).getVal();
+			if (ntWidth > 0) {
+				height = ntWidth * AlignmentAPI.getNtaxa();
+			}
+			
+			// Taxa?
+			if (AlignmentAPI.isReady()) {
+				
+				double x0 = xdivide1*width + ((NumericalOption)taxaSpacing).getVal();
+				
+				JSONArray taxa = AlignmentAPI.getTaxaGraphics(x0, xdivide2*width, 0, height);
+				objs.putAll(taxa);
+				
+			}
+			
 			// Alignment?
 			if (AlignmentAPI.isReady()) {
 				
-				double ntWidth = ((NumericalOption)siteDim).getVal();
-				if (ntWidth > 0) {
-					height = ntWidth * AlignmentAPI.getNtaxa();
-				}
 				
-				JSONArray alignment = AlignmentAPI.getGraphics(xdivide*width, width, 0, height, ntWidth);
+				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height);
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());
@@ -186,6 +241,37 @@ public class OptionsAPI {
 
 	
 	
+	
+	/**
+	 * Get a list of options
+	 * @return
+	 * @throws Exception
+	 */
+	private static List<Option> getOptionList() throws Exception{
+		
+		prepareColourings();
+		
+		
+		// Introspectively find all options and add them to the list of options
+		List<Option> options = new ArrayList<>();
+		Field[] fields = OptionsAPI.class.getDeclaredFields();
+		for (Field field: fields) {
+			
+			if (field.getType().equals(Option.class)) {
+				try {
+					Option option = (Option) field.get(null);
+					options.add(option);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+			}
+		}
+		
+		return options;
+		
+	}
+	
+	
 	/**
 	 * Get the list of visual settings as a json string
 	 * @return
@@ -193,28 +279,10 @@ public class OptionsAPI {
 	public static String getOptions() {
 		
 		try {
-			prepareColourings();
-			
-			
-			// Introspectively find all options and add them to the list of options
-			List<Option> options = new ArrayList<>();
-			Field[] fields = OptionsAPI.class.getDeclaredFields();
-			for (Field field: fields) {
-				
-				if (field.getType().equals(Option.class)) {
-					try {
-						Option option = (Option) field.get(null);
-						options.add(option);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} 
-				}
-			}
-			
 			
 			
 			JSONArray arr = new JSONArray();
-			for (Option option : options) {
+			for (Option option : getOptionList()) {
 				arr.put(option.toJSON());
 			}
 			return arr.toString();

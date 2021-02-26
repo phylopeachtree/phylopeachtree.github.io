@@ -102,14 +102,33 @@ public class AlignmentAPI {
 	 * @param xmin
 	 * @return
 	 */
-	public static JSONArray getGraphics(double xmin, double xmax, double ymin, double ymax, double ntWidth) {
+	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax) {
 		
 		// Switch ymax and ymin for js
 		Scaling scaling = new Scaling(0, 1, 0, 1, xmin, xmax, ymin, ymax);
 		
-
 		
-		return THE_ALIGNMENT.getGraphics(scaling);
+		return THE_ALIGNMENT.getAlignmentGraphics(scaling);
+	}
+	
+	
+	
+	/**
+	 * Get the graphics for the taxa
+	 * @param xmin
+	 * @param xmax
+	 * @param ymin
+	 * @param ymax
+	 * @return
+	 */
+	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax) {
+		
+		// Switch ymax and ymin for js
+		Scaling scaling = new Scaling(0, 1, 0, 1, xmin, xmax, ymin, ymax);
+		
+				
+		return THE_ALIGNMENT.getTaxaGraphics(scaling);
+		
 	}
 
 

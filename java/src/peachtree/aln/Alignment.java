@@ -197,27 +197,24 @@ public class Alignment {
 
 	/**
 	 * Get graphics of the alignment
-	 * @param xmin
-	 * @param xmax
-	 * @param ymin
-	 * @param ymax
 	 * @return
 	 */
-	public JSONArray getGraphics(Scaling scaling) {
+	public JSONArray getAlignmentGraphics(Scaling scaling) {
 		
 		
 		
 		
 		JSONArray objs = new JSONArray();
 		
-		double dy = (scaling.ymax() - scaling.ymin()) / this.sequences.size();
+		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
 		double y = scaling.ymin();
+		System.out.println("sequence: " + dy);
 		for (Sequence sequence : sequences) {
 			
 			
 			//long start = Calendar.getInstance().getTimeInMillis();
 			
-			objs.putAll(sequence.getGraphics(scaling, y, dy, colouring, filtering));
+			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, colouring, filtering));
 			
 			//long finish = Calendar.getInstance().getTimeInMillis();
 			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
@@ -228,7 +225,35 @@ public class Alignment {
 		
 		
 	}
-
+	
+	
+	/**
+	 * Get taxa graphics
+	 * @return
+	 */
+	public JSONArray getTaxaGraphics(Scaling scaling) {
+		
+		JSONArray objs = new JSONArray();
+		
+		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
+		double y = scaling.ymin();
+		System.out.println("taxa: " + dy);
+		for (Sequence sequence : sequences) {
+			
+			
+			//long start = Calendar.getInstance().getTimeInMillis();
+			
+			objs.putAll(sequence.getTaxonGraphics(scaling, y, dy, filtering));
+			
+			//long finish = Calendar.getInstance().getTimeInMillis();
+			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
+			y += dy;
+		}
+		
+		return objs;
+		
+		
+	}
 
 	public int getLength() {
 		if (this.sequences == null) return 0;

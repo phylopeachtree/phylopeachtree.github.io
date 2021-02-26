@@ -20,6 +20,7 @@ public class Filtering {
 	List<Integer> sitesToIncludeList;
 	
 	int numSites;
+	int numTaxa;
 	
 	public Filtering(boolean variantSitesOnly, List<Taxon> taxaToInclude, Alignment alignment) {
 		this.variantSitesOnly = variantSitesOnly;
@@ -31,6 +32,9 @@ public class Filtering {
 			for (Taxon taxon: taxaToInclude) {
 				taxaIDsToInclude.put(taxon.getID(), true);
 			}
+			numTaxa = taxaIDsToInclude.size();
+		}else {
+			numTaxa = alignment.getNtaxa();
 		}
 		
 		
@@ -148,6 +152,15 @@ public class Filtering {
 	 */
 	public int getNumSites() {
 		return numSites;
+	}
+
+
+	/**
+	 * Number of sequences included by filter
+	 * @return
+	 */
+	public int getNumSeqs() {
+		return numTaxa;
 	}
 	
 	

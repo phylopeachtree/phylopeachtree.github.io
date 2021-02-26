@@ -46,11 +46,10 @@ body {
 
 
 .loader {
-	%border: 0.1em solid white; 
-	border-top: 0.25em solid white; 
-	border-bottom: 0.25em solid white; 
-	border-left: 0.25em solid #8eab12; 
-	border-right: 0.25em solid #8eab12; 
+	border-top: 0.25em solid #565656; 
+	border-bottom: 0.25em solid #565656; 
+	border-left: 0.25em solid #FFDAB9; 
+	border-right: 0.25em solid #FFDAB9; 
 	border-radius: 100%;
 	width: 0.5em;
 	height: 0.5em;
@@ -78,8 +77,8 @@ body {
 
 
 .uploader.dz-drag-hover, .uploader:hover {
-	background-color:#8eab12;
-	color: white;
+	background-color:#FFDAB9;
+	color: #565656;
 }
 
 .uploader > div {
@@ -98,8 +97,9 @@ body {
 
 #upload_div, #graphics_div{
 	text-align:center;
-	margin: 1em 5em;
+	margin: 1em 0em;
 }
+
 
 
 
@@ -139,8 +139,8 @@ body {
 
 
 .button:hover{
-	color:white;
-	background-color:#8eab12; %green
+	color:#565656;
+	background-color:#FFDAB9; %peach
 }
 
 .button.disabled:hover {
@@ -148,11 +148,24 @@ body {
 }
 
 
+#svgouter{
+	text-align:center;
+	width:0;
+	height:0;
+ 	border:2px solid #000;
+    %overflow: scroll;
+}
+
 
 
 #svg{
-	border-width:2px;
-	border-style: solid;
+	%border-width:1px;
+	%border-style: dotted;
+}
+
+
+#svg.resizing{
+	 opacity: 0.5;
 }
 
 
@@ -161,9 +174,6 @@ body {
 	dominant-baseline:middle; 
 }
 
-#svg #draggableG{
-	cursor:ew-resize;
-}
 
 /* Tabs
 	http://jsfiddle.net/csDP9/9/s 
@@ -257,4 +267,9 @@ ul.tabs li.active:hover::after {
 	padding:5px;
 	margin-top:18px;
 
+}
+
+.draggableDivision{
+	position:absolute;
+	cursor:ew-resize;
 }

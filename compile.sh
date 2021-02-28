@@ -30,7 +30,8 @@ for d in ${deps[@]}; do
 	if [ ! -f "$d.js" ];  then
 		echo "Compiling $d library..."
 		cp java/lib/$d .
-		~/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon $d
+		#~/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon $d
+		../cheerpj/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon $d
 	fi
 
 done
@@ -40,8 +41,8 @@ done
 #:../lib/annotations-2.0.1.jar:../lib/guava-15.0.jar:../lib/javassist-3.19.0-GA.jar:../lib/reflections-0.9.10.jar
 
 echo "Compiling jar into js..."
-~/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon peachtree.jar
-
+#~/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon peachtree.jar
+../cheerpj/cheerpj_2.1/cheerpjfy.py --deps $depsSepByColon peachtree.jar
 
 
 

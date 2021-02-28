@@ -19,6 +19,7 @@ public class Sequence {
 	Taxon taxon;
 	StringBuilder sequence;
 	int[] sequenceArr;
+	int seqLen;
 	boolean isNucleotide;
 	
 	
@@ -33,10 +34,14 @@ public class Sequence {
 		
 		// Is it nucleotide or amino acid?
 		this.isNucleotide = true;
-		//String[] sites = this.sequence.split("");
+		seqLen = 0;
 		for (int i = 0; i < seq.length(); i ++) {
 			
 			String c = seq.substring(i, i+1);
+			if (c.equals("\r") || c.equals("\n")) continue;
+			seqLen ++;
+			
+			
 			boolean isNT = Alignment.nt_chars.containsKey(c);
 			
 			if (!isNT) {
@@ -53,17 +58,22 @@ public class Sequence {
 	/**
 	 * Prepare int array of the sequence
 	 */
-	public void prepareArray() {
-		this.sequenceArr = new int[this.sequence.length()];
-		for (int i = 0; i < this.sequenceArr.length; i ++) {
+	public void prepareArray() throws Exception {
+		System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
+		System.out.println("'" + this.sequence + "'");
+		this.sequenceArr = new int[this.seqLen];
+		for (int i = 0; i < this.seqLen; i ++) {
 			String site = this.sequence.substring(i, i+1);
-			int val;
+			Integer val;
 			if (this.isNucleotide) {
 				val = Alignment.nt_chars.get(site);
 			}else {
 				val = Alignment.alpha_chars.get(site);
 			}
 			//System.out.println("putting " + val + " at site " + i + " for symbol " + site);
+			if (val == null) {
+				throw new Exception("Unknown character " + site + " at site " + (i+1) + " in " + this.getAcc());
+			}
 			this.sequenceArr[i] = val;
 		}
 	}
@@ -93,7 +103,7 @@ public class Sequence {
 	}
 
 	public int getLength() {
-		return this.sequence.length();
+		return this.seqLen;
 	}
 
 	public boolean isNucleotide() {
@@ -155,7 +165,6 @@ public class Sequence {
 		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
 		
 		
-		int seqLen = this.sequence.length();
 		int numSites = filtering == null ? seqLen : filtering.getNumSites();
 		
 		//System.out.println("Displaying " + numSites + " sites");

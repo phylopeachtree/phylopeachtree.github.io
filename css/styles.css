@@ -301,7 +301,7 @@ ul.tabs li.active:hover::after {
 }
 
 .optionsBox{
-	max-width: 300px;
+	max-width: 250px;
 	text-align:center;
 }
 
@@ -373,5 +373,36 @@ ul.tabs li.active:hover::after {
   background: white;
   cursor: pointer;
 }
+
+
+
+
+.dropdown{
+	border: 1px solid black;
+	border-radius: 5px;
+	padding:5;
+	background-color:white;
+}
+
+
+.dropdown:after{
+	width: 0; 
+	height: 0; 
+	position: absolute;
+	top: 40%;
+	right: 5px;
+	content: "";
+	z-index: 98;
+}
+
+.dropdown select{
+	border: 0;
+	position: relative;
+	z-index: 99;
+	background: none;
+	width: 250px;
+}
+
+
 
 

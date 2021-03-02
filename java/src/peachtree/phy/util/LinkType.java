@@ -9,5 +9,4 @@ public enum LinkType {
 	
 	single, complete, upgma, mean, centroid, adjcomplete, neighborjoining
 	
-
 }

@@ -28,7 +28,7 @@ public class OptionsAPI {
 	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
 	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
-	
+	static Option treeMethods;
 	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 20, 1);
 	
 	
@@ -41,7 +41,7 @@ public class OptionsAPI {
 	static Option colourings;
 	
 	
-	static Option treeMethods;
+	
 	
 		
 	static List<Class<? extends Colouring>> colouringClasses;
@@ -54,7 +54,7 @@ public class OptionsAPI {
 		
 		
 		
-		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for building trees", LinkType.neighborjoining, LinkType.values());
+		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
 		
 	}
 	
@@ -146,7 +146,11 @@ public class OptionsAPI {
 	public static String buildTree() {
 		
 		try {
-			return PhylogenyAPI.buildTree(AlignmentAPI.getAlignment(), LinkType.neighborjoining);
+			
+			LinkType method = LinkType.valueOf(((DiscreteOption)treeMethods).getVal().toString());
+			System.out.println("building tree from " + method.toString());
+			
+			return PhylogenyAPI.buildTree(AlignmentAPI.getAlignment(), method);
 		} catch (Exception e) {
 			return getErrorJSON(e);
 		}

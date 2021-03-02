@@ -174,22 +174,41 @@ function renderOptions(){
 					
 					if (opt.type == "NumericalOption"){
 						
-						// Options html
+						// Range slider html
 						optionsHTML += `
 						<div class="optionsBox">
-							
+							` + opt.title + ` (` + opt.value + `)
 							<div class="slidecontainer">
 								 <input onChange="setOptionFromEle(this)" type="range" min="` + opt.min + `" max="` + opt.max + `" value="` + opt.value + `" step="` + opt.step + `" class="slider" var="` + opt.name + `">
 							</div>
-							` + opt.title + ` (` + opt.value + `)
 						</div>`;
 						
 					}
 					
 					
-
-					
-					
+					if (opt.type == "DiscreteOption"){
+						
+						
+						let dropdownOptionsHTML = "";
+						for (let j = 0; j < opt.domain.length; j ++){
+							dropdownOptionsHTML += `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
+						}
+						
+						
+						// Dropdown html
+						optionsHTML += `
+						<div class="optionsBox">
+							` + opt.title + `
+							<div class="dropdown">
+								  <select <input onChange="setOptionFromEle(this)" var="` + opt.name + `">
+								  ` + dropdownOptionsHTML + `
+								  </select>
+							</div>
+						</div>`;
+						
+						
+					}
+		
 					
 				}
 			}

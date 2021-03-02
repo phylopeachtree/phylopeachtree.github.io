@@ -21,7 +21,6 @@ public class ClusterTree extends Tree {
 	
 	
 	
-	Alignment alignment;
 	LinkType linkType;
 	
 	List<String> taxaNames;
@@ -37,15 +36,18 @@ public class ClusterTree extends Tree {
 		this.linkType = linkType;
 		
 		// Method
-		distanceIsBranchLength = linkType == LinkType.neighborjoining || linkType == LinkType.neighborjoining2;
+		distanceIsBranchLength = linkType == LinkType.neighborjoining;
 		
 		final Node root = buildClusterer();
 		this.setRoot(root);
 		
-		// Set tip dates to zero
-        final Node[] nodes = getNodesAsArray();
-        for (int i = 0; i < getLeafNodeCount(); i++) {
-            nodes[i].setHeight(0);
+		// Ensure that last tip is at 0
+		double latestTip = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < this.nodes.length; i++) {
+        	latestTip = Math.min(latestTip, this.nodes[i].getHeight());
+        }
+        for (int i = 0; i < this.nodes.length; i++) {
+        	this.nodes[i].setHeight(this.nodes[i].getHeight() - latestTip);
         }
         
         super.initArray();
@@ -80,11 +82,14 @@ public class ClusterTree extends Tree {
 
         // used for keeping track of hierarchy
         final NodeX[] clusterNodes = new NodeX[taxonCount];
-        if (linkType == LinkType.neighborjoining || linkType == LinkType.neighborjoining2) {
+
+        // Build the tree
+        if (linkType == LinkType.neighborjoining) {
             neighborJoining(clusters, clusterID, clusterNodes);
         } else {
             doLinkClustering(clusters, clusterID, clusterNodes);
         }
+        
         
 
         // move all clusters in m_nClusterID array
@@ -311,7 +316,7 @@ public class ClusterTree extends Tree {
             node.m_right(clusterNodes[min2]);
             clusterNodes[min2].m_parent(node);
         }
-        if (distanceIsBranchLength) {
+        if (this.distanceIsBranchLength) {
             node.setLength(dist1, dist2);
         } else {
             node.setHeight(dist1, dist2);

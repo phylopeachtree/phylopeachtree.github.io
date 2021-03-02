@@ -4,16 +4,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import peachtree.aln.Filtering;
+import peachtree.options.Scaling;
+
 
 public class Node {
 
 	
 	int nodeNr;
+	String acc;
 	double height;
 	Node parent;
 	List<Node> children;
 	
 	public Node() {
+		this.acc = "";
 		this.nodeNr = 0;
 		this.height = 0;
 		this.parent = null;
@@ -21,6 +29,7 @@ public class Node {
 	}
 	
 	public Node(int index) {
+		this.acc = "";
 		this.nodeNr = index;
 		this.height = 0;
 		this.parent = null;
@@ -34,7 +43,12 @@ public class Node {
 	 * @return
 	 */
 	public String getAcc() {
-		return "" + this.nodeNr;
+		if (this.acc.isEmpty()) return "" + (this.nodeNr+1);
+		return this.acc;
+	}
+	
+	public void setAcc(String acc) {
+		this.acc = acc;
 	}
 	
 	
@@ -87,9 +101,6 @@ public class Node {
 	
 	
 	
-	
-	
-	
 	/**
 	 * Is it a leaf
 	 * @return
@@ -139,6 +150,8 @@ public class Node {
 	 */
 	public Node copy() {
 		Node clone = new Node(this.getNr());
+		clone.acc = this.acc;
+		clone.height = this.height;
 		for (Node child : children) {
 			clone.addChild(child.copy());
 		}
@@ -194,6 +207,12 @@ public class Node {
 	}
 	
 
+	@Override
+	public String toString() {
+		return this.toSortedNewick(new int[1], false);
+	}
+	
+	
 	/**
 	 * Print node as a newick
 	 * Adapted from beast2.evolution.tree.Node
@@ -229,9 +248,7 @@ public class Node {
                     buf.append(child1);
                 }
                 buf.append(")");
-                if (getAcc() != null) {
-                    buf.append(nodeNr+1);
-                }
+                //buf.append(this.getAcc());
 
             } else {
                 // General method for >2 children
@@ -266,26 +283,106 @@ public class Node {
                 }
 
                 buf.append(")");
-
-                if (getAcc() != null) {
-                    buf.append(nodeNr + 1);
-                }
+                //buf.append(this.getAcc());
             }
 
         } else {
             maxNodeInClade[0] = nodeNr;
-            buf.append(nodeNr + 1);
+            //buf.append(nodeNr + 1);
         }
 
         if (printMetaData) {
             //buf.append(getNewickMetaData());
         }
 
+        buf.append(this.getAcc());
         buf.append(":");
         //if (printMetaData) buf.append(getNewickLengthMetaData());
         buf.append(getLength());
 
         return buf.toString();
     }
+
+    
+    
+    /**
+     * Get the svg graphics of this subtree
+     * @param dy
+     * @param filtering
+     * @param branchWidth
+     * @return y
+     */
+	public double getGraphics(JSONArray objs, double dy, Filtering filtering, Scaling scaling, double branchWidth) {
+		
+		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
+		
+		double x2 = this.getHeight();
+		double x2Scaled = scaling.scaleX(x2);
+		
+		// If leaf, go with node ordering
+		double y = 0;
+		if (this.isLeaf()) {
+			y = this.getNr() * dy + (0.5*dy);
+		}
+		
+		
+		// If parent node, y is midpoint between children
+		else {
+			
+			
+			double maxY = Double.NEGATIVE_INFINITY;
+			double minY = Double.POSITIVE_INFINITY;
+			for (Node child : this.getChildren()) {
+				double ychild = child.getGraphics(objs, dy, filtering, scaling, branchWidth);
+				y += ychild;
+				if (ychild > maxY) maxY = ychild;
+				if (ychild < minY) minY = ychild;
+			}
+			y = y / this.getChildCount();
+			
+			
+			// Shoulder 
+			if (minY != maxY) {
+				
+				JSONObject shoulder_json = new JSONObject();
+				shoulder_json.put("ele", "line").put("x1", x2Scaled).put("x2", x2Scaled);
+				shoulder_json.put("y1", scaling.scaleY(minY)).put("y2", scaling.scaleY(maxY));
+				shoulder_json.put("stroke_width", branchWidth);
+				shoulder_json.put("stroke", "black");
+				shoulder_json.put("stroke_linecap", "round");
+				objs.put(shoulder_json);
+				
+			}
+			
+			
+		}
+		
+		
+		// Branch
+		if (!this.isRoot()) {
+			
+			
+			double x1 = this.getParent().getHeight();
+			
+			double yscaled = scaling.scaleY(y);
+			
+			// Branch
+			JSONObject branch_json = new JSONObject();
+			branch_json.put("ele", "line").put("x1", scaling.scaleX(x1)).put("x2", x2Scaled);
+			branch_json.put("y1", yscaled).put("y2", yscaled);
+			branch_json.put("stroke_width", branchWidth);
+			branch_json.put("stroke", "black");
+			branch_json.put("stroke_linecap", "round");
+			objs.put(branch_json);
+			
+			
+		}
+		
+		
+		return y;
+		
+	}
+
+
 	
 }

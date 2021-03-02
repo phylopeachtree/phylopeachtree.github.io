@@ -136,7 +136,7 @@ public class AlignmentAPI {
 	 */
 	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax) {
 		
-		// Switch ymax and ymin for js
+		
 		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 				

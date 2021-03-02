@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import peachtree.aln.colourings.Colouring;
 import peachtree.aln.colourings.JalviewNucleotideColouring;
 import peachtree.options.Scaling;
+import peachtree.phy.Node;
+import peachtree.phy.Tree;
 
 public class Alignment {
 	
@@ -251,6 +253,67 @@ public class Alignment {
 	}
 	
 	
+	/**
+	 * Sort the taxa by the tree
+	 * @param tree
+	 */
+	public void sortByTree(Tree tree) throws Exception {
+		
+		
+		Node[] leaves = tree.getLeavesAsArray();
+		
+		// Find a new ordering
+		int[] newOrdering = new int[leaves.length];
+		for (int taxonNr = 0; taxonNr < leaves.length; taxonNr ++) {
+			
+			String accession = leaves[taxonNr].getAcc();
+			
+			// Find the sequence number with this accession
+			int seqIndex = -1;
+			for (int i = 0; i < this.getNtaxa(); i++) {
+				if (this.getSequence(i).getAcc().equals(accession)) {
+					seqIndex = i;
+					break;
+				}
+			}
+			if (seqIndex == -1) {
+				throw new Exception("Cannot find " + accession + " in alignment");
+			}
+			
+			newOrdering[taxonNr] = seqIndex;
+			
+		}
+		
+		
+		
+		
+		// Create new sequence array
+		List<Sequence> sequencesNew = new ArrayList<>();
+		
+		
+		// Reorder the array
+		for (int newIndex = 0; newIndex < leaves.length; newIndex ++) {
+			int oldIndex = newOrdering[newIndex];
+			sequencesNew.add(this.getSequence(oldIndex));
+			
+		}
+		
+		
+		// Point to the new array
+		this.sequences = sequencesNew;
+		
+		// Reinitialise
+		this.filtering = new Filtering(true, null, this);
+		this.initPatterns();
+		
+		
+	}
+	
+	
+	
+
+
+
 	/**
 	 * Alignment colouring
 	 * @param colouring
@@ -553,6 +616,15 @@ public class Alignment {
 	 */
 	public double getPatternWeight(int i) {
 		return this.patternWeights.get(i);
+	}
+
+
+	/**
+	 * Site/taxon filtering
+	 * @return
+	 */
+	public Filtering getFiltering() {
+		return this.filtering;
 	}
 
 

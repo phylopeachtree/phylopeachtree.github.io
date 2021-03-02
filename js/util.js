@@ -211,6 +211,10 @@ function buildTree(){
 			$(btnID).removeClass("disabled");
 			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!");
 			BUILDING_TREE = false;
+			
+			renderGraphics();
+			
+			
 		});
 	}, 1);
 	

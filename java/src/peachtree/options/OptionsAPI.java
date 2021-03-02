@@ -21,23 +21,23 @@ import peachtree.phy.util.LinkType;
 
 public class OptionsAPI {
 	
-
+	static final long CHUNK_SIZE = 30000;
 	
 	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
-	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 700, 100, 2000);
-	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.1, 0, 1);
-	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.3, 0, 1);
+	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000);
+	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1);
+	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1);
 	
 	static Option siteHeight = new NumericalOption("siteHeight", "Alignment", "Height of an aligned site", 20, 1, 100);
-	static Option siteMinWidth = new NumericalOption("siteDim", "siteMinWidth", "Minimum width of an aligned site", 15, 1, 100);
+	static Option siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of an aligned site", 15, 1, 100);
 	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50);
 	static Option colourings;
 	
-	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 20, 1, 100);
+	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 100);
 	
 		
 	static List<Class<? extends Colouring>> colouringClasses;
-	static final long CHUNK_SIZE = 30000;
+	
 	static JSONArray graphicalObjects = null;
 	
 	public static void init() throws Exception {
@@ -187,6 +187,20 @@ public class OptionsAPI {
 				height = ntHeight * AlignmentAPI.getNtaxa();
 			}
 			
+			
+			if (PhylogenyAPI.isReady()) {
+				
+				System.out.println("tree API");
+				double spacing = ((NumericalOption)taxaSpacing).getVal();
+				double branchW = ((NumericalOption)branchwidth).getVal();
+				
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(spacing, xdivide1*width - spacing, 0, height, branchW);
+				objs.putAll(tree);
+				
+				
+			}
+			
+			
 			// Width of taxa
 			if (AlignmentAPI.isReady()) {
 				
@@ -233,8 +247,8 @@ public class OptionsAPI {
 
 		
 		// Keep adding to the string until the string is too large
-		// TODO use a string builder for efficiency
-		String out = "[";
+		StringBuilder out = new StringBuilder();
+		out.append("[");
 		int len = 0;
 		boolean addedObj = false;
 		do {
@@ -244,9 +258,9 @@ public class OptionsAPI {
 				//System.out.println("Added json at position " + i + ". Total length " + );
 				
 				// Update string
-				if (addedObj) out = out + ",";
+				if (addedObj) out.append(",");
 				addedObj = true;
-				out = out + str;
+				out.append(str);
 				len = out.length();
 
 				// Remove 1st element from from array
@@ -265,9 +279,9 @@ public class OptionsAPI {
 			System.out.println("Error: chunk sizes are too small");
 		}
 
-		out += "]";
+		out.append("]");
 		
-		return out;
+		return out.toString();
 	}
 
 	

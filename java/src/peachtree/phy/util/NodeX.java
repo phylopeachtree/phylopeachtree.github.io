@@ -104,6 +104,7 @@ public class NodeX {
 
     @Override
 	public String toString() {
+    	
         final DecimalFormat myFormatter = new DecimalFormat("#.#####", new DecimalFormatSymbols(Locale.US));
 
         if (m_left == null) {
@@ -128,17 +129,21 @@ public class NodeX {
     	
         final Node node = new Node();
         node.setHeight(m_fHeight);
+        
         if (m_left == null) {
         	
         	Node left = new Node();
-        	node.addChild(left);
+        	
         	left.setNr(m_iLeftInstance);
         	left.setHeight(m_fHeight - m_fLeftLength);
+        	left.setAcc(taxaNames.get(m_iLeftInstance));
+        	node.addChild(left);
             if (m_right == null) {
             	Node right = new Node();
-                node.addChild(right);
                 right.setNr(m_iRightInstance);
                 right.setHeight(m_fHeight - m_fRightLength);
+                right.setAcc(taxaNames.get(m_iRightInstance));
+                node.addChild(right);
             } else {
                 node.addChild(m_right.toNode());
             }
@@ -149,6 +154,7 @@ public class NodeX {
                 node.addChild(right);
                 right.setNr(m_iRightInstance);
                 right.setHeight(m_fHeight - m_fRightLength);
+                right.setAcc(taxaNames.get(m_iRightInstance));
             } else {
             	node.addChild(m_right.toNode());
             }
@@ -159,6 +165,9 @@ public class NodeX {
         if (node.getHeight() < node.getChild(1).getHeight() + EPSILON) {
             node.setHeight(node.getChild(1).getHeight() + EPSILON);
         }
+        
+        
+        
 
         //node.getChild(1).setParent(node);
         //node.getChild(0).setParent(node);
@@ -166,3 +175,10 @@ public class NodeX {
     }
 
 }
+
+
+
+
+
+
+

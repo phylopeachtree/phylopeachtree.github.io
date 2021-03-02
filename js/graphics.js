@@ -257,8 +257,6 @@ function plotNextObject(svg, iteration = 0){
 				return;
 			}else{
 
-				
-
 				// Repeat
 				plotNextObject(svg, iteration + 1)
 

@@ -30,6 +30,21 @@ public class Scaling {
 	}
 	
 	
+public Scaling(double canvasMinX, double canvasMaxX, double canvasMinY, double canvasMaxY, double xmin, double xmax, double ymin, double ymax) {
+		
+		this.canvasMinX = canvasMinX;
+		this.canvasMaxX = canvasMaxX;
+		this.canvasMinY = canvasMinY;
+		this.canvasMaxY = canvasMaxY;
+		
+		this.xmin = xmin;
+		this.xmax = xmax;
+		this.ymin = ymin;
+		this.ymax = ymax;
+		
+	}
+	
+	
 	
 	/**
 	 * Check if this unscaled value is in range

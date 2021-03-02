@@ -1,14 +1,18 @@
 package peachtree.phy;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONArray;
 
+import peachtree.aln.Alignment;
+import peachtree.aln.Filtering;
+import peachtree.aln.Sequence;
+import peachtree.options.Scaling;
 
 public class Tree {
 
 	
 	Node root;
 	Node[] nodes;
+	Alignment alignment;
 	
 	
 	public Tree() {
@@ -16,7 +20,8 @@ public class Tree {
 	}
 	
 	
-	public Tree(Node root) {
+	public Tree(Node root, Alignment alignment) {
+		this.alignment = alignment;
 		this.setRoot(root);
 	}
 	
@@ -28,7 +33,7 @@ public class Tree {
 	
 
 	public Tree copy() {
-		return new Tree(this.root.copy());
+		return new Tree(this.root.copy(), this.alignment);
 	}
 	
 	
@@ -37,6 +42,9 @@ public class Tree {
 	 */
 	public void initArray() {
 		this.nodes = listNodes(root);
+		for (int i = 0; i < this.nodes.length; i ++) {
+			this.nodes[i].setNr(i);
+		}
 	}
 	
 	
@@ -46,6 +54,19 @@ public class Tree {
 	 */
 	public Node[] getNodesAsArray() {
 		return this.nodes;
+	}
+	
+	
+	/**
+	 * List of leaves i.e. the first N nodes
+	 * @return
+	 */
+	public Node[] getLeavesAsArray() {
+		Node[] leaves = new Node[this.getLeafNodeCount()];
+		for (int i = 0; i < leaves.length; i ++) {
+			leaves[i] = this.nodes[i];
+		}
+		return leaves;
 	}
 	
 	
@@ -128,7 +149,43 @@ public class Tree {
 		 nodes[pos] = node;
 		 return pos + 1;
 	 }
+
+
+	 
+	/**
+	 * Get a json array of graphics
+	 * @param scaling
+	 * @param branchWidth
+	 * @return
+	 */
+	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth) {
+		
+		JSONArray objs = new JSONArray();
+		Filtering filtering = this.alignment.getFiltering();
+		double dy = (scaling.ymax() - scaling.ymin()) / filtering.getNumSeqs();
+		this.root.getGraphics(objs, dy, filtering, scaling, branchWidth);
+		
+		return objs;
+		
+	}
+
+	public double getHeight() {
+		return this.root.getHeight();
+	}
+
+	
 	
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+

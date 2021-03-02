@@ -32,21 +32,21 @@ public class Scaling {
 	
 	
 	/**
-	 * Check if this scaled value is in range
+	 * Check if this unscaled value is in range
 	 * @param x
 	 * @return
 	 */
 	public boolean inRangeX(double x) {
-		return x >= canvasMinX && x < canvasMaxX;
+		return x >= xmin && x < xmax;
 	}
 	
 	/**
-	 * Check if this scaled value is in range
+	 * Check if this unscaled value is in range
 	 * @param x
 	 * @return
 	 */
 	public boolean inRangeY(double y) {
-		return y >= canvasMinY && y < canvasMaxY;
+		return y >= ymin && y < ymax;
 	}
 	
 	

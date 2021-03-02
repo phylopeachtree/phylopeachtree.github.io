@@ -14,6 +14,11 @@ function initGraphics(){
 }
 
 
+
+
+
+
+
 /*
 	Draw if possible
 */

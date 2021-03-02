@@ -6,6 +6,7 @@ function initUtil(){
 	
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
+	BUILDING_TREE = false;
 	
 	
 
@@ -22,7 +23,7 @@ function initUtil(){
 		// Closure to capture the file information.
 		reader.onload = (function(theFile) {
 			
-			addLoader("#aln_upload_title");
+			addLoader($("#aln_upload_title"));
 			
 			return function(e) {
 				
@@ -81,7 +82,7 @@ function initUtil(){
 function plotUploadErrorMsg(err, uploadSelector){
 	console.log("caught", err);
 	$(uploadSelector + " .usermsg").html("<b>Error: </b>" + err.message);
-	removeLoader(uploadSelector + "_title");
+	removeLoader($(uploadSelector + "_title"));
 	return false;
 }
 
@@ -93,7 +94,7 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 	if (time == "0" || time == 0) time = "<1";
 	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + time + "ms!");
 	updateRenderBtn();
-	removeLoader(uploadSelector + "_title");
+	removeLoader($(uploadSelector + "_title"));
 	return true;
 }
 
@@ -101,12 +102,12 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 /*
 	Adds a loading icon
 */
-function addLoader(selector){
-	$(selector).append(`<div title="Loading..." class="loader"></div>`);
+function addLoader(ele){
+	ele.append(`<div title="Loading..." class="loader"></div>`);
 }
 
-function removeLoader(selector){
-	$(selector + " .loader").remove();
+function removeLoader(ele){
+	ele.find(" .loader").remove();
 }
 
 
@@ -182,6 +183,37 @@ function toggleTab(ele){
 
 
 
+}
+
+
+/*
+	Build a tree from the alignment using the selected method
+*/
+function buildTree(){
+	
+	if (BUILDING_TREE) return;
+	BUILDING_TREE = true;
+	
+	let btnID = "#buildTreeBtn";
+	
+	$(btnID).addClass("disabled");
+	addLoader($(btnID).parent());
+	$(btnID).parent().find(".usermsg").html("");
+	
+	// Asynchronous call to allow dom to update
+	setTimeout(function() {
+		cjCall("peachtree.options.OptionsAPI", "buildTree").then(function(results){
+			
+			var results = JSON.parse(cjStringJavaToJs(results));
+			
+			console.log("tree", results.newick);
+			removeLoader($(btnID).parent());
+			$(btnID).removeClass("disabled");
+			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!");
+			BUILDING_TREE = false;
+		});
+	}, 1);
+	
 }
 
 

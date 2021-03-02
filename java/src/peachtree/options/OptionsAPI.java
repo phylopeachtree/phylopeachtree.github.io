@@ -13,6 +13,9 @@ import peachtree.aln.AlignmentAPI;
 import peachtree.aln.colourings.ClustalAminoColouring;
 import peachtree.aln.colourings.Colouring;
 import peachtree.aln.colourings.JalviewNucleotideColouring;
+import peachtree.phy.ClusterTree;
+import peachtree.phy.PhylogenyAPI;
+import peachtree.phy.util.LinkType;
 
 
 
@@ -118,6 +121,22 @@ public class OptionsAPI {
 		
 		
 		return "{}";
+		
+	}
+	
+	
+	
+	/**
+	 * Build a tree from the alignment
+	 * @return
+	 */
+	public static String buildTree() {
+		
+		try {
+			return PhylogenyAPI.buildTree(AlignmentAPI.getAlignment(), LinkType.neighborjoining);
+		} catch (Exception e) {
+			return getErrorJSON(e);
+		}
 		
 	}
 	

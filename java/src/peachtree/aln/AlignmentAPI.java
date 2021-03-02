@@ -3,13 +3,11 @@ package peachtree.aln;
 
 
 import java.util.Calendar;
-import java.util.Collection;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.colourings.Colouring;
-import peachtree.options.NumericalOption;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 
@@ -169,6 +167,11 @@ public class AlignmentAPI {
 	public static int getNtaxa() {
 		if (THE_ALIGNMENT == null) return 0;
 		return THE_ALIGNMENT.getNtaxa();
+	}
+
+
+	public static Alignment getAlignment() {
+		return THE_ALIGNMENT;
 	}
 	
 }

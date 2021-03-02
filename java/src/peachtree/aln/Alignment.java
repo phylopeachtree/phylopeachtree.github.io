@@ -20,7 +20,8 @@ public class Alignment {
 	List<Sequence> sequences;
 	boolean isNucleotide;
 	int alignmentLength;
-	
+	List<int[]> patterns;
+	List<Double> patternWeights;
 	
 	Colouring colouring;
 	Filtering filtering;
@@ -58,6 +59,8 @@ public class Alignment {
 		long timeOnStrbuilding = 0;
 		for (String line : lines) {
 			
+			line = line.replaceAll("\r", "");
+			
 			//System.out.println(line);
 			
 			if (line.substring(0,1).equals(">")) {
@@ -72,30 +75,8 @@ public class Alignment {
 				// Parse the sequence
 				if (seq.length() > 0) {
 					
-					
-					Sequence sequence = new Sequence(seqID, acc, seq);
-					if (this.sequences.isEmpty()) {
-						this.alignmentLength = sequence.getLength();
-						this.isNucleotide = sequence.isNucleotide();
-					}else {
-						
-						// All sequences must have same length
-						if (sequence.getLength() != alignmentLength) {
-							throw new Exception("Cannot parse sequence " + sequence.getAcc() + " because of length mismatch (" + 
-									sequence.getLength() + " != " + alignmentLength + ")");
-						}
-						
-						// Is it still a nucleotide alignment?
-						if (this.isNucleotide && !sequence.isNucleotide()) {
-							this.isNucleotide = false;
-							for (Sequence s : sequences) {
-								s.setIsNucleotide(false);
-							}
-						}
-						
-					}
-					
-					sequences.add(sequence);
+					parseSequence(acc, seq, seqID);
+					seqID++;
 					seq = new StringBuilder();
 				}
 				
@@ -125,6 +106,12 @@ public class Alignment {
 		
 		
 		
+		// Parse the last sequence
+		if (seq.length() > 0) {
+			parseSequence(acc, seq, seqID);
+		}
+		
+		
 		if (this.sequences.isEmpty()) {
 			throw new Exception("Cannot detect any sequences in the alignment. Are you sure this is .fasta?");
 		}
@@ -146,7 +133,10 @@ public class Alignment {
 		this.colouring = new JalviewNucleotideColouring();
 		
 		
-		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites and " + this.sequences.size() + " taxa");
+		// Initialise patterns
+		this.initPatterns();
+		
+		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites, " + this.getPatternCount() + " patterns, and " + this.sequences.size() + " taxa ");
 		
 		
 		long timeOnFilteringT = Calendar.getInstance().getTimeInMillis() - t1;
@@ -154,6 +144,109 @@ public class Alignment {
 		System.out.println(timeOnSeqs + "ms on seq");
 		System.out.println(timeOnStrbuilding + "ms on str");
 		
+		
+	}
+	
+	
+	/**
+	 * Initialise site patterns
+	 */
+	private void initPatterns() {
+		
+		
+		this.patterns = new ArrayList<>();
+		this.patternWeights = new ArrayList<>();
+		for (int siteNum = 0; siteNum < this.getLength(); siteNum ++) {
+			
+			// Get pattern of this column
+			int[] site = new int[this.getNtaxa()];
+			for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+				Sequence sequence = this.getSequence(taxonNum);
+				site[taxonNum] = sequence.getSymbolInt(siteNum);
+			}
+			
+			
+			// Check if it is unique
+			int patternMatch = -1;
+			for (int patternNum = 0; patternNum < this.patterns.size(); patternNum ++) {
+				int[] pattern = this.patterns.get(patternNum);
+				boolean isUniqueFromThisPattern = false;
+				for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+					if (site[taxonNum] != pattern[taxonNum]) {
+						isUniqueFromThisPattern = true;
+						break;
+					}
+				}
+				
+				// This column is a duplicate. Do not add it to the list of unique patterns
+				if (!isUniqueFromThisPattern) {
+					patternMatch = patternNum;
+					break;
+				}
+				
+			}
+			
+			
+			// If unique site, then add to list
+			if (patternMatch == -1) {
+				this.patterns.add(site);
+				this.patternWeights.add(1.0);
+			}
+			
+			// Otherwise increment the pattern weight
+			else {
+				double weight = this.patternWeights.get(patternMatch);
+				this.patternWeights.set(patternMatch, weight + 1.0);
+			}
+			
+		}
+		
+		
+		System.out.println("There are " + this.patterns.size() + " patterns");
+		
+		
+	}
+	
+	
+	/**
+	 * Add the sequence + accession
+	 * @param acc
+	 * @param seq
+	 * @throws Exception 
+	 */
+	private void parseSequence(String acc, StringBuilder seq, int seqID) throws Exception {
+		
+		Sequence sequence = new Sequence(seqID, acc, seq);
+		if (this.sequences.isEmpty()) {
+			this.alignmentLength = sequence.getLength();
+			this.isNucleotide = sequence.isNucleotide();
+		}else {
+			
+			// All sequences must have same length
+			if (sequence.getLength() != alignmentLength) {
+				throw new Exception("Cannot parse sequence " + sequence.getAcc() + " because of length mismatch (" + 
+						sequence.getLength() + " != " + alignmentLength + ")");
+			}
+			
+			// Is it still a nucleotide alignment?
+			if (this.isNucleotide && !sequence.isNucleotide()) {
+				this.isNucleotide = false;
+				for (Sequence s : sequences) {
+					s.setIsNucleotide(false);
+				}
+			}
+			
+			
+			// Does it have a unique accession?
+			for (Sequence other : sequences) {
+				if (other.getAcc().equals(sequence.getAcc())) {
+					throw new Exception("Duplicate sequence accession detected: " + sequence.getAcc());
+				}
+			}
+			
+		}
+		
+		sequences.add(sequence);
 		
 	}
 	
@@ -208,7 +301,7 @@ public class Alignment {
 		
 		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
 		double y = scaling.ymin();
-		System.out.println("sequence: " + dy);
+		//System.out.println("sequence: " + dy);
 		for (Sequence sequence : sequences) {
 
 			
@@ -273,8 +366,21 @@ public class Alignment {
 	}
 	
 	
-	
-	
+	/**
+	 * Is the index abgisuous / gap?
+	 * @param index
+	 * @param isNT
+	 * @return
+	 */
+	public static boolean isAmbiguousOrGap(int index, boolean isNT) {
+		
+		if (isNT) {
+			if (index > ambiguousNtIndex) return true;
+		} else {
+			if (index > ambiguousAlphaIndex) return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * Is the symbol ambiguous or a gap?
@@ -297,6 +403,9 @@ public class Alignment {
 		
 		return false;
 	}
+	
+	
+
 	
 	
 	/**
@@ -401,8 +510,53 @@ public class Alignment {
 		if (this.filtering == null) return 0;
 		return this.filtering.getNumSites();
 	}
+
+
+	public List<String> getNames() {
+		List<String> names = new ArrayList<>();
+		for (Sequence seq : sequences) {
+			names.add(seq.getAcc());
+		}
+		return names;
+	}
 	
 	
+	
+	/**
+	 * Number of site patterns
+	 * @return
+	 */
+	public int getPatternCount() {
+		return this.patterns.size();
+	}
+	
+	
+	/**
+	 * Gets the pattern index patternNum
+	 * @param siteNum
+	 * @return
+	 */
+	public int[] getPattern(int patternNum) {
+		return this.patterns.get(patternNum);
+	}
+	
+	
+	public int getPattern(int patternNum, int taxonNum) {
+		return this.patterns.get(patternNum)[taxonNum];
+	}
+
+
+	/**
+	 * Weight of pattern i
+	 * @param i
+	 * @return
+	 */
+	public double getPatternWeight(int i) {
+		return this.patternWeights.get(i);
+	}
+
+
+
 
 	
 

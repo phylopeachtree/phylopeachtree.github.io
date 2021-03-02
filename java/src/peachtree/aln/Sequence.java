@@ -59,8 +59,8 @@ public class Sequence {
 	 * Prepare int array of the sequence
 	 */
 	public void prepareArray() throws Exception {
-		System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
-		System.out.println("'" + this.sequence + "'");
+		//System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
+		//System.out.println("'" + this.sequence + "'");
 		this.sequenceArr = new int[this.seqLen];
 		for (int i = 0; i < this.seqLen; i ++) {
 			String site = this.sequence.substring(i, i+1);
@@ -131,14 +131,18 @@ public class Sequence {
 		// Should this sequence be included?
 		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
 		
-		double yc_text = scaling.scaleY(y + height/2);
-		
 		// Do not plot beyond the edge
-		if (!scaling.inRangeY(yc_text)) return arr;
+		double yc = y + height/2;
+		if (!scaling.inRangeY(yc)) return arr;
+		
+		
+		double yc_scaled = scaling.scaleY(yc);
+		
+		
 		
 		/// Plot accession
 		JSONObject acc_json = new JSONObject();
-		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_text);
+		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_scaled);
 		acc_json.put("text_anchor", "start"); 
 		acc_json.put("value", this.getAcc());
 		acc_json.put("title", this.getAcc());
@@ -178,13 +182,17 @@ public class Sequence {
 			dx = (scaling.xmax() - scaling.xmin()) / numSites;
 			dxScaled =  (scaling.scaleX(dx*2) - scaling.scaleX(dx)) + 1;
 			//System.out.println("nsites = " + numSites + " at width " + minNtWidth + " dx " + dx + " scaled " + dxScaled);
+		}else {
+			//System.out.println("stretched sizing " + numSites);
 		}
 		double heightScaled = scaling.scaleY(height) + 1;
 		double x = scaling.xmin();
-		double yc_rect = scaling.scaleY(y);
-		double yc_text = scaling.scaleY(y + height/2);
 		
-		if (!scaling.inRangeY(yc_rect)) return arr;
+		// Do not plot beyond the edge
+		if (!scaling.inRangeY(y)) return arr;
+		
+		double yc_rect_scaled = scaling.scaleY(y);
+		double yc_text_scaled = scaling.scaleY(y + height/2);
 		
 		
 		
@@ -192,19 +200,17 @@ public class Sequence {
 		JSONObject nt_bg, nt_font;
 		for (int site : filtering.getSites()) {
 
-			
+			// Do not plot beyond the edge
+			if (!scaling.inRangeX(x)) break;
 			
 			String symbol = this.getSymbol(site);
 			
 			double xc = scaling.scaleX(x);
 			
 			
-			// Do not plot beyond the edge
-			if (!scaling.inRangeX(xc)) break;
-			
 			
 			// Background colour
-			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect)
+			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect_scaled)
 								.put("width", dxScaled).put("height", heightScaled);
 			if (colouring != null) {
 				nt_bg.put("fill", colouring.getColour(symbol));
@@ -219,7 +225,7 @@ public class Sequence {
 			
 			// Text
 			xc = scaling.scaleX(x + dx/2);
-			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text);
+			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text_scaled);
 			nt_font.put("value", symbol);
 			nt_font.put("text_anchor", "middle"); // Right alignment
 			nt_font.put("title", "Site " + (site+1));
@@ -238,9 +244,14 @@ public class Sequence {
 		
 	}
 
+	
+	public int getSymbolInt(int site) {
+		return this.sequenceArr[site];
+	}
+	
 
 	public String getSymbol(int site) {
-		int i = this.sequenceArr[site];
+		int i = this.getSymbolInt(site);
 		String val;
 		if (this.isNucleotide) {
 			val = Alignment.nt_ids[i];

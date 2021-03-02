@@ -1,1 +1,12 @@
 /PhylogenyAPI.class
+/Tree.class
+/Node.class
+/UPGMA.class
+/ClusterTree.class
+/ClusterTree$Type.class
+/ClusterTree$NodeX.class
+/ClusterTree$Tuple.class
+/ClusterTree$TupleComparator.class
+/JukesCantorDistance.class
+/Distance.class
+/Distance$Base.class

@@ -47,6 +47,8 @@ function initUtil(){
 							 return plotUploadErrorMsg(err, "#aln_upload");
 							 
 						}
+						
+				
 						return plotUploadSuccessMsg(file.name, val.time, "#aln_upload");
 					});
 					
@@ -138,18 +140,22 @@ function renderOptions(){
 			alert(options.err);
 			return;
 		}
+		
+		
 
 		// Get the unique list of sections
 		var sections = [];
 		for (var i = 0; i < options.length; i ++){
-			var s = options[i].section;
+			let opt = options[i];
+			if (opt.isBoundary) continue;
+			let s = opt.section;
 			if (!sections.includes(s)) sections.push(s);
 
 		}
 		console.log("sections", sections);
 
 		// Create one tab per section
-		for (var i = 0; i < sections.length; i++){
+		for (let i = 0; i < sections.length; i++){
 
 
 			var slideInID = "options_" + sections[i];
@@ -158,8 +164,52 @@ function renderOptions(){
 			optionsTabs.append("<li onClick='toggleTab(this)' title='Open/close tab' slide='" + slideInID + "'>" + sections[i] + "</li>")
 
 
-			// Slide in
-			var div = $("<div class='optionsSlideIn' style='display:none'>" + sections[i] + "</div>")
+			// Get the options of this section
+			let optionsHTML = "";
+			for (let o = 0; o < options.length; o ++){
+				let opt = options[o];
+				if (opt.isBoundary) continue;
+				if (opt.section == sections[i]){
+					
+					
+					if (opt.type == "NumericalOption"){
+						
+						// Options html
+						optionsHTML += `
+						<div class="optionsBox">
+							
+							<div class="slidecontainer">
+								 <input onChange="setOptionFromEle(this)" type="range" min="` + opt.min + `" max="` + opt.max + `" value="` + opt.value + `" step="` + opt.step + `" class="slider" var="` + opt.name + `">
+							</div>
+							` + opt.title + ` (` + opt.value + `)
+						</div>`;
+						
+					}
+					
+					
+
+					
+					
+					
+				}
+			}
+			
+			
+			
+
+
+			// Slide in html
+			var slideHTML = `<div class="optionsSlideIn" style="display:none">
+				<div>
+					<h2>
+					` + sections[i] + ` settings
+					</h2>
+					<div>
+					` + optionsHTML + `
+					</div>
+				</div>
+			</div>`;
+			var div = $(slideHTML)
 			div.attr("id", slideInID);
 			slideIns.append(div)
 
@@ -174,6 +224,36 @@ function renderOptions(){
 
 
 /*
+	Sets the value of this option from the element
+*/
+function setOptionFromEle(ele){
+	
+	let id = $(ele).attr("var");
+	let val = $(ele).val();
+	setOptionToVal(id, val);
+	
+}
+
+/*
+	Sets the value of this option and draw the graphics again
+*/
+function setOptionToVal(optionID, newVal){
+	
+	console.log("Setting", optionID, "to", newVal);
+	
+	CANCEL_GRAPHICS = true;
+	cjCall("peachtree.options.OptionsAPI", "setOption", optionID, newVal).then(function(val){
+		
+		//console.log("done", val);
+		CANCEL_GRAPHICS = false;
+		renderGraphics();
+			
+	});
+	
+}
+
+
+/*
 	Opens or closes a tab
 */
 function toggleTab(ele){
@@ -181,11 +261,24 @@ function toggleTab(ele){
 
 	// Update css
 	$(ele).siblings("li").removeClass("active");
+	$(".optionsSlideIn").hide(0);
+	
+	var hiding = $(ele).hasClass("active");
 	$(ele).toggleClass("active");
 
-	var slideid = $(ele).attr("slide");
-	//$("#" + slideid).show(100);
+	var slideID = $(ele).attr("slide");
+	var slideEle = $("#" + slideID);
+	
 
+	
+	if (hiding){
+		//console.log("hiding", slideID);
+		//slideEle.hide(100);
+	}else{
+		//console.log("showing", slideID);
+		slideEle.show(100);
+	}
+	
 
 
 }

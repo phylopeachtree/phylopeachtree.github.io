@@ -191,7 +191,7 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 			svg.addClass("resizing");
 	};
 	options.stop = function(event, ui){
-		CANCEL_GRAPHICS = true;
+		
 		svg.removeClass("resizing");
  		var newValue;
  		if (xAxis) {
@@ -205,16 +205,12 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
  		if (contained && !xAxis) newValue = newValue / svg.height();
  		console.log('new value', newValue);
 
+
+		
+
  		// Set options
-		cjCall("peachtree.options.OptionsAPI", "setOption", id, newValue).then(function(val){
-			
+		setOptionToVal(id, newValue);
 
-
-			//console.log("done", val);
-			CANCEL_GRAPHICS = false;
-			renderGraphics();
-			
-		});
 
  		
 	} 

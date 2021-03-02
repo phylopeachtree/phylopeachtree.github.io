@@ -23,19 +23,24 @@ public class OptionsAPI {
 	
 	static final long CHUNK_SIZE = 30000;
 	
-	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000);
-	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000);
-	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1);
-	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1);
-	
-	static Option siteHeight = new NumericalOption("siteHeight", "Alignment", "Height of an aligned site", 20, 1, 100);
-	static Option siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of an aligned site", 15, 1, 100);
+	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 100, true);
+	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000, 100, true);
+	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
+	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
 	
-	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50);
+	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 20, 1);
+	
+	
+	static Option siteHeight = new NumericalOption("siteHeight", "Taxa", "Taxon label heights", 20, 1, 100, 5);
+	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 5);
+	
+	
+	static Option siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of alignment sites", 15, 1, 100, 5);
+	
 	static Option colourings;
 	
-	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 100);
+	
 	static Option treeMethods;
 	
 		

@@ -30,10 +30,13 @@ public class OptionsAPI {
 	
 	static Option siteHeight = new NumericalOption("siteHeight", "Alignment", "Height of an aligned site", 20, 1, 100);
 	static Option siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of an aligned site", 15, 1, 100);
+	
+	
 	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50);
 	static Option colourings;
 	
 	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 100);
+	static Option treeMethods;
 	
 		
 	static List<Class<? extends Colouring>> colouringClasses;
@@ -44,6 +47,9 @@ public class OptionsAPI {
 		
 		graphicalObjects = null;
 		
+		
+		
+		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for building trees", LinkType.neighborjoining, LinkType.values());
 		
 	}
 	
@@ -109,7 +115,9 @@ public class OptionsAPI {
 					((NumericalOption)option).setVal(Double.parseDouble(value));
 				}
 				
-				// TODO
+				if (option instanceof DiscreteOption) {
+					((DiscreteOption)option).setVal(value);
+				}
 				
 				
 			}

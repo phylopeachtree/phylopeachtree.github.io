@@ -26,10 +26,15 @@ function renderGraphics(){
 	
 	isReadyToRender(function(ready){
 		
+
+		
 		if (!ready) {
 			console.log("Not ready to render!");
 			return;
 		}
+		
+		
+		CANCEL_GRAPHICS = true;
 		
 		
 		// Options
@@ -39,6 +44,9 @@ function renderGraphics(){
 
 		// Generate the graphics objects
 		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
+			
+			
+			CANCEL_GRAPHICS = false;
 
 
 			
@@ -125,6 +133,8 @@ function renderGraphics(){
 	
 	
 }
+
+
 
 
 

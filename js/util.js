@@ -102,8 +102,13 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 /*
 	Adds a loading icon
 */
-function addLoader(ele){
-	ele.append(`<div title="Loading..." class="loader"></div>`);
+function addLoader(ele, large=false){
+	if (large){
+		ele.append(`<div title="Loading..." class="loader large"></div>`);
+	}else{
+		ele.append(`<div title="Loading..." class="loader"></div>`);
+	}
+	
 }
 
 function removeLoader(ele){

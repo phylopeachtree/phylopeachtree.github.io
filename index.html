@@ -31,19 +31,28 @@
   
 		function init() {
 		
-
+			
 			cheerpjInit();
-			initGraphics();
+			addLoader($("#main"), true);
 
 
-			cheerpjRunJar("/app/peachtree.jar", 1);
-			//cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar");
+			//cheerpjRunJar("/app/peachtree.jar", 1);
+			
+			cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar").then(function(val){
+			
+				console.log("Loaded!");
+				removeLoader($("#main"));
+				
+				// Initialise js
+				initGraphics();
+				initUtil();
+				
+			});
 		  
-			//console.log("Loaded!");
+			//
 			
 			
-			// Initialise js
-			initUtil();
+
 
 			
 			//addLoader("#aln_upload_title");
@@ -67,7 +76,7 @@
 		
 		
 		
-		<div id="upload_div" />
+		<div id="upload_div" style="display:none"/>
 		
 		
 			

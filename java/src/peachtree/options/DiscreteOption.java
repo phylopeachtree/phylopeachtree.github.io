@@ -18,17 +18,22 @@ public class DiscreteOption extends Option {
 	Object value;
 	
 	// Domain of values
-	List<?> domain;
+	Object[] domain;
 	
 	
 	public DiscreteOption(String name, String section, String title, Object value, List<?> domain) throws Exception {
+		this(name, section, title, value, domain.toArray());
+	}
+	
+	
+	public DiscreteOption(String name, String section, String title, Object value, Object[] domain) throws Exception {
 		
 		this.name = name;
 		this.domain = domain;
 		this.section = section;
 		this.title = title;
 		
-		if (domain == null || domain.isEmpty()) {
+		if (this.domain == null || this.domain.length == 0) {
 			throw new Exception(this.getName() + " has no domain");
 		}
 		
@@ -39,6 +44,21 @@ public class DiscreteOption extends Option {
 	}
 	
 	
+	public boolean setVal(String val) {
+		
+		// Validate
+		for (Object d : domain) {
+			if (d.toString().equals(val)) {
+				System.out.println("str " + this.getName() + " is set to " + val);
+				this.value = val;
+				return true;
+			}
+		}
+		
+		return false;
+		
+	}
+	
 	/**
 	 * Tries to set the value to val
 	 * If 'val' is not in the domain, returns false
@@ -48,12 +68,13 @@ public class DiscreteOption extends Option {
 	public boolean setVal(Object val) {
 		
 		
-		this.value = val;
-		return true;
+		//this.value = val;
+		//return true;
 		
-		/*
+		
 		if (val == null) {
 			this.value = val;
+			System.out.println("obj " + this.getName() + " is set to " + val);
 			return true;
 		}
 		
@@ -66,7 +87,7 @@ public class DiscreteOption extends Option {
 		}
 		
 		return false;
-		*/
+		
 	}
 	
 	
@@ -78,7 +99,7 @@ public class DiscreteOption extends Option {
 		return this.value;
 	}
 	
-	public List<?> getDomain(){
+	public Object[] getDomain(){
 		return this.domain;
 	}
 	

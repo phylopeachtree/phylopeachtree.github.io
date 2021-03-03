@@ -306,6 +306,12 @@ ul.tabs li.active:hover::after {
 	cursor:ns-resize;
 }
 
+.draggableDivision.scroll{
+	cursor:pointer;
+}
+
+
+
 
 
 

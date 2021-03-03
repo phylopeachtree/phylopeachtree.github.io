@@ -26,10 +26,18 @@ public class OptionsAPI {
 	
 	static final long CHUNK_SIZE = 30000;
 	
+	
+	// Boundaries
 	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 100, true);
 	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000, 100, true);
 	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
 	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
+	
+	
+	// Scroll bars
+	static NumericalOption scrollY  = new NumericalOption("scrollY", "General", "Relative position of y-scrollbar", 0, 0, 1, 0.1, true);
+	static NumericalOption scrollX  = new NumericalOption("scrollX", "General", "Relative position of x-scrollbar", 0, 0, 1, 0.1, true);
+	
 	
 	static DiscreteOption treeMethods;
 	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
@@ -192,16 +200,19 @@ public class OptionsAPI {
 			double height = canvasHeight.getVal();
 			
 			
+			// Scroll bars
+			JSONObject scrolls = new JSONObject();
+			
+			
 			// Height of taxa
 			double ntHeight = siteHeight.getVal();
 			if (AlignmentAPI.isReady()) {
 				ntHeight = Math.max(Math.max(ntHeight,  fontSizeTaxa.getVal()), fontSizeAln.getVal());
 			}
+			System.out.println("ntHeight " + ntHeight);
 			
-			if (ntHeight > 0) {
-				height = Math.min(height, ntHeight * AlignmentAPI.getNtaxa());
-			}
 			
+
 			
 			// x-boundary objects
 			JSONObject xboundaries = new JSONObject();
@@ -214,6 +225,18 @@ public class OptionsAPI {
 			JSONObject yboundaries = new JSONObject();
 			yboundaries.put(canvasHeight.getName(), height);
 			json.put("yboundaries", yboundaries);
+			
+			
+			
+			// Vertical scrolling?
+			if (height < ntHeight * AlignmentAPI.getNtaxa()) {
+				scrolls.put("scrollY", scrollY.getVal()*height);
+			}
+			height = ntHeight * AlignmentAPI.getNtaxa();
+			
+			
+			
+			json.put("scrolls", scrolls);
 			
 			
 			

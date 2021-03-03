@@ -94,6 +94,15 @@ function renderGraphics(){
 					var contained = yboundary != "height";
 					createDraggableStick(svg, initialVal.yboundaries[yboundary], yboundary, false, contained);
 				}
+				
+				
+				// Add the scrollbars
+				if (initialVal.scrolls.scrollY != null){
+					let pos = initialVal.scrolls.scrollY;
+					console.log("scrollY", pos);
+					createScrollbar(svg, pos, "scrollY", true);
+					
+				}
 
 
 
@@ -136,6 +145,68 @@ function renderGraphics(){
 
 
 
+
+/*
+	Create a scrollbar
+*/
+function createScrollbar(svg, pos, id, vertical=true){
+	
+	$("#" + id).remove();
+	const axis = vertical ? "y" : "x";
+	const scrollWidth = 5;
+	const scrollLength = 20;
+	const padding = 3;
+	
+	
+	// Vertical 
+	if (vertical) {
+		
+		left = svg.offset().left;
+		top = svg.offset().top + pos;
+		width = scrollWidth;
+		height = scrollLength;
+	}
+
+	// Horizontal
+	else{
+		
+		// TODO
+		return;
+	}
+	
+	// Create thumb
+	var thumb = $('<canvas/>',{'id':id, 'class':'draggableDivision scroll'}).width(width).height(height);
+	thumb.offset({left: left, top: top});
+	$("#graphics_div").append(thumb)
+	
+	
+	var canvas = document.getElementById(id);
+	var ctx = canvas.getContext('2d');
+	ctx.fillStyle = '#29465b';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
+	
+	// Draggable options
+	const options = {axis: axis}
+	options.cotainment = svg.parent();
+	options.start = function(){
+			svg.addClass("resizing");
+	};
+	options.stop = function(event, ui){
+		
+		svg.removeClass("resizing");
+ 		// TODO
+ 		
+	} 
+
+
+	// Make it draggable
+	$("#" + id).draggable(options);
+
+
+	
+	
+}
 
 
 /*

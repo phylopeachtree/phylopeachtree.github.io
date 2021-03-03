@@ -164,8 +164,43 @@ function renderOptions(){
 			optionsTabs.append("<li onClick='toggleTab(this)' title='Open/close tab' slide='" + slideInID + "'>" + sections[i] + "</li>")
 
 
+			// Slide in html
+			var slideHTML = `<div class="optionsSlideIn" style="display:none">
+				<div>
+					<h2>
+					` + sections[i] + ` settings
+					</h2>
+					<div></div>
+				</div>
+			</div>`;
+			
+			
+			var div = $(slideHTML)
+			div.attr("id", slideInID);
+			slideIns.append(div)
+			
+			
+			// Add draw trees button?
+			if (sections[i] == "Phylogeny") {
+				
+				let btnHTML = `
+				<div class="optionsBox small">
+					<div>
+						<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a tree from the selected method">Build tree</span>
+						<br>
+						<div class="usermsg mediumfont"></div>
+					</div>
+			
+				</div>`;
+					
+				div.children("div").children("div").append(btnHTML);
+				
+				
+			}
+						
+			
+
 			// Get the options of this section
-			let optionsHTML = "";
 			for (let o = 0; o < options.length; o ++){
 				let opt = options[o];
 				if (opt.isBoundary) continue;
@@ -175,13 +210,16 @@ function renderOptions(){
 					if (opt.type == "NumericalOption"){
 						
 						// Range slider html
-						optionsHTML += `
+						
+						let optionsHTML = `
 						<div class="optionsBox">
-							` + opt.title + ` (` + opt.value + `)
+							
 							<div class="slidecontainer">
 								 <input onChange="setOptionFromEle(this)" type="range" min="` + opt.min + `" max="` + opt.max + `" value="` + opt.value + `" step="` + opt.step + `" class="slider" var="` + opt.name + `">
 							</div>
+							` + opt.title + ` (` + opt.value + `)
 						</div>`;
+						div.children("div").children("div").append(optionsHTML);
 						
 					}
 					
@@ -189,22 +227,28 @@ function renderOptions(){
 					if (opt.type == "DiscreteOption"){
 						
 						
-						let dropdownOptionsHTML = "";
-						for (let j = 0; j < opt.domain.length; j ++){
-							dropdownOptionsHTML += `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
-						}
 						
 						
 						// Dropdown html
-						optionsHTML += `
+						let optionsHTML = `
 						<div class="optionsBox">
-							` + opt.title + `
+							
 							<div class="dropdown">
-								  <select <input onChange="setOptionFromEle(this)" var="` + opt.name + `">
-								  ` + dropdownOptionsHTML + `
-								  </select>
+								  <select onChange="setOptionFromEle(this)" var="` + opt.name + `">
+									</select>
 							</div>
+							` + opt.title + `
 						</div>`;
+						div.children("div").children("div").append(optionsHTML);
+						
+						
+						
+						for (let j = 0; j < opt.domain.length; j ++){
+							let dropdownOptionsHTML = `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
+							div.children("div").children("div").find("select").append(dropdownOptionsHTML);
+							if (opt.domain[j] == opt.value) div.children("div").children("div").find("select").val(opt.domain[j]);
+						}
+						
 						
 						
 					}
@@ -216,26 +260,14 @@ function renderOptions(){
 			
 			
 
-
-			// Slide in html
-			var slideHTML = `<div class="optionsSlideIn" style="display:none">
-				<div>
-					<h2>
-					` + sections[i] + ` settings
-					</h2>
-					<div>
-					` + optionsHTML + `
-					</div>
-				</div>
-			</div>`;
-			var div = $(slideHTML)
-			div.attr("id", slideInID);
-			slideIns.append(div)
+	
+			
 
 		}
 
 		
 		//.html(JSON.stringify(options));
+		//addLoader($("#buildTreeBtn").parent());
 				
 	});
 	

@@ -124,7 +124,7 @@ public class Sequence {
 	 * @param filtering
 	 * @return
 	 */
-	public JSONArray getTaxonGraphics(Scaling scaling, double y, double height, Filtering filtering) {
+	public JSONArray getTaxonGraphics(Scaling scaling, double y, double height, Filtering filtering, double textSize) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -146,6 +146,7 @@ public class Sequence {
 		acc_json.put("text_anchor", "start"); 
 		acc_json.put("value", this.getAcc());
 		acc_json.put("title", this.getAcc());
+		acc_json.put("font_size", textSize);
 		arr.put(acc_json);
 		
 		
@@ -161,7 +162,7 @@ public class Sequence {
 	 * @param y
 	 * @return
 	 */
-	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, double minNtWidth, Colouring colouring, Filtering filtering) {
+	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, double minNtWidth, Colouring colouring, Filtering filtering, double textSize) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -229,6 +230,7 @@ public class Sequence {
 			nt_font.put("value", symbol);
 			nt_font.put("text_anchor", "middle"); // Right alignment
 			nt_font.put("title", "Site " + (site+1));
+			nt_font.put("font_size", textSize);
 			
 			arr.put(nt_font);
 			

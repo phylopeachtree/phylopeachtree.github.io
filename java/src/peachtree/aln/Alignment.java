@@ -355,7 +355,7 @@ public class Alignment {
 	 * Get graphics of the alignment
 	 * @return
 	 */
-	public JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth) {
+	public JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth, double textSize) {
 		
 		
 		
@@ -370,7 +370,7 @@ public class Alignment {
 			
 			//long start = Calendar.getInstance().getTimeInMillis();
 			
-			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, minNtWidth, colouring, filtering));
+			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, minNtWidth, colouring, filtering, textSize));
 			
 			//long finish = Calendar.getInstance().getTimeInMillis();
 			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
@@ -387,7 +387,7 @@ public class Alignment {
 	 * Get taxa graphics
 	 * @return
 	 */
-	public JSONArray getTaxaGraphics(Scaling scaling) {
+	public JSONArray getTaxaGraphics(Scaling scaling, double textSize) {
 		
 		JSONArray objs = new JSONArray();
 		
@@ -399,7 +399,7 @@ public class Alignment {
 			
 			//long start = Calendar.getInstance().getTimeInMillis();
 			
-			objs.putAll(sequence.getTaxonGraphics(scaling, y, dy, filtering));
+			objs.putAll(sequence.getTaxonGraphics(scaling, y, dy, filtering, textSize));
 			
 			//long finish = Calendar.getInstance().getTimeInMillis();
 			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");

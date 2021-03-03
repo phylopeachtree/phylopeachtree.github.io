@@ -23,22 +23,25 @@ public class OptionsAPI {
 	
 	static final long CHUNK_SIZE = 30000;
 	
-	static Option canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 100, true);
-	static Option canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000, 100, true);
-	static Option division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
-	static Option division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
+	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 100, true);
+	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000, 100, true);
+	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
+	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
-	static Option treeMethods;
-	static Option branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 20, 1);
-	
-	
-	static Option siteHeight = new NumericalOption("siteHeight", "Taxa", "Taxon label heights", 20, 1, 100, 5);
-	static Option taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 5);
+	static DiscreteOption treeMethods;
+	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 20, 1);
+	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	
 	
-	static Option siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of alignment sites", 15, 1, 100, 5);
+	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
+	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 16, 1, 50, 1);
+	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 5);
 	
-	static Option colourings;
+	
+	static NumericalOption siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of alignment sites", 15, 1, 100, 5);
+	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
+	
+	static DiscreteOption colourings;
 	
 	
 	
@@ -87,7 +90,7 @@ public class OptionsAPI {
 	        }
 	       
 		}
-		colourings = new DiscreteOption("colourings", "Alignment", "Colour scheme of the alignment", classes.get(0), classes);
+		colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", classes.get(0), classes);
 	}
 	
 	
@@ -174,12 +177,23 @@ public class OptionsAPI {
 		try {
 		
 			// Bounds
-			double xdivide1 = ((NumericalOption)division1).getVal();
-			double xdivide2 = ((NumericalOption)division2).getVal();
+			double xdivide1 = division1.getVal();
+			double xdivide2 = division2.getVal();
 			
 			JSONObject json = new JSONObject();
-			double width = ((NumericalOption)canvasWidth).getVal();
-			double height = ((NumericalOption)canvasHeight).getVal();
+			double width = canvasWidth.getVal();
+			double height = canvasHeight.getVal();
+			
+			
+			// Height of taxa
+			double ntHeight = siteHeight.getVal();
+			if (AlignmentAPI.isReady()) {
+				ntHeight = Math.max(Math.max(ntHeight,  fontSizeTaxa.getVal()), fontSizeAln.getVal());
+			}
+			
+			if (ntHeight > 0) {
+				height = Math.min(height, ntHeight * AlignmentAPI.getNtaxa());
+			}
 			
 			
 			// x-boundary objects
@@ -195,21 +209,14 @@ public class OptionsAPI {
 			json.put("yboundaries", yboundaries);
 			
 			
+			
+			// Create graphics
 			JSONArray objs = new JSONArray();
-			
-			
-			// Height of taxa
-			double ntHeight = ((NumericalOption)siteHeight).getVal();
-			if (ntHeight > 0) {
-				height = ntHeight * AlignmentAPI.getNtaxa();
-			}
-			
-			
 			if (PhylogenyAPI.isReady()) {
 				
 				System.out.println("tree API");
-				double spacing = ((NumericalOption)taxaSpacing).getVal();
-				double branchW = ((NumericalOption)branchwidth).getVal();
+				double spacing = treeSpacing.getVal();
+				double branchW = branchwidth.getVal();
 				
 				JSONArray tree = PhylogenyAPI.getTreeGraphics(spacing, xdivide1*width - spacing, 0, height, branchW);
 				objs.putAll(tree);
@@ -224,14 +231,14 @@ public class OptionsAPI {
 			
 			
 				// Taxa
-				double x0 = xdivide1*width + ((NumericalOption)taxaSpacing).getVal();
-				JSONArray taxa = AlignmentAPI.getTaxaGraphics(x0, xdivide2*width, 0, height);
+				double x0 = xdivide1*width + taxaSpacing.getVal();
+				JSONArray taxa = AlignmentAPI.getTaxaGraphics(x0, xdivide2*width, 0, height,  fontSizeTaxa.getVal());
 				objs.putAll(taxa);
 				
 	
 				// Alignment
-				double minWidth = ((NumericalOption)siteMinWidth).getVal();
-				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth);
+				double minWidth = siteMinWidth.getVal();
+				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth, fontSizeAln.getVal());
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());
@@ -319,7 +326,8 @@ public class OptionsAPI {
 		Field[] fields = OptionsAPI.class.getDeclaredFields();
 		for (Field field: fields) {
 			
-			if (field.getType().equals(Option.class)) {
+			if (field.get(null) instanceof Option) {
+					
 				try {
 					Option option = (Option) field.get(null);
 					options.add(option);

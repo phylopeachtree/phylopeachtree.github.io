@@ -101,7 +101,7 @@ public class AlignmentAPI {
 	 * @param xmin
 	 * @return
 	 */
-	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth) {
+	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth, double textSize) {
 		
 		
 		
@@ -121,7 +121,7 @@ public class AlignmentAPI {
 		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 		
-		return THE_ALIGNMENT.getAlignmentGraphics(scaling, minNtWidth);
+		return THE_ALIGNMENT.getAlignmentGraphics(scaling, minNtWidth, textSize);
 	}
 	
 	
@@ -134,13 +134,13 @@ public class AlignmentAPI {
 	 * @param ymax
 	 * @return
 	 */
-	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax) {
+	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax, double textSize) {
 		
 		
 		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 				
-		return THE_ALIGNMENT.getTaxaGraphics(scaling);
+		return THE_ALIGNMENT.getTaxaGraphics(scaling, textSize);
 		
 	}
 

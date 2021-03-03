@@ -307,7 +307,7 @@ ul.tabs li.active:hover::after {
 }
 
 .draggableDivision.scroll{
-	cursor:pointer;
+	cursor:grab;
 }
 
 

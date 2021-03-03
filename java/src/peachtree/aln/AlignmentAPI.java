@@ -108,14 +108,7 @@ public class AlignmentAPI {
 		
 		// Ensure that sites do not go below the minimum width
 		double ntWidth = (xmax - xmin) / AlignmentAPI.getNsitesDisplayed();
-		if (ntWidth < minNtWidth) {
-			
-			// How many sites can fit?
-			//int nsites = (int) Math.floor((xmax - xmin) / minNtWidth);
-			//System.out.println("can fit " + nsites + " sites at " + minNtWidth + " each in a box of width " + (xmax - xmin));
-			
-			//xmax = xmin + minNtWidth*nsites;
-		}
+
 		
 		
 		// Switch ymax and ymin for js

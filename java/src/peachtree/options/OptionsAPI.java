@@ -236,7 +236,7 @@ public class OptionsAPI {
 			
 			
 			
-			json.put("scrolls", scrolls);
+			
 			
 			
 			
@@ -278,10 +278,16 @@ public class OptionsAPI {
 				json.put("ntaxa", AlignmentAPI.getNtaxa());
 				
 				
+				// Horizontal scrolling?
+				//scrolls.put("scrollX", scrollX.getVal()* (width - xdivide2*width) + xdivide2*width);
+				
+				
 			}
 			
 			graphicalObjects = objs;
 			
+			
+			json.put("scrolls", scrolls);
 			System.out.println(json.toString());
 			
 			return json.toString();

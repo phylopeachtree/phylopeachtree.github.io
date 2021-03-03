@@ -101,7 +101,11 @@ function renderGraphics(){
 					let pos = initialVal.scrolls.scrollY;
 					console.log("scrollY", pos);
 					createScrollbar(svg, pos, "scrollY", true);
-					
+				}
+				if (initialVal.scrolls.scrollX != null){
+					let pos = initialVal.scrolls.scrollX;
+					console.log("scrollX", pos);
+					createScrollbar(svg, pos, "scrollX", false);
 				}
 
 
@@ -153,49 +157,69 @@ function createScrollbar(svg, pos, id, vertical=true){
 	
 	$("#" + id).remove();
 	const axis = vertical ? "y" : "x";
-	const scrollWidth = 5;
-	const scrollLength = 20;
+	const scrollWidth = 7;
+	const scrollLength = 30;
 	const padding = 3;
 	
+	
+	let left, top, width, height;
 	
 	// Vertical 
 	if (vertical) {
 		
-		left = svg.offset().left;
+		left = svg.offset().left + padding;
 		top = svg.offset().top + pos;
-		width = scrollWidth;
+		width = scrollWidth + padding;
 		height = scrollLength;
 	}
 
 	// Horizontal
 	else{
 		
-		// TODO
-		return;
+		left = svg.offset().left + pos;
+		top = svg.offset().top + padding;
+		width = scrollLength;
+		height = scrollWidth + padding;
 	}
 	
 	// Create thumb
-	var thumb = $('<canvas/>',{'id':id, 'class':'draggableDivision scroll'}).width(width).height(height);
+	var thumb = $('<canvas/>',{'id':id, 'class':'draggableDivision scroll', title:'Scroll'}).width(width).height(height);
 	thumb.offset({left: left, top: top});
 	$("#graphics_div").append(thumb)
 	
 	
 	var canvas = document.getElementById(id);
 	var ctx = canvas.getContext('2d');
-	ctx.fillStyle = '#29465b';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "#29465b";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+	roundRect(ctx, 0, 0, canvas.width, canvas.height, 50, "#29465b");
 	
 	
 	// Draggable options
 	const options = {axis: axis}
-	options.cotainment = svg.parent();
+	options.containment = svg.parent();
 	options.start = function(){
 			svg.addClass("resizing");
 	};
 	options.stop = function(event, ui){
 		
 		svg.removeClass("resizing");
- 		// TODO
+ 		var newValue;
+ 		if (!vertical) {
+ 			newValue = $(this).offset().left - svg.offset().left;
+			newValue = newValue / svg.width();
+ 		}else{
+ 			newValue = $(this).offset().top - svg.offset().top;
+			newValue = newValue / svg.height();
+ 		}
+
+
+ 		console.log('new value', newValue);
+
+
+ 		// Set options
+		setOptionToVal(id, newValue);
+
  		
 	} 
 
@@ -257,7 +281,7 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 
 	// Draggable options
 	const options = {axis: axis}
-	if (contained) options.cotainment = svg.parent();
+	if (contained) options.containment = svg.parent();
 	options.start = function(){
 			svg.addClass("resizing");
 	};
@@ -405,8 +429,44 @@ function drawSVGobj(svg, object){
 
 
 
+/*
+	Rounded rectangle on a canvas
+	https://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
+*/
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  if (typeof stroke === 'undefined') {
+    stroke = true;
+  }
+  if (typeof radius === 'undefined') {
+    radius = 5;
+  }
+  if (typeof radius === 'number') {
+    radius = {tl: radius, tr: radius, br: radius, bl: radius};
+  } else {
+    var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.stroke();
+  }
 
-
+}
 
 
 

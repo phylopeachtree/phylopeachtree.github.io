@@ -2,6 +2,7 @@ package peachtree.options;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -10,9 +11,11 @@ import org.json.JSONObject;
 //import org.reflections.Reflections;
 
 import peachtree.aln.AlignmentAPI;
-import peachtree.aln.colourings.ClustalAminoColouring;
+import peachtree.aln.colourings.Aliview;
+import peachtree.aln.colourings.ClustalAmino;
 import peachtree.aln.colourings.Colouring;
-import peachtree.aln.colourings.JalviewNucleotideColouring;
+import peachtree.aln.colourings.Drums;
+import peachtree.aln.colourings.Jalview;
 import peachtree.phy.ClusterTree;
 import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.util.LinkType;
@@ -29,7 +32,7 @@ public class OptionsAPI {
 	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
 	static DiscreteOption treeMethods;
-	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 1, 20, 1);
+	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	
 	
@@ -69,7 +72,7 @@ public class OptionsAPI {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	private static void prepareColourings() throws Exception {
+	public static void prepareColourings() throws Exception {
 		
 		
 		// Find all colour classes. Reflections are not working in cheerpj so adding classes manually
@@ -77,20 +80,24 @@ public class OptionsAPI {
 		//Reflections reflections = new Reflections("peachtree.aln.colourings");
 		//Set<Class<? extends Colouring>> classes = reflections.getSubTypesOf(Colouring.class);
 		colouringClasses = new ArrayList<>();
-		colouringClasses.add(ClustalAminoColouring.class);
-		colouringClasses.add(JalviewNucleotideColouring.class);
+		colouringClasses.add(ClustalAmino.class);
+		colouringClasses.add(Jalview.class);
+		colouringClasses.add(Aliview.class);
+		colouringClasses.add(Drums.class);
 		
 		
-		List<Colouring> classes = new ArrayList<>();
+		List<Colouring> colourObjects = new ArrayList<>();
 		for (Class<? extends Colouring> colClass : colouringClasses) {
 	        Colouring col = colClass.newInstance();
 	        if (AlignmentAPI.colouringIsApplicable(col)) {
 	        	 System.out.println(colClass.getName() + " is applicable");
-	        	 classes.add(col);
+	        	 colourObjects.add(col);
 	        }
 	       
 		}
-		colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", classes.get(0), classes);
+		
+		
+		colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", colourObjects.get(0), colourObjects);
 	}
 	
 	
@@ -238,7 +245,9 @@ public class OptionsAPI {
 	
 				// Alignment
 				double minWidth = siteMinWidth.getVal();
-				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth, fontSizeAln.getVal());
+				Colouring cols = (Colouring) colourings.getVal();
+				System.out.println("Using the " + cols.getName() + " scheme");
+				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth, fontSizeAln.getVal(), cols);
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());
@@ -255,6 +264,7 @@ public class OptionsAPI {
 			return json.toString();
 		
 		} catch (Exception e) {
+			e.printStackTrace();
 			return getErrorJSON(e);
 		}
 		
@@ -318,7 +328,7 @@ public class OptionsAPI {
 	 */
 	private static List<Option> getOptionList() throws Exception{
 		
-		prepareColourings();
+		
 		
 		
 		// Introspectively find all options and add them to the list of options

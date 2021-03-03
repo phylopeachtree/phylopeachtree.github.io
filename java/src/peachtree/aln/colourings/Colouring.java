@@ -46,7 +46,7 @@ public abstract class Colouring {
 	
 	@Override
 	public String toString() {
-		return this.toJSON();
+		return this.getName();
 	}
 	
 	

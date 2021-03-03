@@ -38,6 +38,7 @@ public class AlignmentAPI {
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
 			THE_ALIGNMENT = new Alignment(str);
+			OptionsAPI.prepareColourings();
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
 			
@@ -101,7 +102,7 @@ public class AlignmentAPI {
 	 * @param xmin
 	 * @return
 	 */
-	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth, double textSize) {
+	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth, double textSize, Colouring colouring) {
 		
 		
 		
@@ -121,7 +122,7 @@ public class AlignmentAPI {
 		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
 		
 		
-		return THE_ALIGNMENT.getAlignmentGraphics(scaling, minNtWidth, textSize);
+		return THE_ALIGNMENT.getAlignmentGraphics(scaling, colouring, minNtWidth, textSize);
 	}
 	
 	

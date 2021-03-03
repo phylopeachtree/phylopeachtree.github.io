@@ -49,8 +49,8 @@ public class DiscreteOption extends Option {
 		// Validate
 		for (Object d : domain) {
 			if (d.toString().equals(val)) {
-				System.out.println("str " + this.getName() + " is set to " + val);
-				this.value = val;
+				System.out.println("str " + this.getName() + " is set to " + d);
+				this.value = d;
 				return true;
 			}
 		}
@@ -80,7 +80,7 @@ public class DiscreteOption extends Option {
 		
 		// Validate
 		for (Object d : domain) {
-			if (d.equals(val)) {
+			if (d.equals(val) || d.toString().equals(val.toString())) {
 				this.value = val;
 				return true;
 			}

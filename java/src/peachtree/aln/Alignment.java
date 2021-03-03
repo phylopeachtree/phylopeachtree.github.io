@@ -2,7 +2,6 @@ package peachtree.aln;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.colourings.Colouring;
-import peachtree.aln.colourings.JalviewNucleotideColouring;
+import peachtree.aln.colourings.Jalview;
 import peachtree.options.Scaling;
 import peachtree.phy.Node;
 import peachtree.phy.Tree;
@@ -25,7 +24,6 @@ public class Alignment {
 	List<int[]> patterns;
 	List<Double> patternWeights;
 	
-	Colouring colouring;
 	Filtering filtering;
 	
 	
@@ -130,9 +128,6 @@ public class Alignment {
 		
 		// Default filtering
 		this.filtering = new Filtering(true, null, this);
-		
-		// Default colouring
-		this.colouring = new JalviewNucleotideColouring();
 		
 		
 		// Initialise patterns
@@ -314,14 +309,7 @@ public class Alignment {
 
 
 
-	/**
-	 * Alignment colouring
-	 * @param colouring
-	 */
-	public void setColouring(Colouring colouring) {
-		this.colouring = colouring;
-	}
-	
+
 	
 	/**
 	 * Alignment taxon/site filtering
@@ -355,7 +343,7 @@ public class Alignment {
 	 * Get graphics of the alignment
 	 * @return
 	 */
-	public JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth, double textSize) {
+	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize) {
 		
 		
 		

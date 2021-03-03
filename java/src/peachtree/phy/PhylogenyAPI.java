@@ -79,20 +79,12 @@ public class PhylogenyAPI {
 	
 	/**
 	 * Generate graphics for the tree
-	 * @param xmin
-	 * @param xmax
-	 * @param ymin
-	 * @param ymax
+	 * @param scaling
 	 * @param branchWidth
 	 * @return
 	 */
-	public static JSONArray getTreeGraphics(double xmin, double xmax, double ymin, double ymax, double branchWidth) {
-		
-		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax, THE_TREE.getHeight(), 0, 0, 1);
-		
-		
+	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth) {
 		return THE_TREE.getTreeGraphics(scaling, branchWidth);
-		
 	}
 	
 	
@@ -103,6 +95,15 @@ public class PhylogenyAPI {
 	 */
 	public static boolean isReady() {
 		return THE_TREE != null;
+	}
+
+
+	/**
+	 * Height of current tree
+	 * @return
+	 */
+	public static double getHeight() {
+		return THE_TREE.getHeight();
 	}
 	
 	

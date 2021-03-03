@@ -312,17 +312,22 @@ public class Node {
      * @param branchWidth
      * @return y
      */
-	public double getGraphics(JSONArray objs, double dy, Filtering filtering, Scaling scaling, double branchWidth) {
+	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
+		
+		
 		double x2 = this.getHeight();
 		double x2Scaled = scaling.scaleX(x2);
+		double maxY = Double.NEGATIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
 		
 		// If leaf, go with node ordering
 		double y = 0;
 		if (this.isLeaf()) {
-			y = this.getNr() * dy + (0.5*dy);
+			//y = scaling.getYPos(this.getNr()) + (0.5*scaling.getRowHeight()); //this.getNr() * dy + (0.5*dy);
+			y = this.getNr() + 0.5;
 		}
 		
 		
@@ -330,10 +335,9 @@ public class Node {
 		else {
 			
 			
-			double maxY = Double.NEGATIVE_INFINITY;
-			double minY = Double.POSITIVE_INFINITY;
+			
 			for (Node child : this.getChildren()) {
-				double ychild = child.getGraphics(objs, dy, filtering, scaling, branchWidth);
+				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth);
 				y += ychild;
 				if (ychild > maxY) maxY = ychild;
 				if (ychild < minY) minY = ychild;
@@ -341,8 +345,19 @@ public class Node {
 			y = y / this.getChildCount();
 			
 			
-			// Shoulder 
-			if (minY != maxY) {
+		}
+		
+		
+		
+		
+	
+		// Shoulder
+		if (!this.isLeaf()) {
+			
+			
+			// Only draw if this node is in y-range
+			if (scaling.inRangeY(minY) || scaling.inRangeY(maxY) || scaling.inRangeY(y)) {
+			
 				
 				JSONObject shoulder_json = new JSONObject();
 				shoulder_json.put("ele", "line").put("x1", x2Scaled).put("x2", x2Scaled);
@@ -351,9 +366,9 @@ public class Node {
 				shoulder_json.put("stroke", "black");
 				shoulder_json.put("stroke_linecap", "round");
 				objs.put(shoulder_json);
-				
-			}
 			
+			}
+				
 			
 		}
 		
@@ -361,23 +376,26 @@ public class Node {
 		// Branch
 		if (!this.isRoot()) {
 			
+			// Only draw if this node is in y-range
+			if (scaling.inRangeY(y)) {
 			
-			double x1 = this.getParent().getHeight();
+				double x1 = this.getParent().getHeight();
+				double yscaled = scaling.scaleY(y);
+				
+				// Branch
+				JSONObject branch_json = new JSONObject();
+				branch_json.put("ele", "line").put("x1", scaling.scaleX(x1)).put("x2", x2Scaled);
+				branch_json.put("y1", yscaled).put("y2", yscaled);
+				branch_json.put("stroke_width", branchWidth);
+				branch_json.put("stroke", "black");
+				branch_json.put("stroke_linecap", "round");
+				objs.put(branch_json);
 			
-			double yscaled = scaling.scaleY(y);
-			
-			// Branch
-			JSONObject branch_json = new JSONObject();
-			branch_json.put("ele", "line").put("x1", scaling.scaleX(x1)).put("x2", x2Scaled);
-			branch_json.put("y1", yscaled).put("y2", yscaled);
-			branch_json.put("stroke_width", branchWidth);
-			branch_json.put("stroke", "black");
-			branch_json.put("stroke_linecap", "round");
-			objs.put(branch_json);
-			
-			
-		}
+			}
+				
+				
 		
+		}
 		
 		return y;
 		

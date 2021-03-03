@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 import peachtree.aln.colourings.Colouring;
 import peachtree.options.Scaling;
 
@@ -124,27 +125,27 @@ public class Sequence {
 	 * @param filtering
 	 * @return
 	 */
-	public JSONArray getTaxonGraphics(Scaling scaling, double y, double height, Filtering filtering, double textSize) {
+	public JSONArray getTaxonGraphics(Scaling scaling, int seqNum, int padding, Filtering filtering, double textSize) {
 		
 		JSONArray arr = new JSONArray();
+		
+		// Do not plot beyond the edge
+		if (!scaling.inRangeY(seqNum)) return arr;
 		
 		// Should this sequence be included?
 		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
 		
-		// Do not plot beyond the edge
-		double yc = y + height/2;
-		if (!scaling.inRangeY(yc)) return arr;
+		double yc_scaled = scaling.scaleY(seqNum + 0.5);
 		
 		
-		double yc_scaled = scaling.scaleY(yc);
-		
+		String numberPadding = padRight((seqNum+1)+":", padding+2);
 		
 		
 		/// Plot accession
 		JSONObject acc_json = new JSONObject();
 		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_scaled);
 		acc_json.put("text_anchor", "start"); 
-		acc_json.put("value", this.getAcc());
+		acc_json.put("value", numberPadding + this.getAcc());
 		acc_json.put("title", this.getAcc());
 		acc_json.put("font_size", textSize);
 		arr.put(acc_json);
@@ -154,6 +155,11 @@ public class Sequence {
 		
 	}
 	
+	public static String padRight(String s, int n) {
+	     return String.format("%-" + n + "s", s);  
+	}
+
+	
 	
 	/**
 	 * Create JSON object of all elements in this sequence
@@ -162,39 +168,31 @@ public class Sequence {
 	 * @param y
 	 * @return
 	 */
-	public JSONArray getSequenceGraphics(Scaling scaling, double y, double height, double minNtWidth, Colouring colouring, Filtering filtering, double textSize) {
+	public JSONArray getSequenceGraphics(Scaling scaling, int seqNum, double ntWidth, Colouring colouring, Filtering filtering, double textSize) {
 		
 		JSONArray arr = new JSONArray();
+		
+		// Do not plot beyond the edge
+		if (!scaling.inRangeY(seqNum)) return arr;
 		
 		// Should this sequence be included?
 		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
 		
+	
 		
-		int numSites = filtering == null ? seqLen : filtering.getNumSites();
+		double x = 0;
 		
-		//System.out.println("Displaying " + numSites + " sites");
+		double heightScaled = scaling.getRowHeight() + 1;
+		//double x = scaling.xmin();
+		
+
+		
+		double yc_rect_scaled = scaling.scaleY(seqNum);
+		double yc_text_scaled = scaling.scaleY(seqNum + 0.5);
 		
 		
-		
-		double dx = (scaling.xmax() - scaling.xmin()) / numSites;
-		double dxScaled = (scaling.scaleX(dx*2) - scaling.scaleX(dx)) + 1; // Add 1 to avoid white space between sites
-		if (dxScaled < minNtWidth) {
-			numSites = (int) Math.floor((scaling.canvasMaxX() - scaling.canvasMinX()) / minNtWidth);
-			dx = (scaling.xmax() - scaling.xmin()) / numSites;
-			dxScaled =  (scaling.scaleX(dx*2) - scaling.scaleX(dx)) + 1;
-			//System.out.println("nsites = " + numSites + " at width " + minNtWidth + " dx " + dx + " scaled " + dxScaled);
-		}else {
-			//System.out.println("stretched sizing " + numSites);
-		}
-		double heightScaled = scaling.scaleY(height) + 1;
-		double x = scaling.xmin();
-		
-		// Do not plot beyond the edge
-		if (!scaling.inRangeY(y)) return arr;
-		
-		double yc_rect_scaled = scaling.scaleY(y);
-		double yc_text_scaled = scaling.scaleY(y + height/2);
-		
+		// Add some xshift to the first nucleotide so it doesn't get clipped by left boundary
+		Double xshift = null;
 		
 		
 		// Plot sites
@@ -202,17 +200,28 @@ public class Sequence {
 		for (int site : filtering.getSites()) {
 
 			// Do not plot beyond the edge
-			if (!scaling.inRangeX(x)) break;
+			if (!scaling.inRangeX(x, ntWidth)) {
+				x ++;
+				continue;
+			}
+			if (scaling.isAboveRangeX(x, ntWidth)) break;
 			
 			String symbol = this.getSymbol(site);
 			
+			
+			
 			double xc = scaling.scaleX(x);
+			if (xshift == null) {
+				xshift = scaling.canvasMinX() - xc;
+			}
+			xc += xshift;
+			
 			
 			
 			
 			// Background colour
 			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect_scaled)
-								.put("width", dxScaled).put("height", heightScaled);
+								.put("width", ntWidth+1).put("height", heightScaled);
 			if (colouring != null) {
 				nt_bg.put("fill", colouring.getColour(symbol));
 			}
@@ -225,7 +234,7 @@ public class Sequence {
 			
 			
 			// Text
-			xc = scaling.scaleX(x + dx/2);
+			xc = scaling.scaleX(x + 0.5) + xshift;
 			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text_scaled);
 			nt_font.put("value", symbol);
 			nt_font.put("text_anchor", "middle"); // Right alignment
@@ -234,7 +243,7 @@ public class Sequence {
 			
 			arr.put(nt_font);
 			
-			x += dx;
+			x ++;
 			
 			
 		}

@@ -99,13 +99,15 @@ function renderGraphics(){
 				// Add the scrollbars
 				if (initialVal.scrolls.scrollY != null){
 					let pos = initialVal.scrolls.scrollY;
-					console.log("scrollY", pos);
-					createScrollbar(svg, pos, "scrollY", true);
+					let len = initialVal.scrolls.scrollYLength;
+					console.log("scrollY", pos, len);
+					createScrollbar(svg, pos, len, "scrollY", true);
 				}
 				if (initialVal.scrolls.scrollX != null){
 					let pos = initialVal.scrolls.scrollX;
-					console.log("scrollX", pos);
-					createScrollbar(svg, pos, "scrollX", false);
+					let len = initialVal.scrolls.scrollXLength;
+					console.log("scrollX", pos, len);
+					createScrollbar(svg, pos, len, "scrollX", false);
 				}
 
 
@@ -153,12 +155,11 @@ function renderGraphics(){
 /*
 	Create a scrollbar
 */
-function createScrollbar(svg, pos, id, vertical=true){
+function createScrollbar(svg, pos, scrollLength, id, vertical=true){
 	
 	$("#" + id).remove();
 	const axis = vertical ? "y" : "x";
 	const scrollWidth = 7;
-	const scrollLength = 30;
 	const padding = 3;
 	
 	
@@ -207,10 +208,10 @@ function createScrollbar(svg, pos, id, vertical=true){
  		var newValue;
  		if (!vertical) {
  			newValue = $(this).offset().left - svg.offset().left;
-			newValue = newValue / svg.width();
+			//newValue = newValue / svg.width();
  		}else{
  			newValue = $(this).offset().top - svg.offset().top;
-			newValue = newValue / svg.height();
+			//newValue = newValue / svg.height();
  		}
 
 

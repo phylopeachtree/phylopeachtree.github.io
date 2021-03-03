@@ -102,19 +102,7 @@ public class AlignmentAPI {
 	 * @param xmin
 	 * @return
 	 */
-	public static JSONArray getAlignmentGraphics(double xmin, double xmax, double ymin, double ymax, double minNtWidth, double textSize, Colouring colouring) {
-		
-		
-		
-		// Ensure that sites do not go below the minimum width
-		double ntWidth = (xmax - xmin) / AlignmentAPI.getNsitesDisplayed();
-
-		
-		
-		// Switch ymax and ymin for js
-		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
-		
-		
+	public static JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth, double textSize, Colouring colouring) {
 		return THE_ALIGNMENT.getAlignmentGraphics(scaling, colouring, minNtWidth, textSize);
 	}
 	
@@ -128,14 +116,8 @@ public class AlignmentAPI {
 	 * @param ymax
 	 * @return
 	 */
-	public static JSONArray getTaxaGraphics(double xmin, double xmax, double ymin, double ymax, double textSize) {
-		
-		
-		Scaling scaling = new Scaling(xmin, xmax, ymin, ymax);
-		
-				
+	public static JSONArray getTaxaGraphics(Scaling scaling, double textSize) {
 		return THE_ALIGNMENT.getTaxaGraphics(scaling, textSize);
-		
 	}
 
 

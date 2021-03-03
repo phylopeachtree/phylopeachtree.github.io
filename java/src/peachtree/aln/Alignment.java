@@ -340,34 +340,18 @@ public class Alignment {
 
 
 	/**
-	 * Get graphics of the alignment
+	 * Get graphics of the sequences in the alignment
 	 * @return
 	 */
 	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize) {
-		
-		
-		
-		
 		JSONArray objs = new JSONArray();
-		
-		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
-		double y = scaling.ymin();
-		//System.out.println("sequence: " + dy);
-		for (Sequence sequence : sequences) {
-
-			
-			//long start = Calendar.getInstance().getTimeInMillis();
-			
-			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, minNtWidth, colouring, filtering, textSize));
-			
-			//long finish = Calendar.getInstance().getTimeInMillis();
-			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
-			y += dy;
+		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
+			if (scaling.isAboveRangeY(seqNum)) break;
+			Sequence sequence = this.getSequence(seqNum);
+			objs.putAll(sequence.getSequenceGraphics(scaling, seqNum, minNtWidth, colouring, filtering, textSize));
 		}
 		
 		return objs;
-		
-		
 	}
 	
 	
@@ -377,21 +361,14 @@ public class Alignment {
 	 */
 	public JSONArray getTaxaGraphics(Scaling scaling, double textSize) {
 		
-		JSONArray objs = new JSONArray();
+		// Pad right after sequence number
+		int padding = (this.sequences.size() + "").length();
 		
-		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
-		double y = scaling.ymin();
-		System.out.println("taxa: " + dy);
-		for (Sequence sequence : sequences) {
-			
-			
-			//long start = Calendar.getInstance().getTimeInMillis();
-			
-			objs.putAll(sequence.getTaxonGraphics(scaling, y, dy, filtering, textSize));
-			
-			//long finish = Calendar.getInstance().getTimeInMillis();
-			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
-			y += dy;
+		JSONArray objs = new JSONArray();
+		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
+			if (scaling.isAboveRangeY(seqNum)) break;
+			Sequence sequence = this.getSequence(seqNum);
+			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize));
 		}
 		
 		return objs;

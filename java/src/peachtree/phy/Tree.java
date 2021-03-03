@@ -162,9 +162,7 @@ public class Tree {
 		
 		JSONArray objs = new JSONArray();
 		Filtering filtering = this.alignment.getFiltering();
-		double dy = (scaling.ymax() - scaling.ymin()) / filtering.getNumSeqs();
-		this.root.getGraphics(objs, dy, filtering, scaling, branchWidth);
-		
+		this.root.getGraphics(objs, filtering, scaling, branchWidth);
 		return objs;
 		
 	}

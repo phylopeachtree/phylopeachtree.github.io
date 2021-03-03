@@ -28,8 +28,8 @@ public class OptionsAPI {
 	
 	
 	// Boundaries
-	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 100, true);
-	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", 500, 100, 2000, 100, true);
+	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 10, true);
+	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", canvasWidth.getVal() * 0.618, 100, 2000, 10, true);
 	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
 	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
@@ -45,18 +45,16 @@ public class OptionsAPI {
 	
 	
 	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
-	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 16, 1, 50, 1);
+	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 1, 50, 1);
 	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 5);
 	
 	
-	static NumericalOption siteMinWidth = new NumericalOption("siteDim", "Alignment", "Minimum width of alignment sites", 15, 1, 100, 5);
+	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
 	
 	static DiscreteOption colourings;
 	
-	
-	
-	
+
 		
 	static List<Class<? extends Colouring>> colouringClasses;
 	
@@ -129,13 +127,34 @@ public class OptionsAPI {
 				}
 			}
 			
+			
+
+			
+			
 			if (option == null) {
 				System.out.println("Cannot find option " + id);
 			}else {
 				
 				
+				
+				
+				
 				if (option instanceof NumericalOption) {
-					((NumericalOption)option).setVal(Double.parseDouble(value));
+					
+					double val = Double.parseDouble(value);
+					
+					// Special case: scroll bar positions should be normalised
+					if (option == scrollX) {
+						val = val - canvasWidth.getVal()*division2.getVal();
+						val = val / (canvasWidth.getVal() - canvasWidth.getVal()*division2.getVal());
+					}
+					
+					if (option == scrollY) {
+						val = val / canvasHeight.getVal();
+					}
+					
+					
+					((NumericalOption)option).setVal(val);
 				}
 				
 				if (option instanceof DiscreteOption) {
@@ -200,6 +219,9 @@ public class OptionsAPI {
 			double height = canvasHeight.getVal();
 			
 			
+			
+			
+			
 			// Scroll bars
 			JSONObject scrolls = new JSONObject();
 			
@@ -207,10 +229,28 @@ public class OptionsAPI {
 			// Height of taxa
 			double ntHeight = siteHeight.getVal();
 			if (AlignmentAPI.isReady()) {
-				ntHeight = Math.max(Math.max(ntHeight,  fontSizeTaxa.getVal()), fontSizeAln.getVal());
+				//ntHeight = Math.max(Math.max(ntHeight,  fontSizeTaxa.getVal()), fontSizeAln.getVal());
 			}
 			System.out.println("ntHeight " + ntHeight);
 			
+			
+			// Full size of view
+			double fullHeight = ntHeight * AlignmentAPI.getNtaxa();
+			
+			
+			
+			
+			// Vertical scrolling?
+			if (height < fullHeight) {
+				Scaling scaling = new Scaling(0, 1, 0, height);
+				scaling.setRowHeight(ntHeight);
+				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
+				scrolls.put("scrollY", scrollY.getVal()*height).put("scrollYLength", scaling.getScrollYLength());
+			}else {
+				height = ntHeight * AlignmentAPI.getNtaxa();
+				canvasHeight.setVal(height);
+				height = canvasHeight.getVal();
+			}
 			
 
 			
@@ -227,14 +267,7 @@ public class OptionsAPI {
 			json.put("yboundaries", yboundaries);
 			
 			
-			
-			// Vertical scrolling?
-			if (height < ntHeight * AlignmentAPI.getNtaxa()) {
-				scrolls.put("scrollY", scrollY.getVal()*height);
-			}
-			height = ntHeight * AlignmentAPI.getNtaxa();
-			
-			
+
 			
 			
 			
@@ -244,11 +277,17 @@ public class OptionsAPI {
 			JSONArray objs = new JSONArray();
 			if (PhylogenyAPI.isReady()) {
 				
-				System.out.println("tree API");
+				
+				
 				double spacing = treeSpacing.getVal();
 				double branchW = branchwidth.getVal();
 				
-				JSONArray tree = PhylogenyAPI.getTreeGraphics(spacing, xdivide1*width - spacing, 0, height, branchW);
+				// Scaling
+				Scaling scaling = new Scaling(spacing,  xdivide1*width - spacing, 0, height, PhylogenyAPI.getHeight(), 0);
+				scaling.setRowHeight(ntHeight);
+				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
+				
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW);
 				objs.putAll(tree);
 				
 				
@@ -261,16 +300,33 @@ public class OptionsAPI {
 			
 			
 				// Taxa
-				double x0 = xdivide1*width + taxaSpacing.getVal();
-				JSONArray taxa = AlignmentAPI.getTaxaGraphics(x0, xdivide2*width, 0, height,  fontSizeTaxa.getVal());
-				objs.putAll(taxa);
+				if (xdivide2 > xdivide1) {
+					double x0 = xdivide1*width + taxaSpacing.getVal();
+					
+					// Scaling
+					Scaling scaling = new Scaling(x0, xdivide2*width, 0, height);
+					scaling.setRowHeight(ntHeight);
+					scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
+					
+					
+					JSONArray taxa = AlignmentAPI.getTaxaGraphics(scaling,  fontSizeTaxa.getVal());
+					objs.putAll(taxa);
+				}
 				
 	
 				// Alignment
-				double minWidth = siteMinWidth.getVal();
+				double minWidth = ntWidth.getVal();
+				double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
+				int nsitesInView = (int) Math.ceil((width - xdivide2*width) /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
 				Colouring cols = (Colouring) colourings.getVal();
 				System.out.println("Using the " + cols.getName() + " scheme");
-				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(xdivide2*width, width, 0, height, minWidth, fontSizeAln.getVal(), cols);
+				
+				// Scaling
+				Scaling scaling = new Scaling(xdivide2*width, width, 0, height, 0, nsitesInView-1);
+				scaling.setRowHeight(ntHeight);
+				scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullWidth, fullHeight);
+				
+				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, fontSizeAln.getVal(), cols);
 				objs.putAll(alignment);
 				
 				json.put("nsites", AlignmentAPI.getNsites());
@@ -279,7 +335,10 @@ public class OptionsAPI {
 				
 				
 				// Horizontal scrolling?
-				//scrolls.put("scrollX", scrollX.getVal()* (width - xdivide2*width) + xdivide2*width);
+				if (scaling.getScrollXLength() > 0) {
+					scrolls.put("scrollX", scrollX.getVal()* (width - xdivide2*width) + xdivide2*width).put("scrollXLength", scaling.getScrollXLength());
+				}
+				
 				
 				
 			}

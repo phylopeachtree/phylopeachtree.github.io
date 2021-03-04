@@ -125,7 +125,7 @@ public class Sequence {
 	 * @param filtering
 	 * @return
 	 */
-	public JSONArray getTaxonGraphics(Scaling scaling, int seqNum, int padding, Filtering filtering, double textSize) {
+	public JSONArray getTaxonGraphics(Scaling scaling, int seqNum, int padding, Filtering filtering, double textSize, boolean showTaxonNumbers) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -138,7 +138,7 @@ public class Sequence {
 		double yc_scaled = scaling.scaleY(seqNum + 0.5);
 		
 		
-		String numberPadding = padRight((seqNum+1)+":", padding+2);
+		String numberPadding = showTaxonNumbers ? padRight((seqNum+1)+":", padding+2) : "";
 		
 		
 		/// Plot accession

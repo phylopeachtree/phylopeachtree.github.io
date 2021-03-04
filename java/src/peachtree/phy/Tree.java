@@ -158,11 +158,10 @@ public class Tree {
 	 * @param branchWidth
 	 * @return
 	 */
-	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth) {
+	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree) {
 		
 		JSONArray objs = new JSONArray();
-		Filtering filtering = this.alignment.getFiltering();
-		this.root.getGraphics(objs, filtering, scaling, branchWidth);
+		this.root.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree);
 		return objs;
 		
 	}

@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.Alignment;
+import peachtree.aln.AlignmentAPI;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 import peachtree.phy.util.LinkType;
@@ -83,8 +84,8 @@ public class PhylogenyAPI {
 	 * @param branchWidth
 	 * @return
 	 */
-	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth) {
-		return THE_TREE.getTreeGraphics(scaling, branchWidth);
+	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree) {
+		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree);
 	}
 	
 	

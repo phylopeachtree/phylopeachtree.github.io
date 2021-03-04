@@ -42,15 +42,18 @@ public class OptionsAPI {
 	static DiscreteOption treeMethods;
 	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
+	static BooleanOption showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
 	
 	
 	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
 	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 1, 50, 1);
-	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 5);
+	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 1);
+	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Taxa", "Show taxon numbers", true);
 	
 	
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
+	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show variant sites only", true);
 	
 	static DiscreteOption colourings;
 	
@@ -137,8 +140,6 @@ public class OptionsAPI {
 				
 				
 				
-				
-				
 				if (option instanceof NumericalOption) {
 					
 					double val = Double.parseDouble(value);
@@ -155,6 +156,10 @@ public class OptionsAPI {
 					
 					
 					((NumericalOption)option).setVal(val);
+				}
+				
+				if (option instanceof BooleanOption) {
+					((BooleanOption)option).setVal(Boolean.parseBoolean(value));
 				}
 				
 				if (option instanceof DiscreteOption) {
@@ -287,7 +292,7 @@ public class OptionsAPI {
 				scaling.setRowHeight(ntHeight);
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 				
-				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW);
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal());
 				objs.putAll(tree);
 				
 				
@@ -298,6 +303,9 @@ public class OptionsAPI {
 			if (AlignmentAPI.isReady()) {
 				
 			
+				// Initialise filterings if necessary
+				AlignmentAPI.initFiltering(variantSitesOnly.getVal());
+				
 			
 				// Taxa
 				if (xdivide2 > xdivide1) {
@@ -309,7 +317,7 @@ public class OptionsAPI {
 					scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 					
 					
-					JSONArray taxa = AlignmentAPI.getTaxaGraphics(scaling,  fontSizeTaxa.getVal());
+					JSONArray taxa = AlignmentAPI.getTaxaGraphics(scaling,  fontSizeTaxa.getVal(), showTaxonNumbers.getVal());
 					objs.putAll(taxa);
 				}
 				

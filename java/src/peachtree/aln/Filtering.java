@@ -112,6 +112,15 @@ public class Filtering {
 	
 	
 	/**
+	 * Are variant sites only being displayed?
+	 * @return
+	 */
+	public boolean variantSitesOnly() {
+		return this.variantSitesOnly;
+	}
+	
+	
+	/**
 	 * Should this site number be included
 	 * @param site
 	 * @return
@@ -162,6 +171,8 @@ public class Filtering {
 	public int getNumSeqs() {
 		return numTaxa;
 	}
+
+
 	
 	
 	

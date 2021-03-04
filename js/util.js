@@ -224,6 +224,29 @@ function renderOptions(){
 					}
 					
 					
+					if (opt.type == "BooleanOption"){
+						
+						
+						
+
+						
+						// Switch html
+						let optionsHTML = `
+						<div class="optionsBox">
+							<div>
+								<label class="switch">
+									<input onChange="setOptionFromEle(this)" var="` + opt.name + `" type="checkbox">
+									<span class="sliderboolean"></span>
+								</label>
+							</div>
+							` + opt.title + `
+						</div>`;
+						div.children("div").children("div").append(optionsHTML);
+						div.children("div").children("div").find("input").prop("checked", opt.value);
+						
+					}
+					
+					
 					if (opt.type == "DiscreteOption"){
 						
 						
@@ -280,7 +303,14 @@ function renderOptions(){
 function setOptionFromEle(ele){
 	
 	let id = $(ele).attr("var");
-	let val = $(ele).val();
+	let val = 0;
+	if ($(ele).prop('nodeName') == "INPUT" && $(ele).prop("type") == "checkbox"){
+		val = $(ele).prop("checked");
+	}else{
+		val = $(ele).val();
+	}
+	
+
 	setOptionToVal(id, val);
 	
 }

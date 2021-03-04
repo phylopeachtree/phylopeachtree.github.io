@@ -24,8 +24,6 @@ public class Alignment {
 	List<int[]> patterns;
 	List<Double> patternWeights;
 	
-	Filtering filtering;
-	
 	
 	
 	static public Map<String, Integer> nt_chars = null;
@@ -125,9 +123,7 @@ public class Alignment {
 		
 		long t1 = Calendar.getInstance().getTimeInMillis();
 		
-		
-		// Default filtering
-		this.filtering = new Filtering(true, null, this);
+
 		
 		
 		// Initialise patterns
@@ -298,7 +294,6 @@ public class Alignment {
 		this.sequences = sequencesNew;
 		
 		// Reinitialise
-		this.filtering = new Filtering(true, null, this);
 		this.initPatterns();
 		
 		
@@ -308,16 +303,6 @@ public class Alignment {
 	
 
 
-
-
-	
-	/**
-	 * Alignment taxon/site filtering
-	 * @return
-	 */
-	public void setFiltering(Filtering filtering) {
-		this.filtering = filtering;
-	}
 	
 	public JSONObject toJSON() {
 		
@@ -343,7 +328,7 @@ public class Alignment {
 	 * Get graphics of the sequences in the alignment
 	 * @return
 	 */
-	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize) {
+	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize, Filtering filtering) {
 		JSONArray objs = new JSONArray();
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
 			if (scaling.isAboveRangeY(seqNum)) break;
@@ -359,7 +344,7 @@ public class Alignment {
 	 * Get taxa graphics
 	 * @return
 	 */
-	public JSONArray getTaxaGraphics(Scaling scaling, double textSize) {
+	public JSONArray getTaxaGraphics(Scaling scaling, double textSize, Filtering filtering, boolean showTaxonNumbers) {
 		
 		// Pad right after sequence number
 		int padding = (this.sequences.size() + "").length();
@@ -368,7 +353,7 @@ public class Alignment {
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
 			if (scaling.isAboveRangeY(seqNum)) break;
 			Sequence sequence = this.getSequence(seqNum);
-			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize));
+			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize, showTaxonNumbers));
 		}
 		
 		return objs;
@@ -530,15 +515,6 @@ public class Alignment {
 	}
 
 
-	/**
-	 * Number of sites being displayed
-	 * @return
-	 */
-	public int getNsitesDisplayed() {
-		if (this.filtering == null) return 0;
-		return this.filtering.getNumSites();
-	}
-
 
 	public List<String> getNames() {
 		List<String> names = new ArrayList<>();
@@ -584,13 +560,6 @@ public class Alignment {
 	}
 
 
-	/**
-	 * Site/taxon filtering
-	 * @return
-	 */
-	public Filtering getFiltering() {
-		return this.filtering;
-	}
 
 
 

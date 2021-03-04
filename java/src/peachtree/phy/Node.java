@@ -312,7 +312,7 @@ public class Node {
      * @param branchWidth
      * @return y
      */
-	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth) {
+	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -337,7 +337,7 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth);
+				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree);
 				y += ychild;
 				if (ychild > maxY) maxY = ychild;
 				if (ychild < minY) minY = ychild;
@@ -348,6 +348,31 @@ public class Node {
 		}
 		
 		
+		
+		
+		// Dashed line to taxa
+		if (this.isLeaf() && showTaxaOnTree && this.getHeight() > 0) {
+			
+			// Only draw if this node is in y-range
+			if (scaling.inRangeY(y)) {
+				
+				
+				double yscaled = scaling.scaleY(y);
+				
+				JSONObject dashed_json = new JSONObject();
+				dashed_json.put("ele", "line").put("x1", x2Scaled).put("x2", scaling.canvasMaxX());
+				dashed_json.put("y1", yscaled).put("y2", yscaled);
+				dashed_json.put("stroke_width", branchWidth/2);
+				dashed_json.put("stroke", "black");
+				dashed_json.put("stroke_linecap", "round");
+				dashed_json.put("stroke_dasharray", "4,7");
+				objs.put(dashed_json);
+				
+			}
+			
+			
+			
+		}
 		
 		
 	

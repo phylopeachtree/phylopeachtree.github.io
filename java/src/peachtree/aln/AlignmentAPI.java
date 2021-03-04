@@ -15,6 +15,7 @@ public class AlignmentAPI {
 
 	
 	private static Alignment THE_ALIGNMENT;
+	private static Filtering filtering = null;
 	
 	public static void init() {
 		THE_ALIGNMENT = null;
@@ -33,7 +34,7 @@ public class AlignmentAPI {
 		
 		//String str = new String(contents);
 		System.out.println("Uploading alignment " + str.length());
-		
+		filtering = null;
 		
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
@@ -70,30 +71,6 @@ public class AlignmentAPI {
 	}
 	
 	
-	
-	/**
-	 * Return a list of site colourings available for the current alignment
-	 * @return
-	 * @throws Exception
-	 */
-	public static String getColourings() throws Exception {
-		
-		
-		/*
-		 Reflections reflections = new Reflections("java.util");
-		    Set<Class<? extends List>> classes = reflections.getSubTypesOf(peatree.aln.Colouring.class);
-		    for (Class<? extends List> aClass : classes) {
-		        System.out.println(aClass.getName());
-		        if(aClass == ArrayList.class) {
-		            List list = aClass.newInstance();
-		            list.add("test");
-		            System.out.println(list.getClass().getName() + ": " + list.size());
-		        }
-		    }
-		*/
-		
-		return "";
-	}
 
 
 	
@@ -103,7 +80,7 @@ public class AlignmentAPI {
 	 * @return
 	 */
 	public static JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth, double textSize, Colouring colouring) {
-		return THE_ALIGNMENT.getAlignmentGraphics(scaling, colouring, minNtWidth, textSize);
+		return THE_ALIGNMENT.getAlignmentGraphics(scaling, colouring, minNtWidth, textSize, filtering);
 	}
 	
 	
@@ -116,8 +93,8 @@ public class AlignmentAPI {
 	 * @param ymax
 	 * @return
 	 */
-	public static JSONArray getTaxaGraphics(Scaling scaling, double textSize) {
-		return THE_ALIGNMENT.getTaxaGraphics(scaling, textSize);
+	public static JSONArray getTaxaGraphics(Scaling scaling, double textSize, boolean showTaxonNumbers) {
+		return THE_ALIGNMENT.getTaxaGraphics(scaling, textSize, filtering, showTaxonNumbers);
 	}
 
 
@@ -137,7 +114,8 @@ public class AlignmentAPI {
 	
 	public static int getNsitesDisplayed() {
 		if (THE_ALIGNMENT == null) return 0;
-		return THE_ALIGNMENT.getNsitesDisplayed();
+		if (filtering == null) return 0;
+		return filtering.getNumSites();
 	}
 	
 	public static int getNtaxa() {
@@ -149,6 +127,36 @@ public class AlignmentAPI {
 	public static Alignment getAlignment() {
 		return THE_ALIGNMENT;
 	}
+	
+	
+	
+	/**
+	 * Initialise filtering object, if not already initialised
+	 * @param variantSitesOnly
+	 */
+	public static void initFiltering(boolean variantSitesOnly) {
+		
+		
+		boolean initRequired = false;
+		if (filtering == null) initRequired = true;
+		else if (filtering.variantSitesOnly() != variantSitesOnly) initRequired = true;
+		
+		// Default filtering
+		if (initRequired) {
+			filtering = new Filtering(variantSitesOnly, null, THE_ALIGNMENT);
+		}
+		
+		
+	}
+
+	/**
+	 * Filtering object used for drawing alignment/taxa/tree
+	 * @return
+	 */
+	public static Filtering getFiltering() {
+		return filtering;
+	}
+	
 	
 }
 

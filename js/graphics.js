@@ -193,7 +193,7 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
 	var ctx = canvas.getContext('2d');
 	ctx.fillStyle = "#29465b";
 	//ctx.fillRect(0, 0, canvas.width, canvas.height);
-	roundRect(ctx, 0, 0, canvas.width, canvas.height, 50, "#29465b");
+	roundRect(ctx, 0, 0, canvas.width, canvas.height, 10, "#29465b");
 	
 	
 	// Draggable options

@@ -210,6 +210,7 @@ public class Sequence {
 		
 		// Plot sites
 		JSONObject nt_bg, nt_font;
+		String colour;
 		for (int site : filtering.getSites()) {
 
 			// Do not plot beyond the edge
@@ -236,8 +237,9 @@ public class Sequence {
 			nt_bg = new JSONObject().put("ele", "rect").put("x", xc).put("y", yc_rect_scaled)
 								.put("width", ntWidth+1).put("height", heightScaled);
 			if (colouring != null) {
-				nt_bg.put("fill", colouring.getColour(symbol));
-				nt_bg.put("stroke", colouring.getColour(symbol));
+				colour = colouring.getColour(symbol, site);
+				nt_bg.put("fill", colour);
+				//nt_bg.put("stroke", colour);
 			}
 			//nt_bg.put("fill", "#008cba");
 			//nt_bg.put("color", "white");

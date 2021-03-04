@@ -19,11 +19,18 @@ public class Filtering {
 	Map<Integer, Boolean> sitesToIncludeMap;
 	List<Integer> sitesToIncludeList;
 	
+	
+	// Major characters at each site
+	Map<Integer, Integer> majors;
+	
+	
 	int numSites;
 	int numTaxa;
+	boolean isNucleotide;
 	
 	public Filtering(boolean variantSitesOnly, List<Taxon> taxaToInclude, Alignment alignment) {
 		this.variantSitesOnly = variantSitesOnly;
+		this.isNucleotide = alignment.isNucleotide;
 		
 		
 		// Use unique taxa ids
@@ -35,8 +42,11 @@ public class Filtering {
 			numTaxa = taxaIDsToInclude.size();
 		}else {
 			numTaxa = alignment.getNtaxa();
+			for (int i = 0; i < numTaxa; i ++) taxaIDsToInclude.put(i, true);
 		}
 		
+		
+		this.majors = null;
 		
 
 		// Which sites to include?
@@ -95,6 +105,11 @@ public class Filtering {
 			}
 		}
 		
+		
+		
+		// Prepare major/minor alleles
+		this.prepareMajorAlleles(alignment);
+		
 	}
 	
 	
@@ -135,23 +150,6 @@ public class Filtering {
 	
 	public List<Integer> getSites() {
 		return this.sitesToIncludeList;
-		/*
-		int[] sites = new int[this.getNumSites()];
-		if (this.sitesToIncludeMap != null && this.sitesToIncludeMap.size() > 0) {
-			int i = 0;
-			for (int site : this.sitesToIncludeMap.keySet()) {
-				//System.out.println("including site " + site);
-				sites[i] = site;
-				i++;
-			}
-		}else {
-			for (int i = 0; i < this.getNumSites(); i ++) {
-				sites[i] = i;
-				i++;
-			}
-		}
-		return sites;
-		*/
 	}
 
 
@@ -172,9 +170,117 @@ public class Filtering {
 		return numTaxa;
 	}
 
+	
+	
+	/**
+	 * Prepare the arrays of major alleles at each site
+	 */
+	private void prepareMajorAlleles(Alignment alignment) {
+		
+		
+		this.majors = new HashMap<>();
+		HashMap<Integer, Integer> freqs = new HashMap<>();
+		int siteNum, count, character;
+		for (int s = 0; s < this.numSites; s ++) {
+			
+			
+			siteNum = this.sitesToIncludeList.get(s);
+			
+			// List all characters by frequency
+			freqs.clear();
+			for (int taxonNum : this.taxaIDsToInclude.keySet()) {
+				
+				// Count
+				character = alignment.getSequence(taxonNum).getSymbolInt(siteNum);
+				if (freqs.containsKey(character)) {
+					count = freqs.get(character) + 1;
+				}else {
+					count = 1;
+				}
+				freqs.put(character, count);
+				
+			}
+			
+			
+			// Find major allele at this site
+			int maxCount = 0;
+			int major = -1;
+			for (Integer c : freqs.keySet()) {
+				count = freqs.get(c);
+				if (count > maxCount) {
+					maxCount = count;
+					major = c;
+				}
+			}
+			this.majors.put(siteNum, major);
+			
+			
+		}
+		
+	}
+	
+	
+	/**
+	 * Is this character at this site the major allele?
+	 * @param character
+	 * @param siteNum
+	 * @return
+	 */
+	public boolean isMajorAllele(String character, int siteNum) {
+		return isMajorOrMinorAllele(character, siteNum, true);
+	}
 
 	
+	/**
+	 * Is this character at this site a non-major allele?
+	 * @param character
+	 * @param siteNum
+	 * @return
+	 */
+	public boolean isMinorAllele(String character, int siteNum) {
+		return isMajorOrMinorAllele(character, siteNum, false);
+	}
 	
+	
+	/**
+	 * Is this character at this site a major allele (if isMajor=true) or a minor allele (if false)
+	 * @param character
+	 * @param siteNum
+	 * @param isMajor
+	 * @return
+	 */
+	private boolean isMajorOrMinorAllele(String character, int siteNum, boolean isMajor) {
+		
+		if (!this.majors.containsKey(siteNum)) return false;
+		
+		// Convert to int
+		int charInt;
+		if (this.isNucleotide) {
+			charInt = Alignment.nt_chars.get(character);
+		}else {
+			charInt = Alignment.alpha_chars.get(character);
+		}
+		
+		int major = this.majors.get(siteNum);
+		if (isMajor) return major == charInt;
+		return major != charInt;
+		
+	}
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

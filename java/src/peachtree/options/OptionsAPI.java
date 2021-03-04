@@ -330,10 +330,10 @@ public class OptionsAPI {
 	
 				// Alignment
 				double alnViewWidth = (width - xdivide2*width);
+				double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
 				if (alnViewWidth > 0) {
 					
 					double minWidth = ntWidth.getVal();
-					double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
 					int nsitesInView = (int) Math.ceil(alnViewWidth /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
 					Colouring cols = (Colouring) colourings.getVal();
 					cols.setSiteColourFilter((SiteColourFilter)siteColourType.getVal());
@@ -353,7 +353,7 @@ public class OptionsAPI {
 					
 					
 					// Horizontal scrolling?
-					if (scaling.getScrollXLength() > 0) {
+					if (fullWidth > alnViewWidth && scaling.getScrollXLength() > 0) {
 						
 						// Validate scrollX position
 						if (scrollX.getVal()*alnViewWidth + scaling.getScrollXLength() > alnViewWidth) {

@@ -86,6 +86,7 @@ function renderGraphics(){
 
 
 				// Add the boundaries
+				$(".draggableDivision").remove();
 				for (var xboundary in initialVal.xboundaries){
 					console.log("x", xboundary);
 					var contained = xboundary != "width";

@@ -125,7 +125,7 @@ public class Sequence {
 	 * @param filtering
 	 * @return
 	 */
-	public JSONArray getTaxonGraphics(Scaling scaling, int seqNum, int padding, Filtering filtering, double textSize, boolean showTaxonNumbers) {
+	public JSONArray getTaxonGraphics(Scaling scaling, int seqNum, int padding, Filtering filtering, double textSize, boolean showTaxonNumbers, Double[] yshift) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -135,10 +135,15 @@ public class Sequence {
 		// Should this sequence be included?
 		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
 		
-		double yc_scaled = scaling.scaleY(seqNum + 0.5);
 		
+		// Y shift
+		if (yshift[0] == null) {
+			yshift[0] = scaling.canvasMinY() - scaling.scaleY(seqNum);
+		}
+		double yc_scaled = scaling.scaleY(seqNum + 0.5) + yshift[0];
 		
 		String numberPadding = showTaxonNumbers ? padRight((seqNum+1)+":", padding+2) : "";
+		numberPadding.replaceAll(" ", "&#160;"); // White space
 		
 		
 		/// Plot accession
@@ -148,6 +153,8 @@ public class Sequence {
 		acc_json.put("value", numberPadding + this.getAcc());
 		acc_json.put("title", this.getAcc());
 		acc_json.put("font_size", textSize);
+		acc_json.put("white_space", "pre");
+		
 		arr.put(acc_json);
 		
 		
@@ -168,7 +175,7 @@ public class Sequence {
 	 * @param y
 	 * @return
 	 */
-	public JSONArray getSequenceGraphics(Scaling scaling, int seqNum, double ntWidth, Colouring colouring, Filtering filtering, double textSize) {
+	public JSONArray getSequenceGraphics(Scaling scaling, int seqNum, double ntWidth, Colouring colouring, Filtering filtering, double textSize, Double[] yshift) {
 		
 		JSONArray arr = new JSONArray();
 		
@@ -186,9 +193,15 @@ public class Sequence {
 		//double x = scaling.xmin();
 		
 
-		
+		// Y shift to avoid clipping the top margin
 		double yc_rect_scaled = scaling.scaleY(seqNum);
 		double yc_text_scaled = scaling.scaleY(seqNum + 0.5);
+		if (yshift[0] == null) {
+			yshift[0] = scaling.canvasMinY() - yc_rect_scaled;
+		}
+		yc_rect_scaled += yshift[0];
+		yc_text_scaled += yshift[0];
+		
 		
 		
 		// Add some xshift to the first nucleotide so it doesn't get clipped by left boundary
@@ -224,6 +237,7 @@ public class Sequence {
 								.put("width", ntWidth+1).put("height", heightScaled);
 			if (colouring != null) {
 				nt_bg.put("fill", colouring.getColour(symbol));
+				nt_bg.put("stroke", colouring.getColour(symbol));
 			}
 			//nt_bg.put("fill", "#008cba");
 			//nt_bg.put("color", "white");

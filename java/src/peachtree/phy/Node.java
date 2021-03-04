@@ -312,7 +312,7 @@ public class Node {
      * @param branchWidth
      * @return y
      */
-	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree) {
+	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -337,7 +337,7 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree);
+				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
 				y += ychild;
 				if (ychild > maxY) maxY = ychild;
 				if (ychild < minY) minY = ychild;
@@ -349,6 +349,8 @@ public class Node {
 		
 		
 		
+		double yscaled = scaling.scaleY(y);
+		yscaled += yshift;
 		
 		// Dashed line to taxa
 		if (this.isLeaf() && showTaxaOnTree && this.getHeight() > 0) {
@@ -357,7 +359,7 @@ public class Node {
 			if (scaling.inRangeY(y)) {
 				
 				
-				double yscaled = scaling.scaleY(y);
+				
 				
 				JSONObject dashed_json = new JSONObject();
 				dashed_json.put("ele", "line").put("x1", x2Scaled).put("x2", scaling.canvasMaxX());
@@ -386,7 +388,7 @@ public class Node {
 				
 				JSONObject shoulder_json = new JSONObject();
 				shoulder_json.put("ele", "line").put("x1", x2Scaled).put("x2", x2Scaled);
-				shoulder_json.put("y1", scaling.scaleY(minY)).put("y2", scaling.scaleY(maxY));
+				shoulder_json.put("y1", scaling.scaleY(minY) + yshift).put("y2", scaling.scaleY(maxY) + yshift);
 				shoulder_json.put("stroke_width", branchWidth);
 				shoulder_json.put("stroke", "black");
 				shoulder_json.put("stroke_linecap", "round");
@@ -405,7 +407,6 @@ public class Node {
 			if (scaling.inRangeY(y)) {
 			
 				double x1 = this.getParent().getHeight();
-				double yscaled = scaling.scaleY(y);
 				
 				// Branch
 				JSONObject branch_json = new JSONObject();

@@ -16,6 +16,7 @@ import peachtree.aln.colourings.ClustalAmino;
 import peachtree.aln.colourings.Colouring;
 import peachtree.aln.colourings.Drums;
 import peachtree.aln.colourings.Jalview;
+import peachtree.aln.colourings.SiteColourFilter;
 import peachtree.phy.ClusterTree;
 import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.util.LinkType;
@@ -25,11 +26,13 @@ import peachtree.phy.util.LinkType;
 public class OptionsAPI {
 	
 	static final long CHUNK_SIZE = 30000;
+	static final double LEFT_MARGIN = 16; // Left hand margin
+	static final double TOP_MARGIN = 16; // Top margin
 	
 	
 	// Boundaries
-	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 100, 2000, 10, true);
-	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", canvasWidth.getVal() * 0.618, 100, 2000, 10, true);
+	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 10, 2000, 100, true);
+	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", canvasWidth.getVal() * 0.618, 10, 2000, 100, true);
 	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
 	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
@@ -54,7 +57,7 @@ public class OptionsAPI {
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
 	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show variant sites only", true);
-	
+	static DiscreteOption siteColourType;
 	static DiscreteOption colourings;
 	
 
@@ -67,9 +70,8 @@ public class OptionsAPI {
 		
 		graphicalObjects = null;
 		
-		
-		
 		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
+		siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", SiteColourFilter.all, SiteColourFilter.values());
 		
 	}
 	
@@ -146,12 +148,12 @@ public class OptionsAPI {
 					
 					// Special case: scroll bar positions should be normalised
 					if (option == scrollX) {
-						val = val - canvasWidth.getVal()*division2.getVal();
-						val = val / (canvasWidth.getVal() - canvasWidth.getVal()*division2.getVal());
+						val = val - (canvasWidth.getVal())*division2.getVal();
+						val = val / (canvasWidth.getVal() - (canvasWidth.getVal())*division2.getVal());
 					}
 					
 					if (option == scrollY) {
-						val = val / canvasHeight.getVal();
+						val = val / (canvasHeight.getVal());
 					}
 					
 					
@@ -240,20 +242,25 @@ public class OptionsAPI {
 			
 			
 			// Full size of view
-			double fullHeight = ntHeight * AlignmentAPI.getNtaxa();
+			double fullHeight = ntHeight * AlignmentAPI.getNtaxa() + TOP_MARGIN;
 			
 			
 			
 			
 			// Vertical scrolling?
 			if (height < fullHeight) {
-				Scaling scaling = new Scaling(0, 1, 0, height);
+				Scaling scaling = new Scaling(0, 0, TOP_MARGIN, height);
 				scaling.setRowHeight(ntHeight);
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
+				
+				
+				// Validate scrollY position
+				if (scrollY.getVal()*height + scaling.getScrollYLength() > height) {
+					scrollY.setVal((height - scaling.getScrollYLength()) / height);
+				}
 				scrolls.put("scrollY", scrollY.getVal()*height).put("scrollYLength", scaling.getScrollYLength());
 			}else {
-				height = ntHeight * AlignmentAPI.getNtaxa();
-				canvasHeight.setVal(height);
+				canvasHeight.setVal(fullHeight);
 				height = canvasHeight.getVal();
 			}
 			
@@ -272,7 +279,6 @@ public class OptionsAPI {
 			json.put("yboundaries", yboundaries);
 			
 			
-
 			
 			
 			
@@ -288,7 +294,7 @@ public class OptionsAPI {
 				double branchW = branchwidth.getVal();
 				
 				// Scaling
-				Scaling scaling = new Scaling(spacing,  xdivide1*width - spacing, 0, height, PhylogenyAPI.getHeight(), 0);
+				Scaling scaling = new Scaling(LEFT_MARGIN + spacing,  xdivide1*width - spacing, TOP_MARGIN, height, PhylogenyAPI.getHeight(), 0);
 				scaling.setRowHeight(ntHeight);
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 				
@@ -312,7 +318,7 @@ public class OptionsAPI {
 					double x0 = xdivide1*width + taxaSpacing.getVal();
 					
 					// Scaling
-					Scaling scaling = new Scaling(x0, xdivide2*width, 0, height);
+					Scaling scaling = new Scaling(x0, xdivide2*width, TOP_MARGIN, height);
 					scaling.setRowHeight(ntHeight);
 					scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 					
@@ -323,33 +329,58 @@ public class OptionsAPI {
 				
 	
 				// Alignment
-				double minWidth = ntWidth.getVal();
-				double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
-				int nsitesInView = (int) Math.ceil((width - xdivide2*width) /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
-				Colouring cols = (Colouring) colourings.getVal();
-				System.out.println("Using the " + cols.getName() + " scheme");
+				double alnViewWidth = (width - xdivide2*width);
+				if (alnViewWidth > 0) {
+					
+					double minWidth = ntWidth.getVal();
+					double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
+					int nsitesInView = (int) Math.ceil(alnViewWidth /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
+					Colouring cols = (Colouring) colourings.getVal();
+					cols.setSiteColourFilter((SiteColourFilter)siteColourType.getVal());
+					System.out.println("Using the " + cols.getName() + " scheme");
+					
+					// Scaling
+					Scaling scaling = new Scaling(xdivide2*width, width, TOP_MARGIN, height, 0, nsitesInView-1);
+					scaling.setRowHeight(ntHeight);
+					scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullWidth, fullHeight);
+					
+					JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, fontSizeAln.getVal(), cols);
+					objs.putAll(alignment);
+					
+					json.put("nsites", AlignmentAPI.getNsites());
+					json.put("nsitesdisplayed", AlignmentAPI.getNsitesDisplayed());
+					json.put("ntaxa", AlignmentAPI.getNtaxa());
+					
+					
+					// Horizontal scrolling?
+					if (scaling.getScrollXLength() > 0) {
+						
+						// Validate scrollX position
+						if (scrollX.getVal()*alnViewWidth + scaling.getScrollXLength() > alnViewWidth) {
+							scrollX.setVal((alnViewWidth - scaling.getScrollXLength()) / alnViewWidth);
+						}
+						
+						scrolls.put("scrollX", scrollX.getVal()* (width - xdivide2*width) + xdivide2*width).put("scrollXLength", scaling.getScrollXLength());
+					}
+					
 				
-				// Scaling
-				Scaling scaling = new Scaling(xdivide2*width, width, 0, height, 0, nsitesInView-1);
-				scaling.setRowHeight(ntHeight);
-				scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullWidth, fullHeight);
-				
-				JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, fontSizeAln.getVal(), cols);
-				objs.putAll(alignment);
-				
-				json.put("nsites", AlignmentAPI.getNsites());
-				json.put("nsitesdisplayed", AlignmentAPI.getNsitesDisplayed());
-				json.put("ntaxa", AlignmentAPI.getNtaxa());
-				
-				
-				// Horizontal scrolling?
-				if (scaling.getScrollXLength() > 0) {
-					scrolls.put("scrollX", scrollX.getVal()* (width - xdivide2*width) + xdivide2*width).put("scrollXLength", scaling.getScrollXLength());
 				}
 				
 				
 				
 			}
+			
+			
+			
+			// Add top layer objects
+			JSONArray topObjs = new JSONArray();
+			
+			// Top and left margin backgrounds
+			JSONObject top  = new JSONObject().put("ele", "rect").put("x", 0).put("y", 0).put("width", width).put("height", TOP_MARGIN).put("fill", "#FFDAB9");
+			JSONObject left = new JSONObject().put("ele", "rect").put("x", 0).put("y", 0).put("width", LEFT_MARGIN).put("height", height).put("fill", "#FFDAB9");
+			topObjs.put(top).put(left);
+			json.put("objects", topObjs);
+			
 			
 			graphicalObjects = objs;
 			

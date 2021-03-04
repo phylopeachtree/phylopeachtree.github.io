@@ -329,11 +329,17 @@ public class Alignment {
 	 * @return
 	 */
 	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize, Filtering filtering) {
+		
 		JSONArray objs = new JSONArray();
+		if (!scaling.inView()) return objs;
+		
+		// Add some yshift to the first row so it doesn't get clipped by top margin
+		Double[] yshift = new Double[1];
+		
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
 			if (scaling.isAboveRangeY(seqNum)) break;
 			Sequence sequence = this.getSequence(seqNum);
-			objs.putAll(sequence.getSequenceGraphics(scaling, seqNum, minNtWidth, colouring, filtering, textSize));
+			objs.putAll(sequence.getSequenceGraphics(scaling, seqNum, minNtWidth, colouring, filtering, textSize, yshift));
 		}
 		
 		return objs;
@@ -346,14 +352,20 @@ public class Alignment {
 	 */
 	public JSONArray getTaxaGraphics(Scaling scaling, double textSize, Filtering filtering, boolean showTaxonNumbers) {
 		
+		JSONArray objs = new JSONArray();
+		if (!scaling.inView()) return objs;
+		
 		// Pad right after sequence number
 		int padding = (this.sequences.size() + "").length();
 		
-		JSONArray objs = new JSONArray();
+		// Add some yshift to the first row so it doesn't get clipped by top margin
+		Double[] yshift = new Double[1];
+
+		
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
 			if (scaling.isAboveRangeY(seqNum)) break;
 			Sequence sequence = this.getSequence(seqNum);
-			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize, showTaxonNumbers));
+			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize, showTaxonNumbers, yshift));
 		}
 		
 		return objs;

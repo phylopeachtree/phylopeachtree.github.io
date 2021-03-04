@@ -15,7 +15,7 @@ public abstract class Colouring {
 	
 	
 	Map<String, String> colours = new  HashMap<String, String>();
-	
+	SiteColourFilter colFilter = SiteColourFilter.all;
 	
 	public abstract String getName();
 	public abstract boolean isNucleotide();
@@ -47,6 +47,15 @@ public abstract class Colouring {
 	@Override
 	public String toString() {
 		return this.getName();
+	}
+	
+	
+	/**
+	 * Which sites should be coloured
+	 * @param val
+	 */
+	public void setSiteColourFilter(SiteColourFilter val) {
+		this.colFilter = val;
 	}
 	
 	

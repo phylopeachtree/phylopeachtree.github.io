@@ -39,6 +39,7 @@ public class AlignmentAPI {
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
 			THE_ALIGNMENT = new Alignment(str);
+			initFiltering(true);
 			OptionsAPI.prepareColourings();
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );

@@ -161,7 +161,19 @@ public class Tree {
 	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree) {
 		
 		JSONArray objs = new JSONArray();
-		this.root.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree);
+		if (!scaling.inView()) return objs;
+		
+		// Calculate yshift to avoid clipping top margin
+		// First, the top most leaf in the view must be found
+		double yshift = 0;
+		for (int leafNr = 0; leafNr < this.getLeafNodeCount(); leafNr ++) {
+			if (scaling.inRangeY(leafNr)){
+				yshift = scaling.canvasMinY() - scaling.scaleY(leafNr);
+				break;
+			}
+		}
+		
+		this.root.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
 		return objs;
 		
 	}

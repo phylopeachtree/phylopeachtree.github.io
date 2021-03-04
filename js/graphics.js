@@ -78,9 +78,11 @@ function renderGraphics(){
 				svg.parent().width(width + padding);
 
 
-				// Create top layer draggable
+				// Create top layer
 				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
 				svg.append(mainGroup);
+				svg.append(topGroup);
 
 
 				// Add the boundaries
@@ -134,6 +136,13 @@ function renderGraphics(){
 					$("#nsitesdisplayed_div").html("");
 				}
 
+
+
+				// Plot top level objects
+				for (var i = 0; i < initialVal.objects.length; i ++){
+					var o = initialVal.objects[i];
+					drawSVGobj(topGroup, o);
+				}
 
 
 				// Plot json objects 1 chunk at a time
@@ -193,7 +202,7 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
 	var ctx = canvas.getContext('2d');
 	ctx.fillStyle = "#29465b";
 	//ctx.fillRect(0, 0, canvas.width, canvas.height);
-	roundRect(ctx, 0, 0, canvas.width, canvas.height, 10, "#29465b");
+	roundRect(ctx, 0, 0, canvas.width, canvas.height, 300/scrollLength, "#29465b");
 	
 	
 	// Draggable options
@@ -243,7 +252,7 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 	$("#" + id).remove();
 	const axis = xAxis ? "x" : "y";
 	const divisionWidth = 2;
-	const padding = 3;
+	const padding = 2;
 
 
 
@@ -253,14 +262,14 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 	// Vertical 
 	if (xAxis) {
 		left = svg.offset().left + pos;
-		top = svg.offset().top - padding;
+		top = svg.offset().top;
 		width = divisionWidth;
 		height = svg.height() + padding;
 	}
 
 	// Horizontal
 	else{
-		left = svg.offset().left - padding;
+		left = svg.offset().left;
 		top = svg.offset().top + pos;
 		width = svg.width() +  padding;
 		height = divisionWidth;
@@ -276,8 +285,8 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 	// Get the canvas
 	var canvas = document.getElementById(id);
 	var ctx = canvas.getContext('2d');
-	ctx.fillStyle = '#aaaaaa';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "#29465b";
+	roundRect(ctx, 0, 0, canvas.width, canvas.height, 20, "#29465b");
 
 
 	// Draggable options

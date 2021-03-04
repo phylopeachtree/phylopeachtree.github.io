@@ -171,7 +171,7 @@ public class Scaling {
 	 */
 	public boolean inRangeY(double rowPos) {
 		double h = this.scaleY(rowPos);
-		if (h + rowH < this.canvasMinY) return false;
+		if (h < this.canvasMinY) return false;
 		if (h - rowH > this.canvasMaxY) return false;
 		return true;
 	}
@@ -287,6 +287,17 @@ public class Scaling {
 	
 	public double canvasMaxY() {
 		return canvasMaxY;
+	}
+
+
+	/**
+	 * Is the width and height > 0
+	 * @return
+	 */
+	public boolean inView() {
+		if (this.canvasMaxX - this.canvasMinX <= 0) return false;
+		if (this.canvasMaxY - this.canvasMinY <= 0) return false;
+		return true;
 	}
 
 

@@ -242,7 +242,7 @@ function renderOptions(){
 							` + opt.title + `
 						</div>`;
 						div.children("div").children("div").append(optionsHTML);
-						div.children("div").children("div").find("input").prop("checked", opt.value);
+						div.find(`input[var="` + opt.name + `"]`).prop("checked", opt.value);
 						
 					}
 					
@@ -268,8 +268,8 @@ function renderOptions(){
 						
 						for (let j = 0; j < opt.domain.length; j ++){
 							let dropdownOptionsHTML = `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
-							div.children("div").children("div").find("select").append(dropdownOptionsHTML);
-							if (opt.domain[j] == opt.value) div.children("div").children("div").find("select").val(opt.domain[j]);
+							div.find(`select[var="` + opt.name + `"]`).append(dropdownOptionsHTML);
+							if (opt.domain[j] == opt.value) div.find(`select[var="` + opt.name + `"]`).val(opt.domain[j]);
 						}
 						
 						

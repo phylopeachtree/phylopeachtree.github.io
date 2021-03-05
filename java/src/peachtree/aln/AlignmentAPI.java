@@ -238,6 +238,7 @@ public class AlignmentAPI {
 		if (initRequired) {
 			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
 			selectionIsDirty = false;
+			orderingIsDirty = false;
 		}
 		
 		

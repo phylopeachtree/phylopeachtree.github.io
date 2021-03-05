@@ -2,6 +2,7 @@ package peachtree.aln;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class Filtering {
 		
 		
 		// Use unique taxa ids
-		this.taxaIDsToInclude = new HashMap<>();
+		this.taxaIDsToInclude = new LinkedHashMap<>();
 		
 		
 		// Use the tree to find taxa
@@ -78,11 +79,20 @@ public class Filtering {
 		}
 		numTaxa = taxaIDsToInclude.size();
 		
+		// Just show everything
+		if (numTaxa == 0) {
+			for (Sequence seq : alignment.getSequences()) {
+				Taxon taxon = seq.getTaxon();
+				taxaIDsToInclude.put(taxon.getID(), true);
+			}
+			numTaxa = taxaIDsToInclude.size();
+		}
+		
 		this.majors = null;
 		
 
 		// Which sites to include?
-		this.sitesToIncludeMap = new HashMap<>();
+		this.sitesToIncludeMap = new LinkedHashMap<>();
 		this.sitesToIncludeList = new ArrayList<>();
 		if (this.variantSitesOnly) {
 			for (int site = 0; site < alignment.getLength(); site ++) {
@@ -224,7 +234,7 @@ public class Filtering {
 		
 		
 		this.majors = new HashMap<>();
-		if (numTaxa < 2 || numSites == 0) return;
+		if (numTaxa < 2 || this.sitesToIncludeList.isEmpty()) return;
 		HashMap<Integer, Integer> freqs = new HashMap<>();
 		int siteNum, count, character;
 		for (int s = 0; s < this.numSites; s ++) {
@@ -314,6 +324,22 @@ public class Filtering {
 		if (isMajor) return major == charInt;
 		return major != charInt;
 		
+	}
+
+
+	/**
+	 * Get the index of this taxon
+	 * @param taxon
+	 * @return
+	 */
+	public int getIndex(Taxon taxon) {
+		
+		int rowNum = 0;
+		for (int taxonID : this.taxaIDsToInclude.keySet()) {
+			if (taxon.getID() == taxonID) return rowNum;
+			rowNum ++;
+		}
+		return -1;
 	}
 	
 	

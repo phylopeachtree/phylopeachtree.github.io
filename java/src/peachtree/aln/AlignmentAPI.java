@@ -18,6 +18,7 @@ public class AlignmentAPI {
 	private static Alignment THE_ALIGNMENT;
 	private static Filtering filtering = null;
 	private static boolean selectionIsDirty = false;
+	private static boolean orderingIsDirty = false;
 	
 	public static void init() {
 		THE_ALIGNMENT = null;
@@ -30,6 +31,51 @@ public class AlignmentAPI {
 	public static void setSelectionToDirty() {
 		selectionIsDirty = true;
 	}
+	
+	/**
+	 * Notify the API that the taxon ordering has changed and therefore the filtering needs to be constructed again
+	 */
+	public static void setOrderingToDirty() {
+		orderingIsDirty = true;
+	}
+	
+	
+	
+	/**
+	 * Return a list of taxa labels, as a json string
+	 * @return
+	 */
+	public static String getListOfTaxaLabels() {
+		
+		
+		
+		try {
+			
+			JSONObject json = new JSONObject();
+			JSONArray labels = new JSONArray();
+			if (THE_ALIGNMENT != null) {
+			
+				// Find all displayed taxa
+				for (Sequence seq : THE_ALIGNMENT.getSequences()) {
+					Taxon taxon = seq.getTaxon();
+					if (filtering.includeTaxon(taxon)) {
+						labels.put(taxon.getName());
+					}
+				}
+			
+			}
+			
+			json.put("labels", labels);
+			return json.toString();
+			
+		}catch (Exception e){
+			e.printStackTrace();
+			return OptionsAPI.getErrorJSON(e);
+		}
+	}
+	
+	
+
 	
 	/**
 	 * Set the global alignment used in this session
@@ -185,6 +231,7 @@ public class AlignmentAPI {
 		else if (filtering.variantSitesOnly() != variantSitesOnly) initRequired = true;
 		else if (filtering.focusing() != focus) initRequired = true;
 		else if (filtering.getTree() != tree) initRequired = true;
+		else if (orderingIsDirty) initRequired = true;
 		
 		
 		// Default filtering
@@ -202,6 +249,27 @@ public class AlignmentAPI {
 	 */
 	public static Filtering getFiltering() {
 		return filtering;
+	}
+
+	
+	/**
+	 * Get the taxon object
+	 * @param label
+	 * @return
+	 */
+	public static Taxon getTaxon(String label) {
+		return THE_ALIGNMENT.getTaxon(label);
+	}
+
+
+	
+	/**
+	 * Find the row number of this taxon in the filtering
+	 * @param taxon
+	 * @return
+	 */
+	public static int getTaxonRowNum(Taxon taxon) {
+		return filtering.getIndex(taxon);
 	}
 	
 	

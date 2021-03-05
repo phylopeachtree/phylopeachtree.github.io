@@ -11,6 +11,7 @@ import org.json.JSONObject;
 //import org.reflections.Reflections;
 
 import peachtree.aln.AlignmentAPI;
+import peachtree.aln.Taxon;
 import peachtree.aln.colourings.Aliview;
 import peachtree.aln.colourings.ClustalAmino;
 import peachtree.aln.colourings.Colouring;
@@ -69,9 +70,14 @@ public class OptionsAPI {
 	
 	static JSONArray graphicalObjects = null;
 	
+	
+	// Taxon to scroll to next time
+	static Taxon focalTaxon = null;
+	
 	public static void init() throws Exception {
 		
 		graphicalObjects = null;
+		focalTaxon = null;
 		
 		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
 		siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", SiteColourFilter.all, SiteColourFilter.values());
@@ -269,6 +275,25 @@ public class OptionsAPI {
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 				
 				
+				// Scroll to a taxon?
+				if (focalTaxon != null) {
+					
+					
+					
+					// What row number?
+					int rowNum = AlignmentAPI.getTaxonRowNum(focalTaxon);
+					
+					// Scroll Y value
+					scaling.setScroll(0, 0, 0, fullHeight);
+					double ypos = scaling.scaleY(rowNum) - TOP_MARGIN - height / 2;
+					scrollY.setVal(ypos / (fullHeight-TOP_MARGIN));
+					scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
+					
+					System.out.println("Setting scrolly to " + (ypos / (fullHeight-TOP_MARGIN)) + " to see " + focalTaxon.getName());
+					
+				}
+				
+				
 				// Validate scrollY position
 				if (scrollY.getVal()*height + scaling.getScrollYLength() > height) {
 					scrollY.setVal((height - scaling.getScrollYLength()) / height);
@@ -278,6 +303,9 @@ public class OptionsAPI {
 				canvasHeight.setVal(fullHeight);
 				height = canvasHeight.getVal();
 			}
+			
+			// Reset focal taxon
+			focalTaxon = null;
 			
 			
 			// Shrink width?
@@ -302,9 +330,7 @@ public class OptionsAPI {
 			yboundaries.put(canvasHeight.getName(), height);
 			json.put("yboundaries", yboundaries);
 			
-			
-			
-			
+
 			
 			
 			
@@ -525,6 +551,35 @@ public class OptionsAPI {
 		}
 	}
 	
+	
+	
+	/**
+	 * Declare the current taxon label as the focal label so it can be zoomed in on and selected
+	 */
+	public static void searchForTaxon(String label) {
+		
+		focalTaxon = null;
+		
+		
+		// Get the taxon
+		Taxon taxon = AlignmentAPI.getTaxon(label);
+		if (taxon == null) {
+			System.out.println("Warning: cannot find " + label);
+			return;
+		}
+		
+		//System.out.println("Found " + taxon.getName());
+		
+		
+		// Select it
+		taxon.isSelected(true);
+		
+		
+		// Set it as the focal taxon
+		focalTaxon = taxon;
+
+		
+	}
 	
 	
 	/**

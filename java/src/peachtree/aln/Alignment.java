@@ -608,6 +608,21 @@ public class Alignment {
 	}
 
 
+	
+	/**
+	 * Find the taxon with this label
+	 * @param label
+	 * @return
+	 */
+	public Taxon getTaxon(String label) {
+		for (Sequence seq : this.getSequences()) {
+			Taxon taxon = seq.getTaxon();
+			if (taxon.getName().equals(label)) return taxon;
+		}
+		return null;
+	}
+
+
 
 	
 

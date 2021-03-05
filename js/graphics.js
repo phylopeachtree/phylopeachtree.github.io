@@ -40,6 +40,8 @@ function renderGraphics(){
 		// Options
 		renderOptions();
 		
+		
+
 	
 		addLoader($("#ctrl_loading_div"));
 
@@ -62,6 +64,10 @@ function renderGraphics(){
 				// Hide the upload menu
 				$("#graphics_div").show(0);
 				$("#upload_div").hide(0);
+				
+				
+				// Search bar
+				populateTaxonSearchBar();
 				
 				// Async
 				setTimeout(function() {

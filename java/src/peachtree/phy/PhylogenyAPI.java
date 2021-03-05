@@ -51,6 +51,7 @@ public class PhylogenyAPI {
 			
 			// Sort taxa by tree
 			sortTaxaByTree(THE_TREE, alignment);
+			AlignmentAPI.setOrderingToDirty();
 			
 			
 			long finish = Calendar.getInstance().getTimeInMillis();

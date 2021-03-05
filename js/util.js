@@ -367,7 +367,7 @@ function buildTree(){
 			
 			var results = JSON.parse(cjStringJavaToJs(results));
 			
-			console.log("tree", results.newick);
+			//console.log("tree", results.newick);
 			removeLoader($("#ctrl_loading_div"));
 			$(btnID).removeClass("disabled");
 			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();;
@@ -442,7 +442,7 @@ function toggleTaxon(ele){
 	Clears all taxa selection
 */
 function clearSelection(){
-	if ($("#svg .taxon.selected").length == 0) return;
+	//if ($("#svg .taxon.selected").length == 0) return;
 	$("#svg").find(".taxon.selected").removeClass("selected");
 	updateSelectionCSS();
 	cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
@@ -458,7 +458,7 @@ function clearSelection(){
 	Focuses on taxa
 */
 function focusSelection() {
-	if ($("#svg .taxon.selected").length == 0) return;
+	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing selection...");
 	setOptionToVal("focusOnTaxa", "true");
 }
@@ -467,7 +467,7 @@ function focusSelection() {
 	Focuses on clade
 */
 function cladeSelection() {
-	if ($("#svg .taxon.selected").length == 0) return;
+	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing clade...");
 	setOptionToVal("focusOnClade", "true");
 }
@@ -479,13 +479,69 @@ function cladeSelection() {
 */
 function updateSelectionCSS(){
 	
+	
+	$(".selectBtn").removeClass("disabled");
+	
+	
+	/**
 	// If nothing is selected, disable buttons
 	if ($("#svg .taxon.selected").length == 0){
 		$(".selectBtn").addClass("disabled");
 	}else{
 		$(".selectBtn").removeClass("disabled");
 	}
+	**/
 }
+
+
+/*
+	Populates the taxon search bar auto complete
+*/
+function populateTaxonSearchBar(){
+	cjCall("peachtree.aln.AlignmentAPI", "getListOfTaxaLabels").then(function(val){
+		
+		
+		var results = JSON.parse(cjStringJavaToJs(val));
+		if (results.err != null){
+			console.log(results.err);
+		}else{
+			$("#taxon_search_input").autocomplete({
+				source: results.labels,
+				select: searchForTaxon});
+				
+			// Bind enter keypress
+			/*
+			$("#taxon_search_input").keydown(function(event){
+				if(event.keyCode == 13) {
+					//searchForTaxon();
+				}
+			 });
+			 
+			 */
+		}
+		
+		
+	})
+}
+
+
+/*
+	Attempts to find this taxon
+*/
+function searchForTaxon(){
+	
+	// Asynchronous
+	setTimeout(function() {
+		let label = $("#taxon_search_input").val();
+		console.log("searchForTaxon", label);
+		cjCall("peachtree.options.OptionsAPI", "searchForTaxon", label).then(function(){
+			renderGraphics();
+		});
+		
+	}, 1);
+}
+
+
 
 
 

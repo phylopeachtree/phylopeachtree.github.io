@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import peachtree.phy.Tree;
+
 
 /**
  * Filtering of sites and taxa
@@ -15,6 +17,7 @@ public class Filtering {
 
 	
 	boolean variantSitesOnly;
+	boolean focusing;
 	Map<Integer, Boolean> taxaIDsToInclude;
 	Map<Integer, Boolean> sitesToIncludeMap;
 	List<Integer> sitesToIncludeList;
@@ -22,29 +25,58 @@ public class Filtering {
 	
 	// Major characters at each site
 	Map<Integer, Integer> majors;
-	
+	Tree tree;
 	
 	int numSites;
 	int numTaxa;
 	boolean isNucleotide;
 	
-	public Filtering(boolean variantSitesOnly, List<Taxon> taxaToInclude, Alignment alignment) {
+	public Filtering(boolean variantSitesOnly, boolean focus, Alignment alignment, Tree tree) {
+		
+		
+		System.out.println("...preparing filtering...");
+		
+		this.focusing = focus;
 		this.variantSitesOnly = variantSitesOnly;
 		this.isNucleotide = alignment.isNucleotide;
 		
 		
 		// Use unique taxa ids
 		this.taxaIDsToInclude = new HashMap<>();
-		if (taxaToInclude != null) {
-			for (Taxon taxon: taxaToInclude) {
-				taxaIDsToInclude.put(taxon.getID(), true);
-			}
-			numTaxa = taxaIDsToInclude.size();
-		}else {
-			numTaxa = alignment.getNtaxa();
-			for (int i = 0; i < numTaxa; i ++) taxaIDsToInclude.put(i, true);
-		}
 		
+		
+		// Use the tree to find taxa
+		if (tree != null) {
+			
+			this.tree = tree;
+			
+			// Find selected taxa
+			List<Taxon> selected = new ArrayList<>();
+			for (Sequence seq : alignment.getSequences()) {
+				Taxon taxon = seq.getTaxon();
+				if (taxon.isSelected()) selected.add(taxon);
+			}
+			
+			
+			// Find their mrca and take the full clade
+			selected = tree.getClade(selected);
+			
+			
+			// Select the ones to include
+			for (Taxon taxon : selected) {
+				taxon.isSelected(true);
+			}
+			
+		}
+			
+			
+			
+		// Use all taxa / selected taxa
+		for (Sequence seq : alignment.getSequences()) {
+			Taxon taxon = seq.getTaxon();
+			if (!focus || taxon.isSelected()) taxaIDsToInclude.put(taxon.getID(), true);
+		}
+		numTaxa = taxaIDsToInclude.size();
 		
 		this.majors = null;
 		
@@ -135,6 +167,19 @@ public class Filtering {
 	}
 	
 	
+	public Tree getTree() {
+		return this.tree;
+	}
+	
+	/**
+	 * Are the selected sites the only ones being displayed?
+	 * @return
+	 */
+	public boolean focusing() {
+		return this.focusing;
+	}
+	
+	
 	/**
 	 * Should this site number be included
 	 * @param site
@@ -179,6 +224,7 @@ public class Filtering {
 		
 		
 		this.majors = new HashMap<>();
+		if (numTaxa < 2 || numSites == 0) return;
 		HashMap<Integer, Integer> freqs = new HashMap<>();
 		int siteNum, count, character;
 		for (int s = 0; s < this.numSites; s ++) {
@@ -251,6 +297,9 @@ public class Filtering {
 	 */
 	private boolean isMajorOrMinorAllele(String character, int siteNum, boolean isMajor) {
 		
+		if (this.numTaxa < 2) {
+			return isMajor;
+		}
 		if (!this.majors.containsKey(siteNum)) return false;
 		
 		// Convert to int

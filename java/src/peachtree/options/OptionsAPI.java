@@ -42,18 +42,21 @@ public class OptionsAPI {
 	static NumericalOption scrollX  = new NumericalOption("scrollX", "General", "Relative position of x-scrollbar", 0, 0, 1, 0.1, true);
 	
 	
+	// Phylogeny
 	static DiscreteOption treeMethods;
 	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	static BooleanOption showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
 	
-	
+	// Taxa
 	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
 	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 1, 50, 1);
 	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 1);
 	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Taxa", "Show taxon numbers", true);
+	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Taxa", "Show only selected taxa", false, true);
+	static BooleanOption focusOnClade = new BooleanOption("focusOnClade", "Taxa", "Show only clade of selected taxa", false, true);
 	
-	
+	// Alignment
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
 	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show variant sites only", true);
@@ -161,7 +164,17 @@ public class OptionsAPI {
 				}
 				
 				if (option instanceof BooleanOption) {
-					((BooleanOption)option).setVal(Boolean.parseBoolean(value));
+					
+					boolean val = Boolean.parseBoolean(value);
+
+					// Special case: if focusOnClade is enabled, then enable focusOnTaxa too
+					if (option == focusOnClade && val == true) focusOnTaxa.setVal(true);
+					
+					// If focusOnTaxa is enabled, then set focusOnClade to false
+					if (option == focusOnTaxa && val == true) focusOnClade.setVal(false);
+					if (option == focusOnClade || option == focusOnTaxa) AlignmentAPI.setSelectionToDirty();
+					
+					((BooleanOption)option).setVal(val);
 				}
 				
 				if (option instanceof DiscreteOption) {
@@ -226,7 +239,9 @@ public class OptionsAPI {
 			double height = canvasHeight.getVal();
 			
 			
+			// Initialise filterings if necessary
 			
+			AlignmentAPI.initFiltering(variantSitesOnly.getVal(), focusOnTaxa.getVal(), (focusOnClade.getVal() ? PhylogenyAPI.getTree() : null));
 			
 			
 			// Scroll bars
@@ -242,8 +257,8 @@ public class OptionsAPI {
 			
 			
 			// Full size of view
-			double fullHeight = ntHeight * AlignmentAPI.getNtaxa() + TOP_MARGIN;
-			
+			double fullHeight = ntHeight * AlignmentAPI.getNtaxaDisplayed() + TOP_MARGIN;
+			double fullAlnWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
 			
 			
 			
@@ -262,6 +277,15 @@ public class OptionsAPI {
 			}else {
 				canvasHeight.setVal(fullHeight);
 				height = canvasHeight.getVal();
+			}
+			
+			
+			// Shrink width?
+			if (width*(1-xdivide2) > fullAlnWidth) {
+				canvasWidth.setVal(width*xdivide2 + fullAlnWidth);
+				width = canvasWidth.getVal();
+				division2.setVal((width-fullAlnWidth)/width);
+				xdivide2 = division2.getVal();
 			}
 			
 
@@ -289,6 +313,7 @@ public class OptionsAPI {
 			if (PhylogenyAPI.isReady()) {
 				
 				
+				PhylogenyAPI.applyFiltering(AlignmentAPI.getFiltering());
 				
 				double spacing = treeSpacing.getVal();
 				double branchW = branchwidth.getVal();
@@ -309,8 +334,7 @@ public class OptionsAPI {
 			if (AlignmentAPI.isReady()) {
 				
 			
-				// Initialise filterings if necessary
-				AlignmentAPI.initFiltering(variantSitesOnly.getVal());
+				
 				
 			
 				// Taxa
@@ -330,7 +354,7 @@ public class OptionsAPI {
 	
 				// Alignment
 				double alnViewWidth = (width - xdivide2*width);
-				double fullWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
+				
 				if (alnViewWidth > 0) {
 					
 					double minWidth = ntWidth.getVal();
@@ -342,7 +366,7 @@ public class OptionsAPI {
 					// Scaling
 					Scaling scaling = new Scaling(xdivide2*width, width, TOP_MARGIN, height, 0, nsitesInView-1);
 					scaling.setRowHeight(ntHeight);
-					scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullWidth, fullHeight);
+					scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullAlnWidth, fullHeight);
 					
 					JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, fontSizeAln.getVal(), cols);
 					objs.putAll(alignment);
@@ -350,6 +374,7 @@ public class OptionsAPI {
 					json.put("nsites", AlignmentAPI.getNsites());
 					json.put("nsitesdisplayed", AlignmentAPI.getNsitesDisplayed());
 					json.put("ntaxa", AlignmentAPI.getNtaxa());
+					json.put("ntaxadisplayed", AlignmentAPI.getNtaxaDisplayed());
 					
 					
 					// Horizontal scrolling?
@@ -523,7 +548,50 @@ public class OptionsAPI {
 		return ready;
 		
 	}
+
+
+
+	/**
+	 * Are variant sites only being displayed
+	 * @return
+	 */
+	public static boolean variantSitesOnly() {
+		return variantSitesOnly.getVal();
+	}
 	
 	
+	
+	/**
+	 * Are selected taxa being focused on
+	 * @return
+	 */
+	public static boolean focusingOnTaxa() {
+		return focusOnTaxa.getVal();
+	}
+	
+	
+	/**
+	 * Set whether taxa are being focused on
+	 * @return
+	 */
+	public static void focusingOnTaxa(boolean val) {
+		focusOnTaxa.setVal(val);
+	}
+	
+	/**
+	 * Is a clade being focused on
+	 * @return
+	 */
+	public static boolean focusOnClade() {
+		return focusOnClade.getVal();
+	}
+	
+	/**
+	 * Set whether a clade is being focused on
+	 * @return
+	 */
+	public static void focusOnClade(boolean val) {
+		focusOnClade.setVal(val);
+	}
 
 }

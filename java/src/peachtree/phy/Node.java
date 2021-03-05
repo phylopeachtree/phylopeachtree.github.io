@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.Filtering;
+import peachtree.aln.Taxon;
 import peachtree.options.Scaling;
 
 
@@ -15,14 +16,17 @@ public class Node {
 
 	
 	int nodeNr;
+	int filteredNodeNr;
 	String acc;
 	double height;
 	Node parent;
 	List<Node> children;
+	Taxon taxon = null;
 	
 	public Node() {
 		this.acc = "";
 		this.nodeNr = 0;
+		this.filteredNodeNr = 0;
 		this.height = 0;
 		this.parent = null;
 		this.children = new ArrayList<>();
@@ -31,6 +35,7 @@ public class Node {
 	public Node(int index) {
 		this.acc = "";
 		this.nodeNr = index;
+		this.filteredNodeNr = index;
 		this.height = 0;
 		this.parent = null;
 		this.children = new ArrayList<>();
@@ -51,6 +56,13 @@ public class Node {
 		this.acc = acc;
 	}
 	
+	public void setTaxon(Taxon taxon) {
+		this.taxon = taxon;
+	}
+	
+	public Taxon getTaxon() {
+		return this.taxon;
+	}
 	
 	public int getNr() {
 		return this.nodeNr;
@@ -58,6 +70,14 @@ public class Node {
 	
 	public void setNr(int nr) {
 		this.nodeNr = nr;
+	}
+	
+	public void setFilteredNr(int nr) {
+		this.filteredNodeNr = nr;
+	}
+	
+	public int getFilteredNr() {
+		return this.filteredNodeNr;
 	}
 	
 	public double getHeight() {
@@ -188,6 +208,19 @@ public class Node {
 	}
 	
 	
+	
+	/**
+	 * Gets all leaves in this subtree and adds them to the list
+	 */
+	public void getLeafSet(List<Node> leaves){
+		if (this.isLeaf()) leaves.add(this);
+		for (Node child : this.children) {
+			child.getLeafSet(leaves);
+		}
+		
+	}
+	
+	
 	/**
 	 * Number of immediate children
 	 * @return
@@ -312,7 +345,7 @@ public class Node {
      * @param branchWidth
      * @return y
      */
-	public double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift) {
+	public Double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -324,10 +357,11 @@ public class Node {
 		double minY = Double.POSITIVE_INFINITY;
 		
 		// If leaf, go with node ordering
-		double y = 0;
+		Double y = null;
+		int nValidChildren = 0;
 		if (this.isLeaf()) {
-			//y = scaling.getYPos(this.getNr()) + (0.5*scaling.getRowHeight()); //this.getNr() * dy + (0.5*dy);
-			y = this.getNr() + 0.5;
+			if (!filtering.includeTaxon(this.getTaxon())) return null;
+			y = this.getFilteredNr() + 0.5;
 		}
 		
 		
@@ -337,17 +371,24 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
-				y += ychild;
-				if (ychild > maxY) maxY = ychild;
-				if (ychild < minY) minY = ychild;
+				Double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
+				if (ychild != null) {
+					if (y == null) y = 0.0;
+					y += ychild;
+					if (ychild > maxY) maxY = ychild;
+					if (ychild < minY) minY = ychild;
+					nValidChildren ++;
+				}
 			}
-			y = y / this.getChildCount();
+			if (y != null) y = y / nValidChildren;
 			
 			
 		}
 		
 		
+		
+		// If this has y=null, then do not plot the subtree
+		if (y == null) return y;
 		
 		double yscaled = scaling.scaleY(y);
 		yscaled += yshift;
@@ -357,8 +398,6 @@ public class Node {
 			
 			// Only draw if this node is in y-range
 			if (scaling.inRangeY(y)) {
-				
-				
 				
 				
 				JSONObject dashed_json = new JSONObject();

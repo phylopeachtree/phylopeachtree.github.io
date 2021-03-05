@@ -147,7 +147,7 @@ function renderOptions(){
 		var sections = [];
 		for (var i = 0; i < options.length; i ++){
 			let opt = options[i];
-			if (opt.isBoundary) continue;
+			if (opt.hide) continue;
 			let s = opt.section;
 			if (!sections.includes(s)) sections.push(s);
 
@@ -179,31 +179,13 @@ function renderOptions(){
 			div.attr("id", slideInID);
 			slideIns.append(div)
 			
-			
-			// Add draw trees button?
-			if (sections[i] == "Phylogeny") {
-				
-				let btnHTML = `
-				<div class="optionsBox small">
-					<div>
-						<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a tree from the selected method">Build tree</span>
-						<br>
-						<div class="usermsg mediumfont"></div>
-					</div>
-			
-				</div>`;
-					
-				div.children("div").children("div").append(btnHTML);
-				
-				
-			}
-						
+		
 			
 
 			// Get the options of this section
 			for (let o = 0; o < options.length; o ++){
 				let opt = options[o];
-				if (opt.isBoundary) continue;
+				if (opt.hide) continue;
 				if (opt.section == sections[i]){
 					
 					
@@ -376,7 +358,7 @@ function buildTree(){
 	let btnID = "#buildTreeBtn";
 	
 	$(btnID).addClass("disabled");
-	addLoader($(btnID).parent());
+	addLoader($("#ctrl_loading_div"));
 	$(btnID).parent().find(".usermsg").html("");
 	
 	// Asynchronous call to allow dom to update
@@ -386,16 +368,16 @@ function buildTree(){
 			var results = JSON.parse(cjStringJavaToJs(results));
 			
 			console.log("tree", results.newick);
-			removeLoader($(btnID).parent());
+			removeLoader($("#ctrl_loading_div"));
 			$(btnID).removeClass("disabled");
-			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!");
+			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();;
 			BUILDING_TREE = false;
 			
 			renderGraphics();
 			
 			
 		});
-	}, 1);
+	}, 10);
 	
 }
 
@@ -438,8 +420,72 @@ function isReadyToRender(callback = function(response) { }){
 
 
 
+/*
+	Select/deselect a taxon
+*/
+function toggleTaxon(ele){
+
+	// Update class
+	ele.toggleClass("selected");
+	
+	
+	updateSelectionCSS();
+	
+	// Inform the model
+	let index = parseFloat(ele.attr("i"));
+	cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
+	
+}
 
 
+/*
+	Clears all taxa selection
+*/
+function clearSelection(){
+	if ($("#svg .taxon.selected").length == 0) return;
+	$("#svg").find(".taxon.selected").removeClass("selected");
+	updateSelectionCSS();
+	cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
+		renderGraphics();
+	});
+	
+	
+}
+
+
+
+/*
+	Focuses on taxa
+*/
+function focusSelection() {
+	if ($("#svg .taxon.selected").length == 0) return;
+	console.log("Focusing selection...");
+	setOptionToVal("focusOnTaxa", "true");
+}
+
+/*
+	Focuses on clade
+*/
+function cladeSelection() {
+	if ($("#svg .taxon.selected").length == 0) return;
+	console.log("Focusing clade...");
+	setOptionToVal("focusOnClade", "true");
+}
+
+
+
+/*
+	Updates the CSS on selection buttons
+*/
+function updateSelectionCSS(){
+	
+	// If nothing is selected, disable buttons
+	if ($("#svg .taxon.selected").length == 0){
+		$(".selectBtn").addClass("disabled");
+	}else{
+		$(".selectBtn").removeClass("disabled");
+	}
+}
 
 
 

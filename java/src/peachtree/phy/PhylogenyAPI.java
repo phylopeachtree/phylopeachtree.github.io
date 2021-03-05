@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import peachtree.aln.Alignment;
 import peachtree.aln.AlignmentAPI;
+import peachtree.aln.Filtering;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 import peachtree.phy.util.LinkType;
@@ -79,6 +80,14 @@ public class PhylogenyAPI {
 	
 	
 	/**
+	 * Apply the filtering to this tree
+	 */
+	public static void applyFiltering(Filtering filtering) {
+		if (THE_TREE == null) return;
+		THE_TREE.applyFiltering(filtering);
+	}
+	
+	/**
 	 * Generate graphics for the tree
 	 * @param scaling
 	 * @param branchWidth
@@ -105,6 +114,11 @@ public class PhylogenyAPI {
 	 */
 	public static double getHeight() {
 		return THE_TREE.getHeight();
+	}
+
+
+	public static Tree getTree() {
+		return THE_TREE;
 	}
 	
 	

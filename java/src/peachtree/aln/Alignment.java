@@ -245,7 +245,7 @@ public class Alignment {
 	
 	
 	/**
-	 * Sort the taxa by the tree
+	 * Sort the taxa by the tree and ensure the taxon objects are mapped
 	 * @param tree
 	 */
 	public void sortByTree(Tree tree) throws Exception {
@@ -262,7 +262,9 @@ public class Alignment {
 			// Find the sequence number with this accession
 			int seqIndex = -1;
 			for (int i = 0; i < this.getNtaxa(); i++) {
-				if (this.getSequence(i).getAcc().equals(accession)) {
+				Sequence seq = this.getSequence(i);
+				if (seq.getAcc().equals(accession)) {
+					leaves[taxonNr].setTaxon(seq.getTaxon());
 					seqIndex = i;
 					break;
 				}
@@ -336,10 +338,13 @@ public class Alignment {
 		// Add some yshift to the first row so it doesn't get clipped by top margin
 		Double[] yshift = new Double[1];
 		
+		int seqNumDisplayed = 0;
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
-			if (scaling.isAboveRangeY(seqNum)) break;
+			if (scaling.isAboveRangeY(seqNumDisplayed)) break;
 			Sequence sequence = this.getSequence(seqNum);
-			objs.putAll(sequence.getSequenceGraphics(scaling, seqNum, minNtWidth, colouring, filtering, textSize, yshift));
+			if (!filtering.includeTaxon(sequence.getTaxon())) continue;
+			objs.putAll(sequence.getSequenceGraphics(scaling, seqNumDisplayed, minNtWidth, colouring, filtering, textSize, yshift));
+			seqNumDisplayed ++;
 		}
 		
 		return objs;
@@ -361,11 +366,13 @@ public class Alignment {
 		// Add some yshift to the first row so it doesn't get clipped by top margin
 		Double[] yshift = new Double[1];
 
-		
+		int seqNumDisplayed = 0;
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
-			if (scaling.isAboveRangeY(seqNum)) break;
+			if (scaling.isAboveRangeY(seqNumDisplayed)) break;
 			Sequence sequence = this.getSequence(seqNum);
-			objs.putAll(sequence.getTaxonGraphics(scaling, seqNum, padding, filtering, textSize, showTaxonNumbers, yshift));
+			if (!filtering.includeTaxon(sequence.getTaxon())) continue;
+			objs.putAll(sequence.getTaxonGraphics(scaling, seqNumDisplayed, padding, filtering, textSize, showTaxonNumbers, yshift));
+			seqNumDisplayed ++;
 		}
 		
 		return objs;
@@ -572,7 +579,33 @@ public class Alignment {
 	}
 
 
+	/**
+	 * Toggle selection of this taxon
+	 * @param taxonNum
+	 */
+	public void selectTaxon(int taxonNum) {
+		this.sequences.get(taxonNum).getTaxon().toggleSelection();
+	}
 
+
+	
+	/**
+	 * Deselct all taxa
+	 */
+	public void clearSelection() {
+		for (Sequence seq : this.sequences) {
+			seq.getTaxon().isSelected(false);
+		}
+	}
+
+
+	/**
+	 * Get list of sequences
+	 * @return
+	 */
+	public List<Sequence> getSequences(){
+		return this.sequences;
+	}
 
 
 

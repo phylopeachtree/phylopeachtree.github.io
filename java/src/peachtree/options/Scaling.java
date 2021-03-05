@@ -257,7 +257,7 @@ public class Scaling {
 	 */
 	public double scaleX(double x) {
 		x = (x - xmin) / (xmax - xmin) * (canvasMaxX - canvasMinX) + canvasMinX - this.scrollX;
-		return Math.round(x);
+		return x; //Math.round(x);
 	}
 	
 	

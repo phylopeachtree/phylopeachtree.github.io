@@ -132,9 +132,6 @@ public class Sequence {
 		// Do not plot beyond the edge
 		if (!scaling.inRangeY(seqNum)) return arr;
 		
-		// Should this sequence be included?
-		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
-		
 		
 		// Y shift
 		if (yshift[0] == null) {
@@ -154,6 +151,9 @@ public class Sequence {
 		acc_json.put("title", this.getAcc());
 		acc_json.put("font_size", textSize);
 		acc_json.put("white_space", "pre");
+		acc_json.put("class", "taxon" + (this.getTaxon().isSelected() ? " selected" : "") );
+		acc_json.put("i", seqNum);
+		
 		
 		arr.put(acc_json);
 		
@@ -182,10 +182,6 @@ public class Sequence {
 		// Do not plot beyond the edge
 		if (!scaling.inRangeY(seqNum)) return arr;
 		
-		// Should this sequence be included?
-		if (filtering != null && !filtering.includeTaxon(this.getTaxon())) return arr;
-		
-	
 		
 		double x = 0;
 		
@@ -239,7 +235,7 @@ public class Sequence {
 			if (colouring != null) {
 				colour = colouring.getColour(symbol, site);
 				nt_bg.put("fill", colour);
-				//nt_bg.put("stroke", colour);
+				nt_bg.put("stroke", colour);
 			}
 			//nt_bg.put("fill", "#008cba");
 			//nt_bg.put("color", "white");

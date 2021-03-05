@@ -1,10 +1,14 @@
 package peachtree.phy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 
 import peachtree.aln.Alignment;
 import peachtree.aln.Filtering;
 import peachtree.aln.Sequence;
+import peachtree.aln.Taxon;
 import peachtree.options.Scaling;
 
 public class Tree {
@@ -167,8 +171,9 @@ public class Tree {
 		// First, the top most leaf in the view must be found
 		double yshift = 0;
 		for (int leafNr = 0; leafNr < this.getLeafNodeCount(); leafNr ++) {
-			if (scaling.inRangeY(leafNr)){
-				yshift = scaling.canvasMinY() - scaling.scaleY(leafNr);
+			int filteredNr = this.nodes[leafNr].getFilteredNr();
+			if (filteredNr >= 0 && scaling.inRangeY(filteredNr)){
+				yshift = scaling.canvasMinY() - scaling.scaleY(filteredNr);
 				break;
 			}
 		}
@@ -183,7 +188,112 @@ public class Tree {
 	}
 
 	
+	/**
+	 * Apply the taxon filtering 
+	 * @param filtering
+	 */
+	public void applyFiltering(Filtering filtering) {
+		
+		int nr = 0;
+		for (Node leaf : this.getLeavesAsArray()) {
+			
+			// Maintain a separate numbering system where filtered-out leaves are omitted
+			if (filtering.focusing()) {
+				if (leaf.getTaxon().isSelected()) {
+					leaf.setFilteredNr(nr);
+					nr ++;
+				}else {
+					leaf.setFilteredNr(-1);
+				}
+			}else {
+				leaf.setFilteredNr(nr);
+				nr ++;
+			}
+			
+			
+			
+		}
+		
+	}
+
+
 	
+	/**
+	 * Get all taxa which form a clade
+	 * @param taxa
+	 * @return
+	 */
+	public List<Taxon> getClade(List<Taxon> taxa) {
+		
+		
+		// Find the mrca
+		Node mrca = null;
+		for (int i = 0; i < taxa.size(); i ++) {
+			Node node1 = this.getNode(taxa.get(i));
+			for (int j = i+1; j < taxa.size(); j ++) {
+				Node node2 = this.getNode(taxa.get(j));
+				Node ancestor = getMRCA(node1, node2);
+				
+				// The mrca of the set of taxa is the pairwise mrca with the greatest height
+				if (mrca == null || ancestor.getHeight() > mrca.getHeight()){
+					mrca = ancestor;
+				}
+					
+			}
+			
+		}
+		
+		// Get all leaves in this subtree
+		List<Node> leaves = new ArrayList<>();
+		mrca.getLeafSet(leaves);
+		
+		
+		// Return their taxa
+		List<Taxon> clade = new ArrayList<>();
+		for (Node leaf : leaves) clade.add(leaf.getTaxon());
+		return clade;
+		
+	}
+
+	
+	/**
+	 * Returns the leaf node associated with this taxon
+	 * @param taxon
+	 * @return
+	 */
+	public Node getNode(Taxon taxon) {
+		for (Node leaf : this.getLeavesAsArray()) {
+			if (leaf.getTaxon() == taxon) return leaf;
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Gets thr MRCA of these two nodes
+	 * @param taxon1
+	 * @param taxon2
+	 * @return
+	 */
+	public Node getMRCA(Node node1, Node node2) {
+		
+		// Trace from node1 to the root
+		List<Node> trace1 = new ArrayList<>();
+		Node node = node1;
+		while (node != null) {
+			trace1.add(node);
+			node = node.getParent();
+		} 
+		
+		// Find the earliest node on this path from node2 to the root
+		node = node2;
+		while(node != null) {
+			if (trace1.contains(node)) return node;
+			node = node.getParent();
+		}
+		
+		return null;
+	}
 	
 	
 }

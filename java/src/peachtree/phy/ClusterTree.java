@@ -50,6 +50,7 @@ public class ClusterTree extends Tree {
         	this.nodes[i].setHeight(this.nodes[i].getHeight() - latestTip);
         }
         
+ 
         super.initArray();
 		
 

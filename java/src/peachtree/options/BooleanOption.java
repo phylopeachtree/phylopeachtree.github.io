@@ -9,10 +9,16 @@ public class BooleanOption extends Option {
 	boolean value;
 	
 	public BooleanOption(String name, String section, String title, boolean value) {
+		this(name, section, title, value, false);
+	}
+	
+	
+	public BooleanOption(String name, String section, String title, boolean value, boolean hide) {
 		this.name = name;
 		this.section = section;
 		this.title = title; 
 		this.value = value;
+		this.hide = hide;
 	}
 	
 	
@@ -34,8 +40,8 @@ public class BooleanOption extends Option {
 
 	@Override
 	public JSONObject toJSON() {
-		JSONObject json = new JSONObject().put("name", name).put("section", section).put("title", title)
-				.put("value", value).put("type", this.getClass().getSimpleName());
+		JSONObject json = new JSONObject().put("value", value);
+		super.modifyJSON(json);
 		return json;
 	}
 

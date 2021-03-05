@@ -22,16 +22,23 @@ public class DiscreteOption extends Option {
 	
 	
 	public DiscreteOption(String name, String section, String title, Object value, List<?> domain) throws Exception {
-		this(name, section, title, value, domain.toArray());
+		this(name, section, title, value, domain.toArray(), false);
+	}
+	
+
+	
+	public DiscreteOption(String name, String section, String title, Object value, Object[] domain) throws Exception {
+		this(name, section, title, value, domain, false);
 	}
 	
 	
-	public DiscreteOption(String name, String section, String title, Object value, Object[] domain) throws Exception {
+public DiscreteOption(String name, String section, String title, Object value, Object[] domain, boolean hide) throws Exception {
 		
 		this.name = name;
 		this.domain = domain;
 		this.section = section;
 		this.title = title;
+		this.hide = hide;
 		
 		if (this.domain == null || this.domain.length == 0) {
 			throw new Exception(this.getName() + " has no domain");
@@ -107,14 +114,14 @@ public class DiscreteOption extends Option {
 	
 	@Override
 	public JSONObject toJSON() {
-		JSONObject json = new JSONObject().put("name", name).put("section", section).put("title", title)
-				.put("value", value).put("type", this.getClass().getSimpleName());
+		JSONObject json = new JSONObject().put("value", value);
 		JSONArray domainArr = new JSONArray();
 		for (Object val : domain) {
 			if (val instanceof String) domainArr.put(val);
 			else domainArr.put(val.toString());
 		}
 		json.put("domain", domainArr);
+		super.modifyJSON(json);
 		return json;
 	}
 

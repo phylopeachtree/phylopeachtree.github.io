@@ -41,6 +41,7 @@ function renderGraphics(){
 		renderOptions();
 		
 	
+		addLoader($("#ctrl_loading_div"));
 
 		// Generate the graphics objects
 		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
@@ -59,95 +60,89 @@ function renderGraphics(){
 
 
 				// Hide the upload menu
-				$("#graphics_div").show(FADE_IN_TIME);
+				$("#graphics_div").show(0);
 				$("#upload_div").hide(0);
-
-				// Prepare svg width/height
-				var svg = $("#svg");
-				const padding = 0;
-
-
-				var width = initialVal.xboundaries.width;
-				var height = initialVal.yboundaries.height;
-
-				svg.html("");
-				svg.height(height);
-				svg.width(width);
-
-				svg.parent().height(height + padding);
-				svg.parent().width(width + padding);
-
-
-				// Create top layer
-				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				svg.append(mainGroup);
-				svg.append(topGroup);
-
-
-				// Add the boundaries
-				$(".draggableDivision").remove();
-				for (var xboundary in initialVal.xboundaries){
-					console.log("x", xboundary);
-					var contained = xboundary != "width";
-					createDraggableStick(svg, initialVal.xboundaries[xboundary], xboundary, true, contained);
-				}
-				for (var yboundary in initialVal.yboundaries){
-					console.log("y", yboundary);
-					var contained = yboundary != "height";
-					createDraggableStick(svg, initialVal.yboundaries[yboundary], yboundary, false, contained);
-				}
 				
-				
-				// Add the scrollbars
-				if (initialVal.scrolls.scrollY != null){
-					let pos = initialVal.scrolls.scrollY;
-					let len = initialVal.scrolls.scrollYLength;
-					console.log("scrollY", pos, len);
-					createScrollbar(svg, pos, len, "scrollY", true);
-				}
-				if (initialVal.scrolls.scrollX != null){
-					let pos = initialVal.scrolls.scrollX;
-					let len = initialVal.scrolls.scrollXLength;
-					console.log("scrollX", pos, len);
-					createScrollbar(svg, pos, len, "scrollX", false);
-				}
+				// Async
+				setTimeout(function() {
+
+					// Prepare svg width/height
+					var svg = $("#svg");
+					const padding = 0;
+
+
+					var width = initialVal.xboundaries.width;
+					var height = initialVal.yboundaries.height;
+
+					svg.html("");
+					svg.height(height);
+					svg.width(width);
+
+					svg.parent().height(height + padding);
+					svg.parent().width(width + padding);
+
+
+					// Create top layer
+					var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+					var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+					svg.append(mainGroup);
+					svg.append(topGroup);
+
+
+					// Add the boundaries
+					$(".draggableDivision").remove();
+					for (var xboundary in initialVal.xboundaries){
+						console.log("x", xboundary);
+						var contained = xboundary != "width";
+						createDraggableStick(svg, initialVal.xboundaries[xboundary], xboundary, true, contained);
+					}
+					for (var yboundary in initialVal.yboundaries){
+						console.log("y", yboundary);
+						var contained = yboundary != "height";
+						createDraggableStick(svg, initialVal.yboundaries[yboundary], yboundary, false, contained);
+					}
+					
+					
+					// Add the scrollbars
+					if (initialVal.scrolls.scrollY != null){
+						let pos = initialVal.scrolls.scrollY;
+						let len = initialVal.scrolls.scrollYLength;
+						console.log("scrollY", pos, len);
+						createScrollbar(svg, pos, len, "scrollY", true);
+					}
+					if (initialVal.scrolls.scrollX != null){
+						let pos = initialVal.scrolls.scrollX;
+						let len = initialVal.scrolls.scrollXLength;
+						console.log("scrollX", pos, len);
+						createScrollbar(svg, pos, len, "scrollX", false);
+					}
 
 
 
 
 
 
-				// Other meta info
-				if (initialVal.ntaxa != null){
-					$("#ntaxa_div").html("There are " + initialVal.ntaxa + " individuals");
-				}else{
-					$("#ntaxa_div").html("");
-				}
 
-				if (initialVal.nsites != null){
-					$("#nsites_div").html("There are " + initialVal.nsites + " sites in the alignment");
-				}else{
-					$("#nsites_div").html("");
-				}
-
-				if (initialVal.nsitesdisplayed != null){
-					$("#nsitesdisplayed_div").html("There are " + initialVal.nsitesdisplayed + " sites in the alignment being displayed");
-				}else{
-					$("#nsitesdisplayed_div").html("");
-				}
+					// Other meta info
+					$("#ntaxa_span").html(initialVal.ntaxa);
+					$("#nsites_span").html(initialVal.nsites);
+					$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
+					$("#nsitesdisplayed_span").html(initialVal.nsitesdisplayed );
+					updateSelectionCSS();
 
 
+					// Plot top level objects
+					for (var i = 0; i < initialVal.objects.length; i ++){
+						var o = initialVal.objects[i];
+						drawSVGobj(topGroup, o);
+					}
 
-				// Plot top level objects
-				for (var i = 0; i < initialVal.objects.length; i ++){
-					var o = initialVal.objects[i];
-					drawSVGobj(topGroup, o);
-				}
 
-
-				// Plot json objects 1 chunk at a time
-				plotNextObject(mainGroup);
+					// Plot json objects 1 chunk at a time
+					plotNextObject(mainGroup);
+					
+					
+				}, 50);
 			}
 
 
@@ -331,6 +326,10 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 }
 
 
+
+
+
+
 /*
 function makeDraggable(evt) {
 	var svg = evt.target;
@@ -366,7 +365,18 @@ function plotNextObject(svg, iteration = 0){
 
 
 			if (objects.length == 0){
+				
+				removeLoader($("#ctrl_loading_div"));
+				
+				// Taxon selection
+				$(svg).find(".taxon").click(function(){
+					toggleTaxon($(this));
+				});
+				
+				
+				updateSelectionCSS();
 				return;
+				
 			}else{
 
 				// Repeat

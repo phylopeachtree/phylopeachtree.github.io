@@ -16,18 +16,15 @@ public class NumericalOption extends Option {
 	double min;
 	double max;
 	double stepSize;
-	boolean isBoundary; // Is this related to the boundary of the canvas?
 	
 	
 
 	public NumericalOption(String name, String section, String title, double val, double min, double max, double stepSize) {
-		
 		this(name, section, title, val, min, max, stepSize, false);
-		
 	}
 	
 	
-	public NumericalOption(String name, String section, String title, double val, double min, double max, double stepSize, boolean isBoundary) {
+	public NumericalOption(String name, String section, String title, double val, double min, double max, double stepSize, boolean hide) {
 		
 		this.name = name;
 		this.min = min;
@@ -36,7 +33,7 @@ public class NumericalOption extends Option {
 		this.section = section;
 		this.title = title;
 		this.stepSize = stepSize;
-		this.isBoundary = isBoundary;
+		this.hide = hide;
 	}
 	
 	
@@ -44,8 +41,8 @@ public class NumericalOption extends Option {
 	
 	@Override
 	public JSONObject toJSON() {
-		JSONObject json = new JSONObject().put("name", name).put("section", section).put("title", title)
-						.put("value", value).put("min", min).put("max", max).put("step", stepSize).put("isBoundary", isBoundary).put("type", this.getClass().getSimpleName());
+		JSONObject json = new JSONObject().put("value", value).put("min", min).put("max", max).put("step", stepSize);
+		super.modifyJSON(json);
 		return json;
 	}
 	

@@ -10,17 +10,26 @@ import org.json.JSONObject;
 import peachtree.aln.colourings.Colouring;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
+import peachtree.phy.Tree;
 
 public class AlignmentAPI {
 
 	
 	private static Alignment THE_ALIGNMENT;
 	private static Filtering filtering = null;
+	private static boolean selectionIsDirty = false;
 	
 	public static void init() {
 		THE_ALIGNMENT = null;
 	}
 	
+	
+	/**
+	 * Notify the API that the selection is dirty and therefore the filtering needs to be constructed again
+	 */
+	public static void setSelectionToDirty() {
+		selectionIsDirty = true;
+	}
 	
 	/**
 	 * Set the global alignment used in this session
@@ -35,11 +44,12 @@ public class AlignmentAPI {
 		//String str = new String(contents);
 		System.out.println("Uploading alignment " + str.length());
 		filtering = null;
+		selectionIsDirty = false;
 		
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
 			THE_ALIGNMENT = new Alignment(str);
-			initFiltering(true);
+			initFiltering(OptionsAPI.variantSitesOnly(), false, null);
 			OptionsAPI.prepareColourings();
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
@@ -69,6 +79,31 @@ public class AlignmentAPI {
 	 */
 	public static boolean isReady() {
 		return THE_ALIGNMENT != null;
+	}
+	
+	
+	
+	/**
+	 * Select the taxon
+	 * Return whether or not a graphical update is needed
+	 * @param taxonNum
+	 */
+	public static boolean selectTaxon(int taxonNum) {
+		THE_ALIGNMENT.selectTaxon(taxonNum);
+		setSelectionToDirty();
+		return filtering.focusing();
+	}
+	
+	
+	/**
+	 * Deselect all taxa
+	 */
+	public static boolean clearSelection() {
+		THE_ALIGNMENT.clearSelection();
+		OptionsAPI.focusingOnTaxa(false);
+		OptionsAPI.focusOnClade(false);
+		setSelectionToDirty();
+		return filtering.focusing();
 	}
 	
 	
@@ -123,6 +158,12 @@ public class AlignmentAPI {
 		if (THE_ALIGNMENT == null) return 0;
 		return THE_ALIGNMENT.getNtaxa();
 	}
+	
+	public static int getNtaxaDisplayed() {
+		if (THE_ALIGNMENT == null) return 0;
+		if (filtering == null) return 0;
+		return filtering.getNumSeqs();
+	}
 
 
 	public static Alignment getAlignment() {
@@ -135,16 +176,21 @@ public class AlignmentAPI {
 	 * Initialise filtering object, if not already initialised
 	 * @param variantSitesOnly
 	 */
-	public static void initFiltering(boolean variantSitesOnly) {
+	public static void initFiltering(boolean variantSitesOnly, boolean focus, Tree tree) {
 		
 		
 		boolean initRequired = false;
 		if (filtering == null) initRequired = true;
+		else if (filtering.focusing() && selectionIsDirty) initRequired = true;
 		else if (filtering.variantSitesOnly() != variantSitesOnly) initRequired = true;
+		else if (filtering.focusing() != focus) initRequired = true;
+		else if (filtering.getTree() != tree) initRequired = true;
+		
 		
 		// Default filtering
 		if (initRequired) {
-			filtering = new Filtering(variantSitesOnly, null, THE_ALIGNMENT);
+			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+			selectionIsDirty = false;
 		}
 		
 		

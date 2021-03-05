@@ -51,7 +51,7 @@ public class OptionsAPI {
 	
 	// Taxa
 	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
-	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 1, 50, 1);
+	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 0, 50, 1);
 	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 1);
 	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Taxa", "Show taxon numbers", true);
 	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Taxa", "Show only selected taxa", false, true);
@@ -59,7 +59,7 @@ public class OptionsAPI {
 	
 	// Alignment
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
-	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 1, 50, 1);
+	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 0, 50, 1);
 	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show variant sites only", true);
 	static DiscreteOption siteColourType;
 	static DiscreteOption colourings;

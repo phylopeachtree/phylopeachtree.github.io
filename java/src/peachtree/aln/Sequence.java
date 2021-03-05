@@ -130,7 +130,7 @@ public class Sequence {
 		JSONArray arr = new JSONArray();
 		
 		// Do not plot beyond the edge
-		if (!scaling.inRangeY(seqNum)) return arr;
+		if (!scaling.inRangeY(seqNum) || textSize <= 0) return arr;
 		
 		
 		// Y shift
@@ -246,14 +246,17 @@ public class Sequence {
 			
 			
 			// Text
-			xc = scaling.scaleX(x + 0.5) + xshift;
-			nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text_scaled);
-			nt_font.put("value", symbol);
-			nt_font.put("text_anchor", "middle"); // Right alignment
-			nt_font.put("title", "Site " + (site+1));
-			nt_font.put("font_size", textSize);
+			if (textSize > 0) {
+				xc = scaling.scaleX(x + 0.5) + xshift;
+				nt_font = new JSONObject().put("ele", "text").put("x", xc).put("y", yc_text_scaled);
+				nt_font.put("value", symbol);
+				nt_font.put("text_anchor", "middle"); // Right alignment
+				nt_font.put("title", "Site " + (site+1));
+				nt_font.put("font_size", textSize);
+				arr.put(nt_font);
+			}
 			
-			arr.put(nt_font);
+			
 			
 			x ++;
 			

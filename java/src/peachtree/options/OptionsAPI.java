@@ -246,8 +246,10 @@ public class OptionsAPI {
 			
 			
 			// Initialise filterings if necessary
-			
 			AlignmentAPI.initFiltering(variantSitesOnly.getVal(), focusOnTaxa.getVal(), (focusOnClade.getVal() ? PhylogenyAPI.getTree() : null));
+			
+			// Prepare tree-alignment labellings if necessary
+			PhylogenyAPI.prepareLabelling(AlignmentAPI.getAlignment());
 			
 			
 			// Scroll bars
@@ -372,8 +374,10 @@ public class OptionsAPI {
 					scaling.setRowHeight(ntHeight);
 					scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 					
+					// Font size
+					double labelFontSize = Math.min(ntHeight, fontSizeTaxa.getVal());
 					
-					JSONArray taxa = AlignmentAPI.getTaxaGraphics(scaling,  fontSizeTaxa.getVal(), showTaxonNumbers.getVal());
+					JSONArray taxa = AlignmentAPI.getTaxaGraphics(scaling,  labelFontSize, showTaxonNumbers.getVal());
 					objs.putAll(taxa);
 				}
 				
@@ -394,7 +398,11 @@ public class OptionsAPI {
 					scaling.setRowHeight(ntHeight);
 					scaling.setScroll(scrollX.getVal(), scrollY.getVal(), fullAlnWidth, fullHeight);
 					
-					JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, fontSizeAln.getVal(), cols);
+					
+					// Font size
+					double ntFontSize = Math.min(ntHeight, fontSizeAln.getVal());
+					
+					JSONArray alignment = AlignmentAPI.getAlignmentGraphics(scaling, minWidth, ntFontSize, cols);
 					objs.putAll(alignment);
 					
 					json.put("nsites", AlignmentAPI.getNsites());

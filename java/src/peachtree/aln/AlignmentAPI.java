@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import peachtree.aln.colourings.Colouring;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
+import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.Tree;
 
 public class AlignmentAPI {
@@ -98,6 +99,11 @@ public class AlignmentAPI {
 			initFiltering(OptionsAPI.variantSitesOnly(), false, null);
 			OptionsAPI.prepareColourings();
 			long finish = Calendar.getInstance().getTimeInMillis();
+			
+			// If tree has been uploaded, check the alignment matches the tree
+			PhylogenyAPI.prepareLabelling(THE_ALIGNMENT);
+			
+			
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
 			
 			JSONObject json = new JSONObject().put("time", (finish-start));

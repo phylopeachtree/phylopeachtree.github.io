@@ -1,5 +1,6 @@
 package peachtree.phy;
 
+
 import java.util.Calendar;
 
 import org.json.JSONArray;
@@ -16,16 +17,55 @@ public class PhylogenyAPI {
 
 	
 	private static Tree THE_TREE;
+	static boolean orderingIsDirty = false;
 	
 	
-	public static int uploadTree(String contents) {
+	public static String uploadTree(String contents) {
 		
-		System.out.println("Uploading tree");
+		System.out.println("Uploading tree " + contents.length());
+		
+
+		try {
+			long start = Calendar.getInstance().getTimeInMillis();
+			THE_TREE = new Tree();
+			THE_TREE.parseFromNexus(contents);
+			orderingIsDirty = true;
+			
+			// If alignment has been uploaded, check it matches the tree
+			prepareLabelling(AlignmentAPI.getAlignment());
+			
+			long finish = Calendar.getInstance().getTimeInMillis();
+			System.out.println("Parsed tree successfully (" + (finish-start) + "ms)" );
+			
+			JSONObject json = new JSONObject().put("time", (finish-start));
+			return json.toString();
+			
+		}catch (Exception e){
+			THE_TREE = null;
+			e.printStackTrace();
+			return OptionsAPI.getErrorJSON(e);
+		}
 		
 		
-		return 1;
+		
 		
 	}
+	
+	
+	/**
+	 * Prepare the labelling between tree and alignment if necessary
+	 * @param alignment
+	 * @throws Exception
+	 */
+	public static void prepareLabelling(Alignment alignment) throws Exception {
+		if (alignment == null) return;
+		if (THE_TREE == null) return;
+		if (!orderingIsDirty) return;
+		sortTaxaByTree(THE_TREE, alignment);
+		AlignmentAPI.setOrderingToDirty();
+		orderingIsDirty = false;
+	}
+	
 	
 	
 	/**
@@ -52,6 +92,7 @@ public class PhylogenyAPI {
 			// Sort taxa by tree
 			sortTaxaByTree(THE_TREE, alignment);
 			AlignmentAPI.setOrderingToDirty();
+			orderingIsDirty = false;
 			
 			
 			long finish = Calendar.getInstance().getTimeInMillis();

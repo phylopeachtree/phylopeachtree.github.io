@@ -1,13 +1,13 @@
 package peachtree.phy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
 
 import peachtree.aln.Alignment;
 import peachtree.aln.Filtering;
-import peachtree.aln.Sequence;
 import peachtree.aln.Taxon;
 import peachtree.options.Scaling;
 
@@ -17,7 +17,7 @@ public class Tree {
 	Node root;
 	Node[] nodes;
 	Alignment alignment;
-	
+	boolean parsedFromFile = false;
 	
 	public Tree() {
 		
@@ -30,6 +30,128 @@ public class Tree {
 	}
 	
 	
+	
+	/**
+	 * Was the tree parsed from a file?
+	 * @return
+	 */
+	public boolean parsedFromFile() {
+		return parsedFromFile;
+	}
+	
+	
+	/**
+	 * Parse from nexus/newick
+	 * If there is more than 1 tree, the last one will be parsed
+	 * @param newick
+	 * @throws Exception
+	 */
+	public void parseFromNexus(String nexus) throws Exception {
+		
+		this.parsedFromFile = true;
+		
+		String[] lines = nexus.split("\n");
+		HashMap<String, String> translateMap = new HashMap<>();
+		
+		// Get the translate tokens
+		boolean beganTrees = false;
+		boolean beganTranslate = false;
+		String[] splt;
+		for (int lineNum = 0; lineNum < lines.length; lineNum++) {
+			String line = lines[lineNum].trim();
+			if (line.toLowerCase().contains("begin trees;")) {
+				beganTrees = true;
+			}
+			else if (beganTrees && line.toLowerCase().equals(";")) {
+				break;
+			}
+			else if (beganTrees && !beganTranslate && line.toLowerCase().contains("translate")) {
+				beganTranslate = true;
+			}
+			else if (beganTranslate) {
+				
+				// Translate token
+				splt = line.split(" ");
+				if (splt.length != 2) {
+					throw new Exception("Cannot parse translate line " + line + " because there are not 2 tokens split by a single space");
+				}
+				
+				String id = splt[0];
+				String label = splt[1];
+				
+				// Remove trailing comma
+				if (label.substring(label.length()-1).equals(",")) label = label.substring(0, label.length()-1); 
+				if (translateMap.containsKey(id)) {
+					throw new Exception("Duplicate translate id detected " + id);
+				}
+				translateMap.put(id, label);
+				
+			}
+		}
+		
+	
+		
+		
+		// Get the last tree's newick
+		StringBuilder newick = null;
+		for (int lineNum = lines.length-1; lineNum >= 0; lineNum --) {
+			String[] lineSplit = lines[lineNum].split("[=]", 2);
+			if (lineNum == lines.length-2) {
+				if (lineSplit[0].length() >= 4) System.out.println(lineSplit[0].toLowerCase().substring(0, 4));
+			}
+			if (lineSplit.length == 2 && lineSplit[0].length() >= 4 && lineSplit[0].toLowerCase().substring(0, 4).equals("tree")) {
+				newick = new StringBuilder(lineSplit[1]);
+				break;
+			}
+		}
+		
+		if (newick == null) {
+			
+			// Maybe it's just newick not nexus. Take first non empty line
+			for (int lineNum = 0; lineNum < lines.length; lineNum ++) {
+				if (!lines[lineNum].isEmpty()) {
+					newick = new StringBuilder(lines[lineNum]);
+					break;
+				}
+			}
+			
+			if (newick == null) throw new Exception("Cannot locate any newick trees in file");
+		}
+		
+		
+		// Remove trailing ; and all spaces
+		newick = new StringBuilder(newick.toString().replace(";", "").replace(" ", ""));
+		
+		this.root = new Node();
+		this.root.setHeight(0);
+		this.root.parseFromNewick(newick);
+		this.initArray();
+		
+		// Normalise so that the smallest leaf is 0
+		double minimalHeight = Double.POSITIVE_INFINITY;
+		for (Node node : this.getNodesAsArray()) minimalHeight = Math.min(minimalHeight, node.getHeight());
+		for (Node node : this.getNodesAsArray()) node.setHeight(node.getHeight() - minimalHeight);
+		
+		
+		
+		// Apply label translation
+		if (!translateMap.isEmpty()) {
+			for (Node node : this.getNodesAsArray()) {
+				String key = node.getAcc();
+				if (translateMap.containsKey(key)) {
+					node.setAcc(translateMap.get(key));
+				}
+			}
+		}
+		
+		//System.out.println("Parsed " + this.toNewick());
+		
+		
+		
+		
+	}
+	
+
 	public void setRoot(Node root) {
 		this.root = root;
 		this.initArray();
@@ -89,7 +211,7 @@ public class Tree {
 	 */
 	public String toNewick() {
 		final int[] dummy = new int[1];
-		return this.root.toSortedNewick(dummy, false);
+		return this.root.toSortedNewick(dummy, false) + ")";
 	}
 	
 	

@@ -466,6 +466,124 @@ public class Node {
 		
 	}
 
+	
+	/**
+	 * Parse newick. Assumes there is no ; on the end
+	 * @param newick
+	 * @throws Exception
+	 */
+	public void parseFromNewick(StringBuilder newick) throws Exception {
+		
+		
+		
+		// Is this a leaf?
+		String char1 = newick.substring(0, 1);
+		boolean hasChildren = char1.equals("(");
+		
+		
+		// What is the node's name
+		String[] bits = newick.toString().split(":");
+		if (bits.length < 2 || bits[0].isEmpty()) {
+			throw new Exception("Cannot identify label for newick string. Please use : delimiter");
+		}
+		
+
+		// Get label
+		String labelAndAnnotations = bits[0];
+		String[] labelSplit = labelAndAnnotations.split("\\[");
+		if (!hasChildren && labelSplit.length > 1) {
+			this.setAcc(labelSplit[0]);
+		}
+		
+		
+	
+		
+		// Validate there is a terminal closing bracket
+		if (hasChildren && !newick.substring(newick.length()-1, newick.length()).equals(")")) {
+			//throw new Exception("Could not parse newick because there is a missing ')'.");
+		}
+		
+		// Find the first closing bracket on the same level
+		String char2;
+		List<StringBuilder> childSubtrees = new ArrayList<>();
+		int level = 0;
+		int pos = 1;
+		int childPos = 1;
+		int annotationLevel = 0;
+		double length = 0;
+		while (pos < newick.length()) {
+			
+			
+			char2 = newick.substring(pos, pos+1);
+			
+			// Annotation. Skip
+			if (char2.equals("[")) {
+				annotationLevel++;
+			}
+			else if (char2.equals("]")) {
+				annotationLevel--;
+			}
+			
+			// Parse node height
+			else if (char2.equals(":") && level == 0) {
+				String lengthStr = newick.substring(pos+1).split("(,|[(]|[)])")[0];
+				length = Double.parseDouble(lengthStr);
+				if (!hasChildren) break;
+			}
+			
+			// Grandchild subtree
+			else if (annotationLevel == 0 && char2.equals("(")) {
+				level++;
+			}
+			
+			// New child of this node
+			else if (annotationLevel == 0 && char2.equals(",") && level == 0) {
+				childSubtrees.add(new StringBuilder(newick.substring(childPos, pos)));
+				childPos = pos+1;
+			}
+			
+			// Child subtree has closed
+			else if (annotationLevel == 0 && char2.equals(")")) {
+				if (level == 0) {
+					childSubtrees.add(new StringBuilder(newick.substring(childPos, pos+1)));
+					childPos = pos+1;
+					break;
+				}
+				level--;
+			}
+			
+			pos ++;
+		}
+		
+		
+		// Validate
+		if (hasChildren && childSubtrees.isEmpty()) {
+			throw new Exception("Could not parse newick. Perhaps there is a missing ')'.");
+		}
+		
+		
+		// Set node height
+		if (!this.isRoot()) {
+			this.setHeight(this.parent.getHeight() - length);
+			//System.out.println(label + " has tree " + newick + " and height " + this.getHeight());
+		}
+		
+		
+		
+		// Parse children
+		for (StringBuilder subtree : childSubtrees) {
+			Node child = new Node();
+			this.addChild(child);
+			child.parseFromNewick(subtree);
+		}
+		
+		
+		
+		
+		
+		
+	}
+	
 
 	
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import peachtree.aln.Filtering;
+
 /**
  * Alignment colouring scheme
  * @author Jordan
@@ -15,7 +17,8 @@ public abstract class Colouring {
 	
 	
 	Map<String, String> colours = new  HashMap<String, String>();
-	
+	SiteColourFilter colFilter = SiteColourFilter.all;
+	Filtering filtering;
 	
 	public abstract String getName();
 	public abstract boolean isNucleotide();
@@ -27,7 +30,21 @@ public abstract class Colouring {
 	
 	
 	
-	public String getColour(String symbol) {
+	public String getColour(String symbol, int siteNum) {
+		
+		
+		// Major alleles only
+		if (this.colFilter == SiteColourFilter.major) {
+			if (!this.filtering.isMajorAllele(symbol, siteNum)) return this.getDefaultCol();
+		}
+		
+		
+		// Minor alleles only
+		else if (this.colFilter == SiteColourFilter.minor) {
+			if (!this.filtering.isMinorAllele(symbol, siteNum)) return this.getDefaultCol();
+		}
+		
+		// All
 		String col = this.colours.get(symbol);
 		if (col == null) return getDefaultCol();
 		return col;
@@ -46,7 +63,17 @@ public abstract class Colouring {
 	
 	@Override
 	public String toString() {
-		return this.toJSON();
+		return this.getName();
+	}
+	
+	
+	/**
+	 * Which sites should be coloured
+	 * @param val
+	 */
+	public void setSiteColourFilter(SiteColourFilter val, Filtering filtering) {
+		this.filtering = filtering;
+		this.colFilter = val;
 	}
 	
 	

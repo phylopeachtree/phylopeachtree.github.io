@@ -6,6 +6,7 @@ function initUtil(){
 	
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
+	BUILDING_TREE = false;
 	
 	
 
@@ -22,7 +23,7 @@ function initUtil(){
 		// Closure to capture the file information.
 		reader.onload = (function(theFile) {
 			
-			addLoader("#aln_upload_title");
+			addLoader($("#aln_upload_title"));
 			
 			return function(e) {
 				
@@ -46,6 +47,8 @@ function initUtil(){
 							 return plotUploadErrorMsg(err, "#aln_upload");
 							 
 						}
+						
+				
 						return plotUploadSuccessMsg(file.name, val.time, "#aln_upload");
 					});
 					
@@ -81,7 +84,7 @@ function initUtil(){
 function plotUploadErrorMsg(err, uploadSelector){
 	console.log("caught", err);
 	$(uploadSelector + " .usermsg").html("<b>Error: </b>" + err.message);
-	removeLoader(uploadSelector + "_title");
+	removeLoader($(uploadSelector + "_title"));
 	return false;
 }
 
@@ -93,7 +96,7 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 	if (time == "0" || time == 0) time = "<1";
 	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + time + "ms!");
 	updateRenderBtn();
-	removeLoader(uploadSelector + "_title");
+	removeLoader($(uploadSelector + "_title"));
 	return true;
 }
 
@@ -101,12 +104,17 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 /*
 	Adds a loading icon
 */
-function addLoader(selector){
-	$(selector).append(`<div title="Loading..." class="loader"></div>`);
+function addLoader(ele, large=false){
+	if (large){
+		ele.append(`<div title="Loading..." class="loader large"></div>`);
+	}else{
+		ele.append(`<div title="Loading..." class="loader"></div>`);
+	}
+	
 }
 
-function removeLoader(selector){
-	$(selector + " .loader").remove();
+function removeLoader(ele){
+	ele.find(" .loader").remove();
 }
 
 
@@ -132,18 +140,22 @@ function renderOptions(){
 			alert(options.err);
 			return;
 		}
+		
+		
 
 		// Get the unique list of sections
 		var sections = [];
 		for (var i = 0; i < options.length; i ++){
-			var s = options[i].section;
+			let opt = options[i];
+			if (opt.hide) continue;
+			let s = opt.section;
 			if (!sections.includes(s)) sections.push(s);
 
 		}
 		console.log("sections", sections);
 
 		// Create one tab per section
-		for (var i = 0; i < sections.length; i++){
+		for (let i = 0; i < sections.length; i++){
 
 
 			var slideInID = "options_" + sections[i];
@@ -152,16 +164,153 @@ function renderOptions(){
 			optionsTabs.append("<li onClick='toggleTab(this)' title='Open/close tab' slide='" + slideInID + "'>" + sections[i] + "</li>")
 
 
-			// Slide in
-			var div = $("<div class='optionsSlideIn' style='display:none'>" + sections[i] + "</div>")
+			// Slide in html
+			var slideHTML = `<div class="optionsSlideIn" style="display:none">
+				<div>
+					<h2>
+					` + sections[i] + ` settings
+					</h2>
+					<div></div>
+				</div>
+			</div>`;
+			
+			
+			var div = $(slideHTML)
 			div.attr("id", slideInID);
 			slideIns.append(div)
+			
+		
+			
+
+			// Get the options of this section
+			for (let o = 0; o < options.length; o ++){
+				let opt = options[o];
+				if (opt.hide) continue;
+				if (opt.section == sections[i]){
+					
+					
+					if (opt.type == "NumericalOption"){
+						
+						// Range slider html
+						
+						let optionsHTML = `
+						<div class="optionsBox">
+							
+							<div class="slidecontainer">
+								 <input onChange="setOptionFromEle(this)" type="range" min="` + opt.min + `" max="` + opt.max + `" value="` + opt.value + `" step="` + opt.step + `" class="slider" var="` + opt.name + `">
+							</div>
+							` + opt.title + ` (` + opt.value + `)
+						</div>`;
+						div.children("div").children("div").append(optionsHTML);
+						
+					}
+					
+					
+					if (opt.type == "BooleanOption"){
+						
+						
+						
+
+						
+						// Switch html
+						let optionsHTML = `
+						<div class="optionsBox">
+							<div>
+								<label class="switch">
+									<input onChange="setOptionFromEle(this)" var="` + opt.name + `" type="checkbox">
+									<span class="sliderboolean"></span>
+								</label>
+							</div>
+							` + opt.title + `
+						</div>`;
+						div.children("div").children("div").append(optionsHTML);
+						div.find(`input[var="` + opt.name + `"]`).prop("checked", opt.value);
+						
+					}
+					
+					
+					if (opt.type == "DiscreteOption"){
+						
+						
+						
+						
+						// Dropdown html
+						let optionsHTML = `
+						<div class="optionsBox">
+							
+							<div class="dropdown">
+								  <select onChange="setOptionFromEle(this)" var="` + opt.name + `">
+									</select>
+							</div>
+							` + opt.title + `
+						</div>`;
+						div.children("div").children("div").append(optionsHTML);
+						
+						
+						
+						for (let j = 0; j < opt.domain.length; j ++){
+							let dropdownOptionsHTML = `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
+							div.find(`select[var="` + opt.name + `"]`).append(dropdownOptionsHTML);
+							if (opt.domain[j] == opt.value) div.find(`select[var="` + opt.name + `"]`).val(opt.domain[j]);
+						}
+						
+						
+						
+					}
+		
+					
+				}
+			}
+			
+			
+			
+
+	
+			
 
 		}
 
 		
 		//.html(JSON.stringify(options));
+		//addLoader($("#buildTreeBtn").parent());
 				
+	});
+	
+}
+
+
+/*
+	Sets the value of this option from the element
+*/
+function setOptionFromEle(ele){
+	
+	let id = $(ele).attr("var");
+	let val = 0;
+	if ($(ele).prop('nodeName') == "INPUT" && $(ele).prop("type") == "checkbox"){
+		val = $(ele).prop("checked");
+	}else{
+		val = $(ele).val();
+	}
+	
+
+	setOptionToVal(id, val);
+	
+}
+
+/*
+	Sets the value of this option and draw the graphics again
+*/
+function setOptionToVal(optionID, newVal){
+	
+	console.log("Setting", optionID, "to", newVal);
+	
+	CANCEL_GRAPHICS = true;
+	cjCall("peachtree.options.OptionsAPI", "setOption", optionID, newVal).then(function(val){
+		
+		//console.log("done", val);
+		CANCEL_GRAPHICS = false;
+		renderGraphics();
+			
 	});
 	
 }
@@ -175,13 +324,61 @@ function toggleTab(ele){
 
 	// Update css
 	$(ele).siblings("li").removeClass("active");
+	$(".optionsSlideIn").hide(0);
+	
+	var hiding = $(ele).hasClass("active");
 	$(ele).toggleClass("active");
 
-	var slideid = $(ele).attr("slide");
-	//$("#" + slideid).show(100);
+	var slideID = $(ele).attr("slide");
+	var slideEle = $("#" + slideID);
+	
+
+	
+	if (hiding){
+		//console.log("hiding", slideID);
+		//slideEle.hide(100);
+	}else{
+		//console.log("showing", slideID);
+		slideEle.show(100);
+	}
+	
 
 
+}
 
+
+/*
+	Build a tree from the alignment using the selected method
+*/
+function buildTree(){
+	
+	if (BUILDING_TREE) return;
+	BUILDING_TREE = true;
+	
+	let btnID = "#buildTreeBtn";
+	
+	$(btnID).addClass("disabled");
+	addLoader($("#ctrl_loading_div"));
+	$(btnID).parent().find(".usermsg").html("");
+	
+	// Asynchronous call to allow dom to update
+	setTimeout(function() {
+		cjCall("peachtree.options.OptionsAPI", "buildTree").then(function(results){
+			
+			var results = JSON.parse(cjStringJavaToJs(results));
+			
+			//console.log("tree", results.newick);
+			removeLoader($("#ctrl_loading_div"));
+			$(btnID).removeClass("disabled");
+			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();;
+			BUILDING_TREE = false;
+			
+			renderGraphics();
+			
+			
+		});
+	}, 10);
+	
 }
 
 
@@ -223,6 +420,126 @@ function isReadyToRender(callback = function(response) { }){
 
 
 
+/*
+	Select/deselect a taxon
+*/
+function toggleTaxon(ele){
+
+	// Update class
+	ele.toggleClass("selected");
+	
+	
+	updateSelectionCSS();
+	
+	// Inform the model
+	let index = parseFloat(ele.attr("i"));
+	cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
+	
+}
+
+
+/*
+	Clears all taxa selection
+*/
+function clearSelection(){
+	//if ($("#svg .taxon.selected").length == 0) return;
+	$("#svg").find(".taxon.selected").removeClass("selected");
+	updateSelectionCSS();
+	cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
+		renderGraphics();
+	});
+	
+	
+}
+
+
+
+/*
+	Focuses on taxa
+*/
+function focusSelection() {
+	//if ($("#svg .taxon.selected").length == 0) return;
+	console.log("Focusing selection...");
+	setOptionToVal("focusOnTaxa", "true");
+}
+
+/*
+	Focuses on clade
+*/
+function cladeSelection() {
+	//if ($("#svg .taxon.selected").length == 0) return;
+	console.log("Focusing clade...");
+	setOptionToVal("focusOnClade", "true");
+}
+
+
+
+/*
+	Updates the CSS on selection buttons
+*/
+function updateSelectionCSS(){
+	
+	
+	$(".selectBtn").removeClass("disabled");
+	
+	
+	/**
+	// If nothing is selected, disable buttons
+	if ($("#svg .taxon.selected").length == 0){
+		$(".selectBtn").addClass("disabled");
+	}else{
+		$(".selectBtn").removeClass("disabled");
+	}
+	**/
+}
+
+
+/*
+	Populates the taxon search bar auto complete
+*/
+function populateTaxonSearchBar(){
+	cjCall("peachtree.aln.AlignmentAPI", "getListOfTaxaLabels").then(function(val){
+		
+		
+		var results = JSON.parse(cjStringJavaToJs(val));
+		if (results.err != null){
+			console.log(results.err);
+		}else{
+			$("#taxon_search_input").autocomplete({
+				source: results.labels,
+				select: searchForTaxon});
+				
+			// Bind enter keypress
+			/*
+			$("#taxon_search_input").keydown(function(event){
+				if(event.keyCode == 13) {
+					//searchForTaxon();
+				}
+			 });
+			 
+			 */
+		}
+		
+		
+	})
+}
+
+
+/*
+	Attempts to find this taxon
+*/
+function searchForTaxon(){
+	
+	// Asynchronous
+	setTimeout(function() {
+		let label = $("#taxon_search_input").val();
+		console.log("searchForTaxon", label);
+		cjCall("peachtree.options.OptionsAPI", "searchForTaxon", label).then(function(){
+			renderGraphics();
+		});
+		
+	}, 1);
+}
 
 
 

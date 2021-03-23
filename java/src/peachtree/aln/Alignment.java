@@ -2,7 +2,6 @@ package peachtree.aln;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.colourings.Colouring;
-import peachtree.aln.colourings.JalviewNucleotideColouring;
+import peachtree.aln.colourings.Jalview;
 import peachtree.options.Scaling;
+import peachtree.phy.Node;
+import peachtree.phy.Tree;
 
 public class Alignment {
 	
@@ -20,10 +21,8 @@ public class Alignment {
 	List<Sequence> sequences;
 	boolean isNucleotide;
 	int alignmentLength;
-	
-	
-	Colouring colouring;
-	Filtering filtering;
+	List<int[]> patterns;
+	List<Double> patternWeights;
 	
 	
 	
@@ -58,6 +57,8 @@ public class Alignment {
 		long timeOnStrbuilding = 0;
 		for (String line : lines) {
 			
+			line = line.replaceAll("\r", "");
+			
 			//System.out.println(line);
 			
 			if (line.substring(0,1).equals(">")) {
@@ -72,30 +73,8 @@ public class Alignment {
 				// Parse the sequence
 				if (seq.length() > 0) {
 					
-					
-					Sequence sequence = new Sequence(seqID, acc, seq);
-					if (this.sequences.isEmpty()) {
-						this.alignmentLength = sequence.getLength();
-						this.isNucleotide = sequence.isNucleotide();
-					}else {
-						
-						// All sequences must have same length
-						if (sequence.getLength() != alignmentLength) {
-							throw new Exception("Cannot parse sequence " + sequence.getAcc() + " because of length mismatch (" + 
-									sequence.getLength() + " != " + alignmentLength + ")");
-						}
-						
-						// Is it still a nucleotide alignment?
-						if (this.isNucleotide && !sequence.isNucleotide()) {
-							this.isNucleotide = false;
-							for (Sequence s : sequences) {
-								s.setIsNucleotide(false);
-							}
-						}
-						
-					}
-					
-					sequences.add(sequence);
+					parseSequence(acc, seq, seqID);
+					seqID++;
 					seq = new StringBuilder();
 				}
 				
@@ -125,6 +104,12 @@ public class Alignment {
 		
 		
 		
+		// Parse the last sequence
+		if (seq.length() > 0) {
+			parseSequence(acc, seq, seqID);
+		}
+		
+		
 		if (this.sequences.isEmpty()) {
 			throw new Exception("Cannot detect any sequences in the alignment. Are you sure this is .fasta?");
 		}
@@ -138,15 +123,13 @@ public class Alignment {
 		
 		long t1 = Calendar.getInstance().getTimeInMillis();
 		
-		
-		// Default filtering
-		this.filtering = new Filtering(true, null, this);
-		
-		// Default colouring
-		this.colouring = new JalviewNucleotideColouring();
+
 		
 		
-		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites and " + this.sequences.size() + " taxa");
+		// Initialise patterns
+		this.initPatterns();
+		
+		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites, " + this.getPatternCount() + " patterns, and " + this.sequences.size() + " taxa ");
 		
 		
 		long timeOnFilteringT = Calendar.getInstance().getTimeInMillis() - t1;
@@ -159,21 +142,169 @@ public class Alignment {
 	
 	
 	/**
-	 * Alignment colouring
-	 * @param colouring
+	 * Initialise site patterns
 	 */
-	public void setColouring(Colouring colouring) {
-		this.colouring = colouring;
+	private void initPatterns() {
+		
+		
+		this.patterns = new ArrayList<>();
+		this.patternWeights = new ArrayList<>();
+		for (int siteNum = 0; siteNum < this.getLength(); siteNum ++) {
+			
+			// Get pattern of this column
+			int[] site = new int[this.getNtaxa()];
+			for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+				Sequence sequence = this.getSequence(taxonNum);
+				site[taxonNum] = sequence.getSymbolInt(siteNum);
+			}
+			
+			
+			// Check if it is unique
+			int patternMatch = -1;
+			for (int patternNum = 0; patternNum < this.patterns.size(); patternNum ++) {
+				int[] pattern = this.patterns.get(patternNum);
+				boolean isUniqueFromThisPattern = false;
+				for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+					if (site[taxonNum] != pattern[taxonNum]) {
+						isUniqueFromThisPattern = true;
+						break;
+					}
+				}
+				
+				// This column is a duplicate. Do not add it to the list of unique patterns
+				if (!isUniqueFromThisPattern) {
+					patternMatch = patternNum;
+					break;
+				}
+				
+			}
+			
+			
+			// If unique site, then add to list
+			if (patternMatch == -1) {
+				this.patterns.add(site);
+				this.patternWeights.add(1.0);
+			}
+			
+			// Otherwise increment the pattern weight
+			else {
+				double weight = this.patternWeights.get(patternMatch);
+				this.patternWeights.set(patternMatch, weight + 1.0);
+			}
+			
+		}
+		
+		
+		System.out.println("There are " + this.patterns.size() + " patterns");
+		
+		
 	}
 	
 	
 	/**
-	 * Alignment taxon/site filtering
-	 * @return
+	 * Add the sequence + accession
+	 * @param acc
+	 * @param seq
+	 * @throws Exception 
 	 */
-	public void setFiltering(Filtering filtering) {
-		this.filtering = filtering;
+	private void parseSequence(String acc, StringBuilder seq, int seqID) throws Exception {
+		
+		Sequence sequence = new Sequence(seqID, acc, seq);
+		if (this.sequences.isEmpty()) {
+			this.alignmentLength = sequence.getLength();
+			this.isNucleotide = sequence.isNucleotide();
+		}else {
+			
+			// All sequences must have same length
+			if (sequence.getLength() != alignmentLength) {
+				throw new Exception("Cannot parse sequence " + sequence.getAcc() + " because of length mismatch (" + 
+						sequence.getLength() + " != " + alignmentLength + ")");
+			}
+			
+			// Is it still a nucleotide alignment?
+			if (this.isNucleotide && !sequence.isNucleotide()) {
+				this.isNucleotide = false;
+				for (Sequence s : sequences) {
+					s.setIsNucleotide(false);
+				}
+			}
+			
+			
+			// Does it have a unique accession?
+			for (Sequence other : sequences) {
+				if (other.getAcc().equals(sequence.getAcc())) {
+					throw new Exception("Duplicate sequence accession detected: " + sequence.getAcc());
+				}
+			}
+			
+		}
+		
+		sequences.add(sequence);
+		
 	}
+	
+	
+	/**
+	 * Sort the taxa by the tree and ensure the taxon objects are mapped
+	 * @param tree
+	 */
+	public void sortByTree(Tree tree) throws Exception {
+		
+		
+		Node[] leaves = tree.getLeavesAsArray();
+		
+		// Find a new ordering
+		int[] newOrdering = new int[leaves.length];
+		for (int taxonNr = 0; taxonNr < leaves.length; taxonNr ++) {
+			
+			String accession = leaves[taxonNr].getAcc();
+			
+			// Find the sequence number with this accession
+			int seqIndex = -1;
+			for (int i = 0; i < this.getNtaxa(); i++) {
+				Sequence seq = this.getSequence(i);
+				if (seq.getAcc().equals(accession)) {
+					leaves[taxonNr].setTaxon(seq.getTaxon());
+					seqIndex = i;
+					break;
+				}
+			}
+			if (seqIndex == -1) {
+				throw new Exception("Cannot find " + accession + " in alignment");
+			}
+			
+			newOrdering[taxonNr] = seqIndex;
+			
+		}
+		
+		
+		
+		
+		// Create new sequence array
+		List<Sequence> sequencesNew = new ArrayList<>();
+		
+		
+		// Reorder the array
+		for (int newIndex = 0; newIndex < leaves.length; newIndex ++) {
+			int oldIndex = newOrdering[newIndex];
+			sequencesNew.add(this.getSequence(oldIndex));
+			
+		}
+		
+		
+		// Point to the new array
+		this.sequences = sequencesNew;
+		
+		// Reinitialise
+		this.initPatterns();
+		
+		
+	}
+	
+	
+	
+
+
 	
 	public JSONObject toJSON() {
 		
@@ -196,34 +327,27 @@ public class Alignment {
 
 
 	/**
-	 * Get graphics of the alignment
+	 * Get graphics of the sequences in the alignment
 	 * @return
 	 */
-	public JSONArray getAlignmentGraphics(Scaling scaling, double minNtWidth) {
-		
-		
-		
+	public JSONArray getAlignmentGraphics(Scaling scaling, Colouring colouring, double minNtWidth, double textSize, Filtering filtering) {
 		
 		JSONArray objs = new JSONArray();
+		if (!scaling.inView()) return objs;
 		
-		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
-		double y = scaling.ymin();
-		System.out.println("sequence: " + dy);
-		for (Sequence sequence : sequences) {
-
-			
-			//long start = Calendar.getInstance().getTimeInMillis();
-			
-			objs.putAll(sequence.getSequenceGraphics(scaling, y, dy, minNtWidth, colouring, filtering));
-			
-			//long finish = Calendar.getInstance().getTimeInMillis();
-			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
-			y += dy;
+		// Add some yshift to the first row so it doesn't get clipped by top margin
+		Double[] yshift = new Double[1];
+		
+		int seqNumDisplayed = 0;
+		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
+			if (scaling.isAboveRangeY(seqNumDisplayed)) break;
+			Sequence sequence = this.getSequence(seqNum);
+			if (!filtering.includeTaxon(sequence.getTaxon())) continue;
+			objs.putAll(sequence.getSequenceGraphics(scaling, seqNumDisplayed, minNtWidth, colouring, filtering, textSize, yshift));
+			seqNumDisplayed ++;
 		}
 		
 		return objs;
-		
-		
 	}
 	
 	
@@ -231,23 +355,24 @@ public class Alignment {
 	 * Get taxa graphics
 	 * @return
 	 */
-	public JSONArray getTaxaGraphics(Scaling scaling) {
+	public JSONArray getTaxaGraphics(Scaling scaling, double textSize, Filtering filtering, boolean showTaxonNumbers) {
 		
 		JSONArray objs = new JSONArray();
+		if (!scaling.inView()) return objs;
 		
-		double dy = (scaling.ymax() - scaling.ymin()) / this.filtering.getNumSeqs();
-		double y = scaling.ymin();
-		System.out.println("taxa: " + dy);
-		for (Sequence sequence : sequences) {
-			
-			
-			//long start = Calendar.getInstance().getTimeInMillis();
-			
-			objs.putAll(sequence.getTaxonGraphics(scaling, y, dy, filtering));
-			
-			//long finish = Calendar.getInstance().getTimeInMillis();
-			//System.out.println("converted sequence " + sequence.getAcc() + " to json (" + (finish - start) + "ms)");
-			y += dy;
+		// Pad right after sequence number
+		int padding = (this.sequences.size() + "").length();
+		
+		// Add some yshift to the first row so it doesn't get clipped by top margin
+		Double[] yshift = new Double[1];
+
+		int seqNumDisplayed = 0;
+		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {
+			if (scaling.isAboveRangeY(seqNumDisplayed)) break;
+			Sequence sequence = this.getSequence(seqNum);
+			if (!filtering.includeTaxon(sequence.getTaxon())) continue;
+			objs.putAll(sequence.getTaxonGraphics(scaling, seqNumDisplayed, padding, filtering, textSize, showTaxonNumbers, yshift));
+			seqNumDisplayed ++;
 		}
 		
 		return objs;
@@ -273,8 +398,21 @@ public class Alignment {
 	}
 	
 	
-	
-	
+	/**
+	 * Is the index abgisuous / gap?
+	 * @param index
+	 * @param isNT
+	 * @return
+	 */
+	public static boolean isAmbiguousOrGap(int index, boolean isNT) {
+		
+		if (isNT) {
+			if (index > ambiguousNtIndex) return true;
+		} else {
+			if (index > ambiguousAlphaIndex) return true;
+		}
+		return false;
+	}
 	
 	/**
 	 * Is the symbol ambiguous or a gap?
@@ -297,6 +435,9 @@ public class Alignment {
 		
 		return false;
 	}
+	
+	
+
 	
 	
 	/**
@@ -393,16 +534,95 @@ public class Alignment {
 	}
 
 
-	/**
-	 * Number of sites being displayed
-	 * @return
-	 */
-	public int getNsitesDisplayed() {
-		if (this.filtering == null) return 0;
-		return this.filtering.getNumSites();
+
+	public List<String> getNames() {
+		List<String> names = new ArrayList<>();
+		for (Sequence seq : sequences) {
+			names.add(seq.getAcc());
+		}
+		return names;
 	}
 	
 	
+	
+	/**
+	 * Number of site patterns
+	 * @return
+	 */
+	public int getPatternCount() {
+		return this.patterns.size();
+	}
+	
+	
+	/**
+	 * Gets the pattern index patternNum
+	 * @param siteNum
+	 * @return
+	 */
+	public int[] getPattern(int patternNum) {
+		return this.patterns.get(patternNum);
+	}
+	
+	
+	public int getPattern(int patternNum, int taxonNum) {
+		return this.patterns.get(patternNum)[taxonNum];
+	}
+
+
+	/**
+	 * Weight of pattern i
+	 * @param i
+	 * @return
+	 */
+	public double getPatternWeight(int i) {
+		return this.patternWeights.get(i);
+	}
+
+
+	/**
+	 * Toggle selection of this taxon
+	 * @param taxonNum
+	 */
+	public void selectTaxon(int taxonNum) {
+		this.sequences.get(taxonNum).getTaxon().toggleSelection();
+	}
+
+
+	
+	/**
+	 * Deselct all taxa
+	 */
+	public void clearSelection() {
+		for (Sequence seq : this.sequences) {
+			seq.getTaxon().isSelected(false);
+		}
+	}
+
+
+	/**
+	 * Get list of sequences
+	 * @return
+	 */
+	public List<Sequence> getSequences(){
+		return this.sequences;
+	}
+
+
+	
+	/**
+	 * Find the taxon with this label
+	 * @param label
+	 * @return
+	 */
+	public Taxon getTaxon(String label) {
+		for (Sequence seq : this.getSequences()) {
+			Taxon taxon = seq.getTaxon();
+			if (taxon.getName().equals(label)) return taxon;
+		}
+		return null;
+	}
+
+
 
 	
 

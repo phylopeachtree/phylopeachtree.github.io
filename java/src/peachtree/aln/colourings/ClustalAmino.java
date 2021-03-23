@@ -2,10 +2,10 @@ package peachtree.aln.colourings;
 
 import java.util.HashMap;
 
-public class ClustalAminoColouring extends Colouring {
+public class ClustalAmino extends Colouring {
 
 	// http://www.bioinformatics.nl/~berndb/aacolour.html
-	public ClustalAminoColouring() {
+	public ClustalAmino() {
 		
 		 colours = new  HashMap<String, String>();
 		 colours.put("G", "orange");

@@ -31,19 +31,38 @@
   
 		function init() {
 		
-
+			
 			cheerpjInit();
-			initGraphics();
+			addLoader($("#main"), true);
 
 
-			cheerpjRunJar("/app/peachtree.jar", 1);
-			//cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar");
+			//cheerpjRunJar("/app/peachtree.jar", 1);
+			
+			cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar").then(function(val){
+			
+				console.log("Loaded!");
+				removeLoader($("#main"));
+				
+				// Initialise js
+				initGraphics();
+				initUtil();
+				
+				
+				
+				//renderOptions();
+				//$("#graphics_div").show(0);
+				
+				
+				
+				
+	
+				
+			});
 		  
-			//console.log("Loaded!");
+			//
 			
 			
-			// Initialise js
-			initUtil();
+
 
 			
 			//addLoader("#aln_upload_title");
@@ -67,18 +86,9 @@
 		
 		
 		
-		<div id="upload_div" />
+		<div id="upload_div" style="display:none"/>
 		
 		
-			
-			
-			<div id="phy_upload" class="uploader" title="Accepted formats: nexus, newick">
-				<div id="phy_upload_title">Drag and drop a phylogenetic tree</div>
-				<div class="usermsg mediumfont"></div>
-				<div class="mediumfont">Out of order</div>
-			</div>
-			
-			OR
 			
 			<div id="aln_upload" class="uploader"  title="Accepted format: fasta">
 				<div id="aln_upload_title">Drag and drop a multiple sequence alignment</div>
@@ -88,8 +98,16 @@
 			</div>
 			
 			
+			OR
+
 			
-			<br><br>
+			<div id="phy_upload" class="uploader" title="Accepted formats: nexus, newick">
+				<div id="phy_upload_title">Drag and drop a phylogenetic tree</div>
+				<div class="usermsg mediumfont"></div>
+				<div class="mediumfont">Out of order</div>
+			</div>
+			
+
 			Upload one or more of the above to begin
 			<br><br>
 			
@@ -105,6 +123,46 @@
 		
 		<div id="graphics_div" style="display:none"/>
 		
+		
+			<div id="control_panel_div">
+			
+				
+				<div> Showing <span id="ntaxadisplayed_span"></span> of <span id="ntaxa_span"></span> taxa </div>
+				<div> Showing <span id="nsitesdisplayed_span"></span> of <span id="nsites_span"></span> sites </div>
+				
+				<div> <b>Taxon selection: </b>
+					<span id="btn_focus" onClick="focusSelection()" class="button selectBtn" title="Focus on taxa selection (click on a label below to select)">Focus</span>
+					<span id="btn_clade" onClick="cladeSelection()" class="button selectBtn" title="Focus on selected clade (only applicable if a tree is uploaded)">Clade</span>
+					<span id="btn_clear" onClick="clearSelection()" class="button selectBtn" title="Clear selection">Clear</span> 
+				</div>
+				
+				
+				<div> 
+					<label for="taxon_search_input"><b>Search:</b></label>
+					<input id="taxon_search_input">
+				</div>
+				
+				
+			
+				<div>
+					<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a tree from the selected method">Build tree</span>
+					<span class="usermsg mediumfont"></span>
+				</div>
+				
+				
+	
+				
+				
+				<div id="ctrl_loading_div">
+				
+				</div>
+			
+			
+			
+			
+			</div>
+			<hr>
+		
 			<div id="svgouter">
 				<svg id="svg">
 			
@@ -114,10 +172,7 @@
 			</div>
 
 
-			<h2>Fun facts</h2>
-			<div id="ntaxa_div"> </div>
-			<div id="nsites_div"> </div>
-			<div id="nsitesdisplayed_div"> </div>
+
 
 			
 			<div id="options_div"/>

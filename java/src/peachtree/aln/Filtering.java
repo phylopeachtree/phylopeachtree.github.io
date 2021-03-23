@@ -2,8 +2,11 @@ package peachtree.aln;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import peachtree.phy.Tree;
 
 
 /**
@@ -15,32 +18,81 @@ public class Filtering {
 
 	
 	boolean variantSitesOnly;
+	boolean focusing;
 	Map<Integer, Boolean> taxaIDsToInclude;
 	Map<Integer, Boolean> sitesToIncludeMap;
 	List<Integer> sitesToIncludeList;
 	
+	
+	// Major characters at each site
+	Map<Integer, Integer> majors;
+	Tree tree;
+	
 	int numSites;
 	int numTaxa;
+	boolean isNucleotide;
 	
-	public Filtering(boolean variantSitesOnly, List<Taxon> taxaToInclude, Alignment alignment) {
+	public Filtering(boolean variantSitesOnly, boolean focus, Alignment alignment, Tree tree) {
+		
+		
+		System.out.println("...preparing filtering...");
+		
+		this.focusing = focus;
 		this.variantSitesOnly = variantSitesOnly;
+		this.isNucleotide = alignment.isNucleotide;
 		
 		
 		// Use unique taxa ids
-		this.taxaIDsToInclude = new HashMap<>();
-		if (taxaToInclude != null) {
-			for (Taxon taxon: taxaToInclude) {
+		this.taxaIDsToInclude = new LinkedHashMap<>();
+		
+		
+		// Use the tree to find taxa
+		if (tree != null) {
+			
+			this.tree = tree;
+			
+			// Find selected taxa
+			List<Taxon> selected = new ArrayList<>();
+			for (Sequence seq : alignment.getSequences()) {
+				Taxon taxon = seq.getTaxon();
+				if (taxon.isSelected()) selected.add(taxon);
+			}
+			
+			
+			// Find their mrca and take the full clade
+			selected = tree.getClade(selected);
+			
+			
+			// Select the ones to include
+			for (Taxon taxon : selected) {
+				taxon.isSelected(true);
+			}
+			
+		}
+			
+			
+			
+		// Use all taxa / selected taxa
+		for (Sequence seq : alignment.getSequences()) {
+			Taxon taxon = seq.getTaxon();
+			if (!focus || taxon.isSelected()) taxaIDsToInclude.put(taxon.getID(), true);
+		}
+		numTaxa = taxaIDsToInclude.size();
+		
+		// Just show everything
+		if (numTaxa == 0) {
+			for (Sequence seq : alignment.getSequences()) {
+				Taxon taxon = seq.getTaxon();
 				taxaIDsToInclude.put(taxon.getID(), true);
 			}
 			numTaxa = taxaIDsToInclude.size();
-		}else {
-			numTaxa = alignment.getNtaxa();
 		}
 		
+		this.majors = null;
 		
 
 		// Which sites to include?
-		this.sitesToIncludeMap = new HashMap<>();
+		this.sitesToIncludeMap = new LinkedHashMap<>();
 		this.sitesToIncludeList = new ArrayList<>();
 		if (this.variantSitesOnly) {
 			for (int site = 0; site < alignment.getLength(); site ++) {
@@ -95,6 +147,11 @@ public class Filtering {
 			}
 		}
 		
+		
+		
+		// Prepare major/minor alleles
+		this.prepareMajorAlleles(alignment);
+		
 	}
 	
 	
@@ -108,6 +165,28 @@ public class Filtering {
 		if (this.taxaIDsToInclude.isEmpty()) return true;
 		return this.taxaIDsToInclude.containsKey(taxon.getID());
 		
+	}
+	
+	
+	/**
+	 * Are variant sites only being displayed?
+	 * @return
+	 */
+	public boolean variantSitesOnly() {
+		return this.variantSitesOnly;
+	}
+	
+	
+	public Tree getTree() {
+		return this.tree;
+	}
+	
+	/**
+	 * Are the selected sites the only ones being displayed?
+	 * @return
+	 */
+	public boolean focusing() {
+		return this.focusing;
 	}
 	
 	
@@ -126,23 +205,6 @@ public class Filtering {
 	
 	public List<Integer> getSites() {
 		return this.sitesToIncludeList;
-		/*
-		int[] sites = new int[this.getNumSites()];
-		if (this.sitesToIncludeMap != null && this.sitesToIncludeMap.size() > 0) {
-			int i = 0;
-			for (int site : this.sitesToIncludeMap.keySet()) {
-				//System.out.println("including site " + site);
-				sites[i] = site;
-				i++;
-			}
-		}else {
-			for (int i = 0; i < this.getNumSites(); i ++) {
-				sites[i] = i;
-				i++;
-			}
-		}
-		return sites;
-		*/
 	}
 
 
@@ -162,8 +224,138 @@ public class Filtering {
 	public int getNumSeqs() {
 		return numTaxa;
 	}
+
 	
 	
+	/**
+	 * Prepare the arrays of major alleles at each site
+	 */
+	private void prepareMajorAlleles(Alignment alignment) {
+		
+		
+		this.majors = new HashMap<>();
+		if (numTaxa < 2 || this.sitesToIncludeList.isEmpty()) return;
+		HashMap<Integer, Integer> freqs = new HashMap<>();
+		int siteNum, count, character;
+		for (int s = 0; s < this.numSites; s ++) {
+			
+			
+			siteNum = this.sitesToIncludeList.get(s);
+			
+			// List all characters by frequency
+			freqs.clear();
+			for (int taxonNum : this.taxaIDsToInclude.keySet()) {
+				
+				// Count
+				character = alignment.getSequence(taxonNum).getSymbolInt(siteNum);
+				if (freqs.containsKey(character)) {
+					count = freqs.get(character) + 1;
+				}else {
+					count = 1;
+				}
+				freqs.put(character, count);
+				
+			}
+			
+			
+			// Find major allele at this site
+			int maxCount = 0;
+			int major = -1;
+			for (Integer c : freqs.keySet()) {
+				count = freqs.get(c);
+				if (count > maxCount) {
+					maxCount = count;
+					major = c;
+				}
+			}
+			this.majors.put(siteNum, major);
+			
+			
+		}
+		
+	}
+	
+	
+	/**
+	 * Is this character at this site the major allele?
+	 * @param character
+	 * @param siteNum
+	 * @return
+	 */
+	public boolean isMajorAllele(String character, int siteNum) {
+		return isMajorOrMinorAllele(character, siteNum, true);
+	}
+
+	
+	/**
+	 * Is this character at this site a non-major allele?
+	 * @param character
+	 * @param siteNum
+	 * @return
+	 */
+	public boolean isMinorAllele(String character, int siteNum) {
+		return isMajorOrMinorAllele(character, siteNum, false);
+	}
+	
+	
+	/**
+	 * Is this character at this site a major allele (if isMajor=true) or a minor allele (if false)
+	 * @param character
+	 * @param siteNum
+	 * @param isMajor
+	 * @return
+	 */
+	private boolean isMajorOrMinorAllele(String character, int siteNum, boolean isMajor) {
+		
+		if (this.numTaxa < 2) {
+			return isMajor;
+		}
+		if (!this.majors.containsKey(siteNum)) return false;
+		
+		// Convert to int
+		int charInt;
+		if (this.isNucleotide) {
+			charInt = Alignment.nt_chars.get(character);
+		}else {
+			charInt = Alignment.alpha_chars.get(character);
+		}
+		
+		int major = this.majors.get(siteNum);
+		if (isMajor) return major == charInt;
+		return major != charInt;
+		
+	}
+
+
+	/**
+	 * Get the index of this taxon
+	 * @param taxon
+	 * @return
+	 */
+	public int getIndex(Taxon taxon) {
+		
+		int rowNum = 0;
+		for (int taxonID : this.taxaIDsToInclude.keySet()) {
+			if (taxon.getID() == taxonID) return rowNum;
+			rowNum ++;
+		}
+		return -1;
+	}
 	
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

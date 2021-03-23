@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class JalviewNucleotideColouring extends Colouring {
+public class Jalview extends Colouring {
 
 	
 	
@@ -12,7 +12,7 @@ public class JalviewNucleotideColouring extends Colouring {
 	
 	
 	 
-	public JalviewNucleotideColouring() {
+	public Jalview() {
 		
 		
 		 colours = new  HashMap<String, String>();

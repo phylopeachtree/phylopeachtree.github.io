@@ -15,9 +15,16 @@ public class NumericalOption extends Option {
 	double value;
 	double min;
 	double max;
+	double stepSize;
 	
 	
-	public NumericalOption(String name, String section, String title, double val, double min, double max) {
+
+	public NumericalOption(String name, String section, String title, double val, double min, double max, double stepSize) {
+		this(name, section, title, val, min, max, stepSize, false);
+	}
+	
+	
+	public NumericalOption(String name, String section, String title, double val, double min, double max, double stepSize, boolean hide) {
 		
 		this.name = name;
 		this.min = min;
@@ -25,14 +32,17 @@ public class NumericalOption extends Option {
 		this.value = val;
 		this.section = section;
 		this.title = title;
-		
+		this.stepSize = stepSize;
+		this.hide = hide;
 	}
+	
+	
 	
 	
 	@Override
 	public JSONObject toJSON() {
-		JSONObject json = new JSONObject().put("name", name).put("section", section).put("title", title)
-						.put("value", value).put("min", min).put("max", max).put("type", this.getClass().getSimpleName());
+		JSONObject json = new JSONObject().put("value", value).put("min", min).put("max", max).put("step", stepSize);
+		super.modifyJSON(json);
 		return json;
 	}
 	

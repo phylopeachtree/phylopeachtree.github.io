@@ -211,7 +211,7 @@ public class Tree {
 	 */
 	public String toNewick() {
 		final int[] dummy = new int[1];
-		return this.root.toSortedNewick(dummy, false) + ")";
+		return this.root.toSortedNewick(dummy, true) + ")";
 	}
 	
 	
@@ -284,7 +284,7 @@ public class Tree {
 	 * @param branchWidth
 	 * @return
 	 */
-	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree) {
+	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree, double nodeRadius) {
 		
 		JSONArray objs = new JSONArray();
 		if (!scaling.inView()) return objs;
@@ -300,7 +300,8 @@ public class Tree {
 			}
 		}
 		
-		this.root.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
+		Node subtree = filtering.getSubtreeRoot() != null ? filtering.getSubtreeRoot() : this.root;
+		subtree.getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius);
 		return objs;
 		
 	}
@@ -349,6 +350,28 @@ public class Tree {
 		
 		
 		// Find the mrca
+		Node mrca = getMRCA(taxa);
+		
+		
+		// Get all leaves in this subtree
+		List<Node> leaves = new ArrayList<>();
+		mrca.getLeafSet(leaves);
+		
+		
+		// Return their taxa
+		List<Taxon> clade = new ArrayList<>();
+		for (Node leaf : leaves) clade.add(leaf.getTaxon());
+		return clade;
+		
+	}
+	
+	
+	/**
+	 * Get the MRCA of a list of taxa
+	 * @return
+	 */
+	public Node getMRCA(List<Taxon> taxa) {
+		
 		Node mrca = null;
 		for (int i = 0; i < taxa.size(); i ++) {
 			Node node1 = this.getNode(taxa.get(i));
@@ -362,18 +385,9 @@ public class Tree {
 				}
 					
 			}
-			
 		}
 		
-		// Get all leaves in this subtree
-		List<Node> leaves = new ArrayList<>();
-		mrca.getLeafSet(leaves);
-		
-		
-		// Return their taxa
-		List<Taxon> clade = new ArrayList<>();
-		for (Node leaf : leaves) clade.add(leaf.getTaxon());
-		return clade;
+		return mrca;
 		
 	}
 

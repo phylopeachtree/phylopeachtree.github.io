@@ -106,7 +106,7 @@ public class AlignmentAPI {
 			
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
 			
-			JSONObject json = new JSONObject().put("time", (finish-start));
+			JSONObject json = new JSONObject().put("time", (finish-start)/1000.0);
 			return json.toString();
 			
 		}catch (Exception e){

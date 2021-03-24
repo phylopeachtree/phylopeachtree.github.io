@@ -37,7 +37,7 @@ public class PhylogenyAPI {
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed tree successfully (" + (finish-start) + "ms)" );
 			
-			JSONObject json = new JSONObject().put("time", (finish-start));
+			JSONObject json = new JSONObject().put("time", (finish-start)/1000.0);
 			return json.toString();
 			
 		}catch (Exception e){
@@ -135,8 +135,8 @@ public class PhylogenyAPI {
 	 * @param branchWidth
 	 * @return
 	 */
-	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree) {
-		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree);
+	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree, double nodeRadius) {
+		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree, nodeRadius);
 	}
 	
 	

@@ -2,6 +2,7 @@ package peachtree.phy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -22,6 +23,7 @@ public class Node {
 	Node parent;
 	List<Node> children;
 	Taxon taxon = null;
+	HashMap<String, String> annotations = new HashMap<>();
 	
 	public Node() {
 		this.acc = "";
@@ -172,6 +174,10 @@ public class Node {
 		Node clone = new Node(this.getNr());
 		clone.acc = this.acc;
 		clone.height = this.height;
+		clone.annotations = new HashMap<>();
+		for (String key : this.annotations.keySet()) {
+			clone.annotations.put(key, this.annotations.get(key));
+		}
 		for (Node child : children) {
 			clone.addChild(child.copy());
 		}
@@ -325,7 +331,7 @@ public class Node {
         }
 
         if (printMetaData) {
-            //buf.append(getNewickMetaData());
+            buf.append(getNewickMetaData());
         }
 
         buf.append(this.getAcc());
@@ -339,13 +345,52 @@ public class Node {
     
     
     /**
+     * Meta data annotations for newick string
+     * @return
+     */
+    private String getNewickMetaData() {
+    	
+    	if (this.annotations.isEmpty()) return "";
+    	StringBuilder str = new StringBuilder("[");
+    	int i = 0;
+    	for (String key : this.annotations.keySet()) {
+    		str.append(key).append("=").append(this.annotations.get(key));
+    		if (i < this.annotations.size()-1) str.append(",");
+    		i++;
+    	}
+    	str.append("]");
+    	return str.toString();
+    	
+    }
+    
+    
+    /**
+     * Meta data annotations for displaying string
+     * @return
+     */
+    private String getTidyMetaData() {
+    	
+    	if (this.annotations.isEmpty()) return "";
+    	StringBuilder str = new StringBuilder();
+    	int i = 0;
+    	for (String key : this.annotations.keySet()) {
+    		str.append(key).append("=").append(this.annotations.get(key));
+    		if (i < this.annotations.size()-1) str.append("\n");
+    		i++;
+    	}
+    	return str.toString();
+    	
+    }
+    
+    
+    /**
      * Get the svg graphics of this subtree
      * @param dy
      * @param filtering
      * @param branchWidth
      * @return y
      */
-	public Double getGraphics(JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift) {
+	public Double getGraphics(boolean isRoot, JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift, double nodeRadius) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -371,7 +416,7 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				Double ychild = child.getGraphics(objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift);
+				Double ychild = child.getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius);
 				if (ychild != null) {
 					if (y == null) y = 0.0;
 					y += ychild;
@@ -440,7 +485,7 @@ public class Node {
 		
 		
 		// Branch
-		if (!this.isRoot()) {
+		if (!isRoot) {
 			
 			// Only draw if this node is in y-range
 			if (scaling.inRangeY(y)) {
@@ -455,11 +500,20 @@ public class Node {
 				branch_json.put("stroke", "black");
 				branch_json.put("stroke_linecap", "round");
 				objs.put(branch_json);
-			
+
+				
 			}
 				
-				
 		
+		}
+		
+		
+		// Draw node and annotate it
+		if (nodeRadius > 0 && scaling.inRangeY(y)) {
+			JSONObject node_json = new JSONObject();
+			node_json.put("ele", "circle").put("cx", x2Scaled).put("cy", yscaled).put("r", nodeRadius).put("fill", "black");
+			if (!this.annotations.isEmpty())  node_json.put("title", this.getTidyMetaData());
+			objs.put(node_json);
 		}
 		
 		return y;
@@ -474,6 +528,8 @@ public class Node {
 	 */
 	public void parseFromNewick(StringBuilder newick) throws Exception {
 		
+		
+		this.annotations = new HashMap<>();
 		
 		
 		// Is this a leaf?
@@ -510,22 +566,41 @@ public class Node {
 		int pos = 1;
 		int childPos = 1;
 		int annotationLevel = 0;
+		int annotationPos = -1;
 		double length = 0;
 		while (pos < newick.length()) {
 			
 			
 			char2 = newick.substring(pos, pos+1);
 			
-			// Annotation. Skip
+			// Annotation
 			if (char2.equals("[")) {
 				annotationLevel++;
+				annotationPos = pos+1;
 			}
 			else if (char2.equals("]")) {
+				if (annotationLevel == 1) this.parseAnnotation(newick.substring(annotationPos, pos));
 				annotationLevel--;
 			}
 			
+			// Array annotation
+			else if (char2.equals("{")) {
+				annotationLevel++;
+			}
+			else if (char2.equals("}")) {
+				annotationLevel--;
+			}
+			
+			else if (annotationLevel == 1 && char2.equals(",")) {
+				
+				// Parse annotation
+				this.parseAnnotation(newick.substring(annotationPos, pos));
+				annotationPos = pos+1;
+				
+			}
+			
 			// Parse node height
-			else if (char2.equals(":") && level == 0) {
+			else if (annotationLevel == 0 && level == 0 && char2.equals(":")) {
 				String lengthStr = newick.substring(pos+1).split("(,|[(]|[)])")[0];
 				length = Double.parseDouble(lengthStr);
 				if (!hasChildren) break;
@@ -580,8 +655,39 @@ public class Node {
 		
 		
 		
+	}
+	
+	
+	/**
+	 * Parse the annotation
+	 * @param annotation
+	 */
+	private void parseAnnotation(String annotation) {
 		
+		//System.out.println(annotation);
 		
+		String[] pair = annotation.split("=");
+		if (pair.length == 2) {
+			String key = pair[0];
+			key = key.replace("&", "");
+			String val = pair[1];
+			this.annotations.put(key, val);
+		}
+			
+		
+	}
+
+	
+	/**
+	 * Return the height of the youngest child in the subtree
+	 * @return
+	 */
+	public double getYoungestChildHeight() {
+		double minHeight = this.getHeight();
+		for (Node child : this.getChildren()) {
+			minHeight = Math.min(minHeight, child.getYoungestChildHeight());
+		}
+		return minHeight;
 	}
 	
 

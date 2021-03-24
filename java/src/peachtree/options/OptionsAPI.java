@@ -46,6 +46,7 @@ public class OptionsAPI {
 	// Phylogeny
 	static DiscreteOption treeMethods;
 	static NumericalOption branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
+	static NumericalOption nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 3, 0, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	static BooleanOption showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
 	
@@ -343,15 +344,27 @@ public class OptionsAPI {
 				
 				PhylogenyAPI.applyFiltering(AlignmentAPI.getFiltering());
 				
-				double spacing = treeSpacing.getVal();
+				
 				double branchW = branchwidth.getVal();
+				double nodeRad = nodeRadius.getVal();
+				double spacing = Math.max(treeSpacing.getVal(), nodeRad);
+				
+				
+				// How tall is the tree?
+				double treeHeight = PhylogenyAPI.getHeight();
+				double treeMin = 0;
+				if (AlignmentAPI.getFiltering().getSubtreeRoot() != null) {
+					treeHeight = AlignmentAPI.getFiltering().getSubtreeRoot().getHeight();
+					treeMin = AlignmentAPI.getFiltering().getSubtreeRoot().getYoungestChildHeight();
+				}
+				
 				
 				// Scaling
-				Scaling scaling = new Scaling(LEFT_MARGIN + spacing,  xdivide1*width - spacing, TOP_MARGIN, height, PhylogenyAPI.getHeight(), 0);
+				Scaling scaling = new Scaling(LEFT_MARGIN + spacing,  xdivide1*width - spacing, TOP_MARGIN, height, treeHeight, treeMin);
 				scaling.setRowHeight(ntHeight);
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 				
-				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal());
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal(), nodeRad);
 				objs.putAll(tree);
 				
 				

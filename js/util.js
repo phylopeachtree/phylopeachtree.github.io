@@ -156,7 +156,7 @@ function plotUploadErrorMsg(err, uploadSelector){
 */
 function plotUploadSuccessMsg(filename, time, uploadSelector){
 	if (time == "0" || time == 0) time = "<1";
-	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + time + "ms!");
+	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + Math.round(time*10)/10 + "s!");
 	updateRenderBtn();
 	removeLoader($(uploadSelector + "_title"));
 	return true;

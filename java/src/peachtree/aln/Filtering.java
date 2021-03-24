@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import peachtree.phy.Node;
 import peachtree.phy.Tree;
 
 
@@ -31,6 +32,7 @@ public class Filtering {
 	int numSites;
 	int numTaxa;
 	boolean isNucleotide;
+	Node subtree; // The subtree (if using a tree as a filter)
 	
 	public Filtering(boolean variantSitesOnly, boolean focus, Alignment alignment, Tree tree) {
 		
@@ -40,7 +42,7 @@ public class Filtering {
 		this.focusing = focus;
 		this.variantSitesOnly = variantSitesOnly;
 		this.isNucleotide = alignment.isNucleotide;
-		
+		this.subtree = null;
 		
 		// Use unique taxa ids
 		this.taxaIDsToInclude = new LinkedHashMap<>();
@@ -61,6 +63,7 @@ public class Filtering {
 			
 			// Find their mrca and take the full clade
 			selected = tree.getClade(selected);
+			this.subtree = tree.getMRCA(selected);
 			
 			
 			// Select the ones to include
@@ -165,6 +168,15 @@ public class Filtering {
 		if (this.taxaIDsToInclude.isEmpty()) return true;
 		return this.taxaIDsToInclude.containsKey(taxon.getID());
 		
+	}
+	
+	
+	/**
+	 * Return the root of the subsetted subtree, if applicable
+	 * @return
+	 */
+	public Node getSubtreeRoot() {
+		return this.subtree;
 	}
 	
 	

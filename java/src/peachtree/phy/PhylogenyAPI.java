@@ -1,7 +1,9 @@
 package peachtree.phy;
 
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,6 +35,9 @@ public class PhylogenyAPI {
 			
 			// If alignment has been uploaded, check it matches the tree
 			prepareLabelling(AlignmentAPI.getAlignment());
+			
+			// Prepare tree annotation options
+			OptionsAPI.prepareTreeAnnotationOptions();
 			
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed tree successfully (" + (finish-start) + "ms)" );
@@ -95,6 +100,9 @@ public class PhylogenyAPI {
 			orderingIsDirty = false;
 			
 			
+			// Prepare tree annotation options
+			OptionsAPI.prepareTreeAnnotationOptions();
+			
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Built successfully (" + (finish-start) + "ms)" );
 			
@@ -135,8 +143,8 @@ public class PhylogenyAPI {
 	 * @param branchWidth
 	 * @return
 	 */
-	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree, double nodeRadius) {
-		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree, nodeRadius);
+	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
+		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
 	}
 	
 	
@@ -161,6 +169,16 @@ public class PhylogenyAPI {
 
 	public static Tree getTree() {
 		return THE_TREE;
+	}
+
+
+	/**
+	 * Return a list of annotations
+	 * @return
+	 */
+	public static List<String> getAllAnnotations() {
+		if (THE_TREE == null) return new ArrayList<>();
+		return THE_TREE.getAllAnnotations();
 	}
 	
 	

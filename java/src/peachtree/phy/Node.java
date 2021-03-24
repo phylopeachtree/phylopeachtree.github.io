@@ -1,5 +1,7 @@
 package peachtree.phy;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -370,8 +372,12 @@ public class Node {
      */
     private String getTidyMetaData() {
     	
-    	if (this.annotations.isEmpty()) return "";
+    	
     	StringBuilder str = new StringBuilder();
+    	str.append(this.getAcc());
+    	str.append("\nheight=").append(this.getHeight());
+    	if (this.annotations.isEmpty()) return str.toString();
+    	str.append("\n");
     	int i = 0;
     	for (String key : this.annotations.keySet()) {
     		str.append(key).append("=").append(this.annotations.get(key));
@@ -390,7 +396,8 @@ public class Node {
      * @param branchWidth
      * @return y
      */
-	public Double getGraphics(boolean isRoot, JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, boolean showTaxaOnTree, double yshift, double nodeRadius) {
+	public Double getGraphics(boolean isRoot, JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, 
+			boolean showTaxaOnTree, double yshift, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -416,7 +423,7 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				Double ychild = child.getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius);
+				Double ychild = child.getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
 				if (ychild != null) {
 					if (y == null) y = 0.0;
 					y += ychild;
@@ -437,12 +444,13 @@ public class Node {
 		
 		double yscaled = scaling.scaleY(y);
 		yscaled += yshift;
+		boolean inrangeY = scaling.inRangeY(y);
 		
 		// Dashed line to taxa
 		if (this.isLeaf() && showTaxaOnTree && this.getHeight() > 0) {
 			
 			// Only draw if this node is in y-range
-			if (scaling.inRangeY(y)) {
+			if (inrangeY) {
 				
 				
 				JSONObject dashed_json = new JSONObject();
@@ -467,7 +475,7 @@ public class Node {
 			
 			
 			// Only draw if this node is in y-range
-			if (scaling.inRangeY(minY) || scaling.inRangeY(maxY) || scaling.inRangeY(y)) {
+			if (scaling.inRangeY(minY) || scaling.inRangeY(maxY) || inrangeY) {
 			
 				
 				JSONObject shoulder_json = new JSONObject();
@@ -488,7 +496,7 @@ public class Node {
 		if (!isRoot) {
 			
 			// Only draw if this node is in y-range
-			if (scaling.inRangeY(y)) {
+			if (inrangeY) {
 			
 				double x1 = this.getParent().getHeight();
 				
@@ -509,12 +517,47 @@ public class Node {
 		
 		
 		// Draw node and annotate it
-		if (nodeRadius > 0 && scaling.inRangeY(y)) {
+		if (nodeRadius > 0 && inrangeY) {
 			JSONObject node_json = new JSONObject();
 			node_json.put("ele", "circle").put("cx", x2Scaled).put("cy", yscaled).put("r", nodeRadius).put("fill", "black");
 			if (!this.annotations.isEmpty())  node_json.put("title", this.getTidyMetaData());
 			objs.put(node_json);
 		}
+		
+		
+		
+		// Internal/leaf node annotations?
+		if (inrangeY && fontSize > 0) {
+			
+			String label = this.isLeaf() ? leafLabel : internalLabel;
+			if (label != null && this.annotations.containsKey(label)) {
+			
+				// Is it a double? If so then round it
+				String val = this.annotations.get(label);
+				try {
+				    double d = Double.parseDouble(val);
+				    BigDecimal bd = new BigDecimal(d);
+				    bd = bd.round(new MathContext(rounding));
+				    val = "" + bd.doubleValue();
+				}
+				catch (Exception e) {};
+				
+				
+				
+				// Plot annotation
+				JSONObject label_json = new JSONObject();
+				label_json.put("ele", "text").put("x", x2Scaled + nodeRadius).put("y", yscaled);
+				label_json.put("text_anchor", "start"); 
+				label_json.put("alignment_baseline", "middle"); 
+				label_json.put("value", val);
+				label_json.put("font_size", fontSize);
+				objs.put(label_json);
+			
+			}
+			
+			
+		}
+
 		
 		return y;
 		
@@ -671,6 +714,7 @@ public class Node {
 			String key = pair[0];
 			key = key.replace("&", "");
 			String val = pair[1];
+			val = val.replace("{", "").replace("}", "");
 			this.annotations.put(key, val);
 		}
 			
@@ -688,6 +732,22 @@ public class Node {
 			minHeight = Math.min(minHeight, child.getYoungestChildHeight());
 		}
 		return minHeight;
+	}
+
+	
+	/**
+	 * Populate the list with a unique list of annotations in the subtree
+	 * @param annotations2
+	 */
+	public void getAllAnnotations(List<String> annotations) {
+		
+		for (String key : this.annotations.keySet()) {
+			if (!annotations.contains(key)) annotations.add(key);
+		}
+		for (Node child : this.getChildren()) {
+			child.getAllAnnotations(annotations);
+		}
+		
 	}
 	
 

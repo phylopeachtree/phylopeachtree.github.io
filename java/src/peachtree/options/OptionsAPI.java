@@ -2,9 +2,7 @@ package peachtree.options;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,7 +16,6 @@ import peachtree.aln.colourings.Colouring;
 import peachtree.aln.colourings.Drums;
 import peachtree.aln.colourings.Jalview;
 import peachtree.aln.colourings.SiteColourFilter;
-import peachtree.phy.ClusterTree;
 import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.util.LinkType;
 
@@ -49,6 +46,10 @@ public class OptionsAPI {
 	static NumericalOption nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 3, 0, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	static BooleanOption showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
+	static DiscreteOption internalNodeLabels;
+	static DiscreteOption leafNodeLabels;
+	static NumericalOption annotationFontSize = new NumericalOption("annotationFontSize", "Phylogeny", "Tree annotation font size", 8, 0, 14, 1, true);
+	static NumericalOption annotationRounding = new NumericalOption("annotationRounding", "Phylogeny", "Tree annotation sf", 3, 1, 8, 1, true);
 	
 	// Taxa
 	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
@@ -79,6 +80,8 @@ public class OptionsAPI {
 		
 		graphicalObjects = null;
 		focalTaxon = null;
+		internalNodeLabels = null;
+		leafNodeLabels = null;
 		
 		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
 		siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", SiteColourFilter.all, SiteColourFilter.values());
@@ -122,7 +125,36 @@ public class OptionsAPI {
 	}
 	
 	
+	/**
+	 * Prepares all node annotations
+	 * @throws Exception
+	 */
+	public static void prepareTreeAnnotationOptions() throws Exception {
+		
+		
+		List<String> annotations = PhylogenyAPI.getAllAnnotations();
+		if (annotations.isEmpty()) {
+			annotationFontSize.hide();
+			annotationRounding.hide();
+			internalNodeLabels = null;
+			leafNodeLabels = null;
+			return;
+		}
+		annotations.add(0, "None");
+		annotationFontSize.show();
+		annotationRounding.show();
+		internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.get(0), annotations);
+		leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.get(0), annotations);
+		
+		
+	}
 	
+	
+
+
+
+
+
 	/**
 	 * Set the value of this option
 	 * @param id
@@ -364,7 +396,13 @@ public class OptionsAPI {
 				scaling.setRowHeight(ntHeight);
 				scaling.setScroll(0, scrollY.getVal(), 0, fullHeight);
 				
-				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal(), nodeRad);
+				// Annotations
+				String internalLabel = internalNodeLabels == null ? null : internalNodeLabels.getVal().toString();
+				String leafLabels = leafNodeLabels == null ? null : leafNodeLabels.getVal().toString();
+				double fontSize = Math.min(ntHeight, annotationFontSize.getVal());
+				int rounding = (int)annotationRounding.getVal();
+				
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal(), nodeRad, internalLabel, leafLabels, fontSize, rounding);
 				objs.putAll(tree);
 				
 				
@@ -373,10 +411,7 @@ public class OptionsAPI {
 			
 			// Width of taxa
 			if (AlignmentAPI.isReady()) {
-				
-			
-				
-				
+
 			
 				// Taxa
 				if (xdivide2 > xdivide1) {
@@ -528,18 +563,15 @@ public class OptionsAPI {
 	private static List<Option> getOptionList() throws Exception{
 		
 		
-		
-		
 		// Introspectively find all options and add them to the list of options
 		List<Option> options = new ArrayList<>();
 		Field[] fields = OptionsAPI.class.getDeclaredFields();
 		for (Field field: fields) {
 			
 			if (field.get(null) instanceof Option) {
-					
 				try {
 					Option option = (Option) field.get(null);
-					options.add(option);
+					if (option != null) options.add(option);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} 

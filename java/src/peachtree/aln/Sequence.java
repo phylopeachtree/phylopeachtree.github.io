@@ -143,7 +143,7 @@ public class Sequence {
 		numberPadding.replaceAll(" ", "&#160;"); // White space
 		
 		
-		/// Plot accession
+		// Plot accession
 		JSONObject acc_json = new JSONObject();
 		acc_json.put("ele", "text").put("x", scaling.scaleX(scaling.xmin())).put("y", yc_scaled);
 		acc_json.put("text_anchor", "start"); 

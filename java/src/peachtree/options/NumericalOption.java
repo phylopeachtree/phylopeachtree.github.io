@@ -57,4 +57,29 @@ public class NumericalOption extends Option {
 		this.value = val;
 	}
 
+	
+	/**
+	 * Unhide the option
+	 */
+	public void show() {
+		this.hide = false;
+	}
+
+	/**
+	 * Hide the option
+	 */
+	public void hide() {
+		this.hide = true;
+	}
+	
+	
 }
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 package peachtree.phy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -284,7 +285,8 @@ public class Tree {
 	 * @param branchWidth
 	 * @return
 	 */
-	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree, double nodeRadius) {
+	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree, 
+			double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
 		
 		JSONArray objs = new JSONArray();
 		if (!scaling.inView()) return objs;
@@ -301,7 +303,7 @@ public class Tree {
 		}
 		
 		Node subtree = filtering.getSubtreeRoot() != null ? filtering.getSubtreeRoot() : this.root;
-		subtree.getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius);
+		subtree.getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
 		return objs;
 		
 	}
@@ -429,6 +431,18 @@ public class Tree {
 		}
 		
 		return null;
+	}
+
+
+	/**
+	 * Find all annotation variables and sort them alphabetically
+	 * @return
+	 */
+	public List<String> getAllAnnotations() {
+		List<String> annotations = new ArrayList<>();
+		root.getAllAnnotations(annotations);
+		Collections.sort(annotations);
+		return annotations;
 	}
 	
 	

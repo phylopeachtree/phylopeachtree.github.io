@@ -11,20 +11,14 @@ import java.util.HashMap;
 public class Aliview extends Colouring {
 
 	
-
-	
 	 
 	public Aliview() {
-		
-		
 		 colours = new  HashMap<String, String>();
 		 colours.put("A", "#5ADC5A");
 		 colours.put("C", "#6464FA");
 		 colours.put("G", "#5A5A5A");
 		 colours.put("T", "#F58282");
 		 colours.put("U", "#F58282");
-		 
-		 
 	}
 	
 	@Override

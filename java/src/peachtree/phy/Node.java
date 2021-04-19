@@ -590,7 +590,7 @@ public class Node {
 		// Get label
 		String labelAndAnnotations = bits[0];
 		String[] labelSplit = labelAndAnnotations.split("\\[");
-		if (!hasChildren && labelSplit.length > 1) {
+		if (!hasChildren) {
 			this.setAcc(labelSplit[0]);
 		}
 		

@@ -299,6 +299,9 @@ public class Alignment {
 		this.initPatterns();
 		
 		
+		
+		
+		
 	}
 	
 	

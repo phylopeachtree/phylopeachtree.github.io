@@ -73,15 +73,29 @@ public class Tree {
 				
 				// Translate token
 				splt = line.split(" ");
-				if (splt.length != 2) {
+				if (splt.length < 2) {
 					throw new Exception("Cannot parse translate line " + line + " because there are not 2 tokens split by a single space");
 				}
 				
 				String id = splt[0];
-				String label = splt[1];
+				String label = "";
+				for (int i = 1; i < splt.length; i ++) {
+					label += splt[i];
+					if (i < splt.length-1) label += " ";
+				}
 				
 				// Remove trailing comma
 				if (label.substring(label.length()-1).equals(",")) label = label.substring(0, label.length()-1); 
+				
+				// Remove " from start and end if there are spaces in the label
+				if (splt.length > 2) {
+					if (label.substring(0, 1).equals("\"") && label.substring(label.length()-1, label.length()).equals("\"")) {
+						label = label.substring(1, label.length()-1);
+					}
+				}
+				
+				
+				
 				if (translateMap.containsKey(id)) {
 					throw new Exception("Duplicate translate id detected " + id);
 				}
@@ -128,11 +142,12 @@ public class Tree {
 		this.root.parseFromNewick(newick);
 		this.initArray();
 		
-		// Normalise so that the smallest leaf is 0
+		
+		
+		// Normalise so that the smallest leaf is at height 0
 		double minimalHeight = Double.POSITIVE_INFINITY;
 		for (Node node : this.getNodesAsArray()) minimalHeight = Math.min(minimalHeight, node.getHeight());
 		for (Node node : this.getNodesAsArray()) node.setHeight(node.getHeight() - minimalHeight);
-		
 		
 		
 		// Apply label translation
@@ -144,6 +159,7 @@ public class Tree {
 				}
 			}
 		}
+		
 		
 		//System.out.println("Parsed " + this.toNewick());
 		

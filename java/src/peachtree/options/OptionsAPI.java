@@ -27,10 +27,13 @@ public class OptionsAPI {
 	static final double LEFT_MARGIN = 16; // Left hand margin
 	static final double TOP_MARGIN = 16; // Top margin
 	
+	static final double INIT_WIDTH = 1000;
+	static final double INIT_HEIGHT = INIT_WIDTH*0.618;
+	
 	
 	// Boundaries
-	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", 1000, 10, 2000, 100, true);
-	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", canvasWidth.getVal() * 0.618, 10, 2000, 100, true);
+	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, 2000, 100, true);
+	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, 2000, 100, true);
 	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
 	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
 	
@@ -87,6 +90,27 @@ public class OptionsAPI {
 		siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", SiteColourFilter.all, SiteColourFilter.values());
 		
 	}
+	
+	
+	
+	/**
+	 * Reset the scrollbars to 0,0
+	 */
+	public static void resetScroll() {
+		scrollX.setVal(0);
+		scrollY.setVal(0);
+	}
+	
+	
+	
+	/**
+	 * Reset window width/height
+	 */
+	public static void resetWindowSize() {
+		canvasWidth.setVal(INIT_WIDTH);
+		canvasHeight.setVal(INIT_HEIGHT);
+	}
+	
 	
 
 	
@@ -211,7 +235,10 @@ public class OptionsAPI {
 					
 					// If focusOnTaxa is enabled, then set focusOnClade to false
 					if (option == focusOnTaxa && val == true) focusOnClade.setVal(false);
-					if (option == focusOnClade || option == focusOnTaxa) AlignmentAPI.setSelectionToDirty();
+					if (option == focusOnClade || option == focusOnTaxa) {
+						resetScroll();
+						AlignmentAPI.setSelectionToDirty();
+					}
 					
 					((BooleanOption)option).setVal(val);
 				}
@@ -299,7 +326,7 @@ public class OptionsAPI {
 			
 			// Full size of view
 			double fullHeight = ntHeight * AlignmentAPI.getNtaxaDisplayed() + TOP_MARGIN;
-			double fullAlnWidth = ntWidth.getVal() * AlignmentAPI.getNsitesDisplayed();
+			double fullAlnWidth = ntWidth.getVal() * (AlignmentAPI.getNsitesDisplayed()+1);
 			
 			
 			

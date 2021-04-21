@@ -38,6 +38,7 @@ public class PhylogenyAPI {
 			
 			// Prepare tree annotation options
 			OptionsAPI.prepareTreeAnnotationOptions();
+			OptionsAPI.resetScroll();
 			
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Parsed tree successfully (" + (finish-start) + "ms)" );
@@ -102,6 +103,7 @@ public class PhylogenyAPI {
 			
 			// Prepare tree annotation options
 			OptionsAPI.prepareTreeAnnotationOptions();
+			OptionsAPI.resetScroll();
 			
 			long finish = Calendar.getInstance().getTimeInMillis();
 			System.out.println("Built successfully (" + (finish-start) + "ms)" );

@@ -102,7 +102,8 @@ public class AlignmentAPI {
 			
 			// If tree has been uploaded, check the alignment matches the tree
 			PhylogenyAPI.prepareLabelling(THE_ALIGNMENT);
-			
+			OptionsAPI.resetScroll();
+			OptionsAPI.resetWindowSize();
 			
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
 			
@@ -154,6 +155,7 @@ public class AlignmentAPI {
 		THE_ALIGNMENT.clearSelection();
 		OptionsAPI.focusingOnTaxa(false);
 		OptionsAPI.focusOnClade(false);
+		OptionsAPI.resetWindowSize();
 		setSelectionToDirty();
 		return filtering.focusing();
 	}

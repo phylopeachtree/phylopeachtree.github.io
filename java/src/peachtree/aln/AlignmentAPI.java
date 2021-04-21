@@ -281,6 +281,15 @@ public class AlignmentAPI {
 		return filtering.getIndex(taxon);
 	}
 	
+
+	/**
+	 * The number of unique sequences in the alignment
+	 * @return
+	 */
+	public static int getNumUniqueSequences() {
+		if (filtering == null) return 0;
+		return filtering.getNumUniqueSequences();
+	}
 	
 }
 

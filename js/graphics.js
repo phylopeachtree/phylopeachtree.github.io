@@ -134,6 +134,7 @@ function renderGraphics(){
 					$("#nsites_span").html(initialVal.nsites);
 					$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
 					$("#nsitesdisplayed_span").html(initialVal.nsitesdisplayed );
+					$("#nuniqueseqs_span").html(initialVal.nuniqueseqs);
 					updateSelectionCSS();
 
 

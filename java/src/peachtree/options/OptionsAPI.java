@@ -484,6 +484,7 @@ public class OptionsAPI {
 					json.put("nsitesdisplayed", AlignmentAPI.getNsitesDisplayed());
 					json.put("ntaxa", AlignmentAPI.getNtaxa());
 					json.put("ntaxadisplayed", AlignmentAPI.getNtaxaDisplayed());
+					json.put("nuniqueseqs", AlignmentAPI.getNumUniqueSequences());
 					
 					
 					// Horizontal scrolling?

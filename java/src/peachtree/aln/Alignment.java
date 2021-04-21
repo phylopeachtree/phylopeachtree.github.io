@@ -32,6 +32,8 @@ public class Alignment {
 	static public String[] alpha_ids;
 	static private int ambiguousNtIndex = -1;
 	static private int ambiguousAlphaIndex = -1;
+	static private int gapNtIndex = -1;
+	static private int gapAlphaIndex = -1;
 
 	
 	public Alignment(String fasta) throws Exception{
@@ -401,8 +403,19 @@ public class Alignment {
 	}
 	
 	
+	public static boolean isAmbiguous(int index, boolean isNT) {
+		
+		if (isNT) {
+			if (index > ambiguousNtIndex && index != gapNtIndex) return true;
+		} else {
+			if (index > ambiguousAlphaIndex && index != gapAlphaIndex) return true;
+		}
+		return false;
+	}
+	
+	
 	/**
-	 * Is the index abgisuous / gap?
+	 * Is the index ambiguous / gap?
 	 * @param index
 	 * @param isNT
 	 * @return
@@ -475,6 +488,7 @@ public class Alignment {
 		
 		nt_chars.put("N", ++i); // Ambiguous
 		nt_chars.put("-", ++i);
+		gapNtIndex = i;
 		
 		// Reverse mapping
 		nt_ids = new String[nt_chars.size()];
@@ -517,6 +531,7 @@ public class Alignment {
 		alpha_chars.put("X", ++i);
 		alpha_chars.put("Z", ++i);
 		alpha_chars.put("-", ++i);
+		gapAlphaIndex = i;
 
 		
 		// Reverse mapping
@@ -624,6 +639,7 @@ public class Alignment {
 		}
 		return null;
 	}
+
 
 
 

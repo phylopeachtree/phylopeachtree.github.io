@@ -23,6 +23,7 @@ public class Sequence {
 	int seqLen;
 	boolean isNucleotide;
 	
+
 	
 	
 	public Sequence(int id, String acc, StringBuilder seq) throws Exception {
@@ -52,7 +53,20 @@ public class Sequence {
 			
 		}
 		
-		
+	}
+	
+	
+	
+	public Sequence copy() {
+		try {
+			Sequence seq = new Sequence(this.getTaxon().getID(), this.getAcc(), new StringBuilder(this.sequence.toString()));
+			seq.isNucleotide = this.isNucleotide;
+			seq.prepareArray();
+			return seq;
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	
@@ -289,6 +303,17 @@ public class Sequence {
 		
 		if (val == null) return "?";
 		return val;
+	}
+
+
+	
+	/**
+	 * Change the site
+	 * @param siteNum
+	 * @param char1
+	 */
+	public void editSiteInt(int siteNum, int newSymbol) {
+		this.sequenceArr[siteNum] = newSymbol;
 	}
 	
 	

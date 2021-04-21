@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import peachtree.phy.Node;
 import peachtree.phy.Tree;
@@ -23,6 +24,8 @@ public class Filtering {
 	Map<Integer, Boolean> taxaIDsToInclude;
 	Map<Integer, Boolean> sitesToIncludeMap;
 	List<Integer> sitesToIncludeList;
+	Alignment alignment;
+	int numUniqueSeqs;
 	
 	
 	// Major characters at each site
@@ -37,12 +40,15 @@ public class Filtering {
 	public Filtering(boolean variantSitesOnly, boolean focus, Alignment alignment, Tree tree) {
 		
 		
-		System.out.println("...preparing filtering...");
 		
+		
+		System.out.println("...preparing filtering...");
+		this.alignment = alignment;
 		this.focusing = focus;
 		this.variantSitesOnly = variantSitesOnly;
 		this.isNucleotide = alignment.isNucleotide;
 		this.subtree = null;
+		this.numUniqueSeqs = -1;
 		
 		// Use unique taxa ids
 		this.taxaIDsToInclude = new LinkedHashMap<>();
@@ -353,6 +359,100 @@ public class Filtering {
 		}
 		return -1;
 	}
+	
+	
+	
+	/**
+	 * Count the number of unique sequences in the alignment
+	 * Ambiguous characters don't affect the count
+	 * @return
+	 */
+	public int getNumUniqueSequences() {
+		
+		if (this.numTaxa == 0) return 0;
+		if (this.numTaxa == 1) return 1;
+		if (this.numUniqueSeqs >= 0) return this.numUniqueSeqs;
+		
+		
+		// Get list of sequences
+		List<Sequence> seqsToInclude = new ArrayList<>();
+		for (Sequence seq : this.alignment.getSequences()) {
+			if (this.includeTaxon(seq.getTaxon())) {
+				seqsToInclude.add(seq);
+			}
+		}
+		
+		
+		
+		// Create a list of sequence classes and try to match each subsequent sequence to a class
+		List<Sequence> seqClasses = new ArrayList<>();
+		seqClasses.add(seqsToInclude.get(0).copy());
+		
+		
+		for (int i = 1; i < seqsToInclude.size(); i ++) {
+			
+			Sequence sequence = seqsToInclude.get(i);
+			
+			// Match it to other classes?
+			boolean foundMatch = false;
+			for (Sequence refseq : seqClasses) {
+				
+				
+				if (this.numTaxa == 4) System.out.println("Comparing " + sequence.getAcc() + " with " + refseq.getAcc());
+				
+				
+				boolean refSeqMatch = true;
+				for (int siteNum : this.sitesToIncludeList) {
+					
+					int char1 = sequence.getSymbolInt(siteNum);
+					int char2 = refseq.getSymbolInt(siteNum);
+					
+					// If the two symbols are identical, or one is ambiguous, then move on to next site
+					if (char1 == char2) continue;
+					if (Alignment.isAmbiguous(char1, this.isNucleotide)) continue;
+					if (Alignment.isAmbiguous(char2, this.isNucleotide)) continue;
+					
+					
+					// Otherwise the match failed
+					refSeqMatch = false;
+					break;
+					
+				}
+				
+				
+				if (refSeqMatch) {
+					foundMatch = true;
+					
+					
+					// Fill in all ambiguous sites in the ref seq with those in this seq
+					for (int siteNum : this.sitesToIncludeList) {
+						
+						
+						int char1 = sequence.getSymbolInt(siteNum);
+						int char2 = refseq.getSymbolInt(siteNum);
+						if (Alignment.isAmbiguous(char2, this.isNucleotide) && !Alignment.isAmbiguous(char1, this.isNucleotide)) {
+							refseq.editSiteInt(siteNum, char1);
+						}
+						
+					}
+					
+					break;
+				}
+				
+				
+			}
+			
+			if (!foundMatch) {
+				seqClasses.add(sequence.copy());
+			}
+			
+			
+		}
+		
+		this.numUniqueSeqs = seqClasses.size();
+		return this.numUniqueSeqs;
+	}
+	
 	
 	
 }

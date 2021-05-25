@@ -26,8 +26,8 @@ public class Sequence {
 
 	
 	
-	public Sequence(int id, String acc, StringBuilder seq) throws Exception {
-		if (acc.substring(0, 1).equals(">")) acc = acc.substring(1);
+	public Sequence(int id, String acc, StringBuilder seq, boolean couldBeNucleotide) throws Exception {
+		
 		
 		this.taxon = new Taxon(id, acc);
 		this.sequenceArr = null;
@@ -36,21 +36,23 @@ public class Sequence {
 		
 		// Is it nucleotide or amino acid?
 		this.isNucleotide = true;
-		seqLen = 0;
-		for (int i = 0; i < seq.length(); i ++) {
-			
-			String c = seq.substring(i, i+1);
-			if (c.equals("\r") || c.equals("\n")) continue;
-			seqLen ++;
-			
-			
-			boolean isNT = Alignment.nt_chars.containsKey(c);
-			
-			if (!isNT) {
-				this.isNucleotide = false;
-				break;
+		seqLen = seq.length();
+		if (couldBeNucleotide) {
+			this.sequenceArr = new int[this.seqLen];
+			String c;
+			for (int i = 0; i < seq.length(); i ++) {
+				
+				
+				c = Character.toString(seq.charAt(i));
+						//seq.substring(i, i+1);
+				Integer val = Alignment.nt_chars.get(c);
+				if (val == null) {
+					this.isNucleotide = false;
+					return;
+				}
+				
+				this.sequenceArr[i] = val;
 			}
-			
 		}
 		
 	}
@@ -59,15 +61,17 @@ public class Sequence {
 	
 	public Sequence copy() {
 		try {
-			Sequence seq = new Sequence(this.getTaxon().getID(), this.getAcc(), new StringBuilder(this.sequence.toString()));
+			Sequence seq = new Sequence(this.getTaxon().getID(), this.getAcc(), new StringBuilder(this.sequence.toString()), this.isNucleotide);
 			seq.isNucleotide = this.isNucleotide;
-			seq.prepareArray();
+			if (!this.isNucleotide) seq.prepareArray();
 			return seq;
 		} catch(Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
+	
+	
 	
 	
 	/**

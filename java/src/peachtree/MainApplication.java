@@ -1,7 +1,11 @@
 package peachtree;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import peachtree.aln.AlignmentAPI;
 import peachtree.options.OptionsAPI;
+import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.Tree;
 
 public class MainApplication {
@@ -14,14 +18,53 @@ public class MainApplication {
 		
 		
 		System.out.println("Initialising peatree...");
+		if (false) {
+			
+			BufferedReader reader = new BufferedReader(new FileReader("/home/jdou557/Documents/Marsden2019/BorderIncursions/alignments/seqs/aln.fasta"));
+			StringBuilder stringBuilder = new StringBuilder();
+			String line = null;
+			String ls = System.getProperty("line.separator");
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			
+			
+			String fasta = stringBuilder.toString();
+			AlignmentAPI.uploadAlignment(fasta);
+	
+			
 		
-		
-		/*
-		Tree tree = new Tree();
-		String newick =  "(A[&a=5,b=10]:0.1,(C[&a=5,b=10]:0.3,D[&a=5,b=10]:0.4)[&a=50,b=0]:0.5);";
-		newick = "(A[&a=5,b=10]:0.1,B[&a=5,b=10]:0.2,(C[&a=5,b=10]:0.3,D[&a=5,b=10]:0.4)[&a=5,b=10]:0.5);";
-		tree.parseFromNexus(newick);
-		*/
+			reader = new BufferedReader(new FileReader("/home/jdou557/Documents/Marsden2019/BorderIncursions/results/borderIncursion/combined/mcc.nexus"));
+			line = null;
+			ls = System.getProperty("line.separator");
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			
+			String nexus = stringBuilder.toString();
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+			PhylogenyAPI.uploadTree(nexus);
+
+		}
 		
 		
 		try {

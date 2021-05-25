@@ -96,6 +96,7 @@ public class AlignmentAPI {
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
 			THE_ALIGNMENT = new Alignment(str);
+			long t0 = Calendar.getInstance().getTimeInMillis();
 			initFiltering(OptionsAPI.variantSitesOnly(), false, null);
 			OptionsAPI.prepareColourings();
 			long finish = Calendar.getInstance().getTimeInMillis();
@@ -105,6 +106,7 @@ public class AlignmentAPI {
 			OptionsAPI.resetScroll();
 			OptionsAPI.resetWindowSize();
 			
+			System.out.println((finish-t0) + "ms on filtering" );
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );
 			
 			JSONObject json = new JSONObject().put("time", (finish-start)/1000.0);

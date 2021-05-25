@@ -38,7 +38,7 @@ public class Alignment {
 	
 	public Alignment(String fasta) throws Exception{
 		
-		
+		long t0 = Calendar.getInstance().getTimeInMillis();
 		if (fasta.isEmpty()) throw new Exception("Empty file contents");
 		
 		if (nt_chars == null) prepareAlignmentChars();
@@ -48,24 +48,22 @@ public class Alignment {
 		this.isNucleotide = true;
 
 		// Parse fasta
+		fasta = fasta.replaceAll("\r", "");
 		String[] lines = fasta.split("\n");
 		String acc = "";
 		boolean parsedSeq = true;
 		int seqID = 0;
 		
 		StringBuilder seq = new StringBuilder();
-		
-		long timeOnSeqs = 0;
-		long timeOnStrbuilding = 0;
+		final char opening = '>';
 		for (String line : lines) {
 			
-			line = line.replaceAll("\r", "");
 			
 			//System.out.println(line);
 			
-			if (line.substring(0,1).equals(">")) {
+			//if (line.substring(0,1).equals(">")) {
+			if (line.charAt(0) == opening) {
 				
-				long t0 = Calendar.getInstance().getTimeInMillis();
 				
 				if (!parsedSeq) {
 					throw new Exception("Cannot find sequence for " + acc);
@@ -80,11 +78,8 @@ public class Alignment {
 					seq = new StringBuilder();
 				}
 				
-				acc = line;
+				acc = line.substring(1);
 				parsedSeq = false;
-				
-				long t1 = Calendar.getInstance().getTimeInMillis();
-				timeOnSeqs += (t1-t0);
 				
 			}
 			
@@ -92,14 +87,8 @@ public class Alignment {
 			
 			
 			else {
-				
-				long t0 = Calendar.getInstance().getTimeInMillis();
-				
 				parsedSeq = true;
 				seq.append(line.toUpperCase());
-				
-				long t1 = Calendar.getInstance().getTimeInMillis();
-				timeOnStrbuilding += (t1-t0);
 			}
 			
 		}
@@ -117,27 +106,28 @@ public class Alignment {
 		}
 		
 		
-		// Build all sequence arrays
-		for (Sequence sequence : sequences) {
-			sequence.prepareArray();
-		}
-		
-		
 		long t1 = Calendar.getInstance().getTimeInMillis();
+		long timeOnSeqs = t1-t0;
 		
+		// Rebuild all sequence arrays if it is not nucleotide
+		if (!this.isNucleotide) {
+			for (Sequence sequence : sequences) {
+				sequence.prepareArray();
+			}
+		}
 
 		
 		
 		// Initialise patterns
-		this.initPatterns();
+		this.patterns = null;
+		//this.initPatterns();
 		
-		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites, " + this.getPatternCount() + " patterns, and " + this.sequences.size() + " taxa ");
+		System.out.println("Parsed an alignment with " + this.alignmentLength + " sites and " + this.sequences.size() + " taxa ");
 		
 		
 		long timeOnFilteringT = Calendar.getInstance().getTimeInMillis() - t1;
-		System.out.println(timeOnFilteringT + "ms on filtering");
+		System.out.println(timeOnFilteringT + "ms on arrays");
 		System.out.println(timeOnSeqs + "ms on seq");
-		System.out.println(timeOnStrbuilding + "ms on str");
 		
 		
 	}
@@ -151,10 +141,12 @@ public class Alignment {
 		
 		this.patterns = new ArrayList<>();
 		this.patternWeights = new ArrayList<>();
+		int[] site = new int[this.getNtaxa()];
 		for (int siteNum = 0; siteNum < this.getLength(); siteNum ++) {
 			
+			
+			
 			// Get pattern of this column
-			int[] site = new int[this.getNtaxa()];
 			for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
 				Sequence sequence = this.getSequence(taxonNum);
 				site[taxonNum] = sequence.getSymbolInt(siteNum);
@@ -184,7 +176,12 @@ public class Alignment {
 			
 			// If unique site, then add to list
 			if (patternMatch == -1) {
-				this.patterns.add(site);
+				int[] siteCpy = new int[site.length];
+				for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+					siteCpy[taxonNum] = site[taxonNum];
+				}
+				
+				this.patterns.add(siteCpy);
 				this.patternWeights.add(1.0);
 			}
 			
@@ -211,7 +208,7 @@ public class Alignment {
 	 */
 	private void parseSequence(String acc, StringBuilder seq, int seqID) throws Exception {
 		
-		Sequence sequence = new Sequence(seqID, acc, seq);
+		Sequence sequence = new Sequence(seqID, acc, seq, this.isNucleotide);
 		if (this.sequences.isEmpty()) {
 			this.alignmentLength = sequence.getLength();
 			this.isNucleotide = sequence.isNucleotide();
@@ -298,10 +295,7 @@ public class Alignment {
 		this.sequences = sequencesNew;
 		
 		// Reinitialise
-		this.initPatterns();
-		
-		
-		
+		this.patterns = null;
 		
 		
 	}
@@ -568,6 +562,7 @@ public class Alignment {
 	 * @return
 	 */
 	public int getPatternCount() {
+		if (this.patterns == null) this.initPatterns();
 		return this.patterns.size();
 	}
 	
@@ -578,11 +573,13 @@ public class Alignment {
 	 * @return
 	 */
 	public int[] getPattern(int patternNum) {
+		if (this.patterns == null) this.initPatterns();
 		return this.patterns.get(patternNum);
 	}
 	
 	
 	public int getPattern(int patternNum, int taxonNum) {
+		if (this.patterns == null) this.initPatterns();
 		return this.patterns.get(patternNum)[taxonNum];
 	}
 
@@ -593,6 +590,7 @@ public class Alignment {
 	 * @return
 	 */
 	public double getPatternWeight(int i) {
+		if (this.patterns == null) this.initPatterns();
 		return this.patternWeights.get(i);
 	}
 

@@ -34,13 +34,19 @@ public class PhylogenyAPI {
 			orderingIsDirty = true;
 			
 			// If alignment has been uploaded, check it matches the tree
+			long t0 = Calendar.getInstance().getTimeInMillis();
 			prepareLabelling(AlignmentAPI.getAlignment());
 			
 			// Prepare tree annotation options
 			OptionsAPI.prepareTreeAnnotationOptions();
 			OptionsAPI.resetScroll();
 			
+			
 			long finish = Calendar.getInstance().getTimeInMillis();
+			System.out.println((t0-start) +  "ms on parsing from nexus" );
+			System.out.println((finish-t0) +  "ms on labelling" );
+			
+			
 			System.out.println("Parsed tree successfully (" + (finish-start) + "ms)" );
 			
 			JSONObject json = new JSONObject().put("time", (finish-start)/1000.0);

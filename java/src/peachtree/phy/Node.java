@@ -576,34 +576,29 @@ public class Node {
 		
 		
 		// Is this a leaf?
-		String char1 = newick.substring(0, 1);
-		boolean hasChildren = char1.equals("(");
-		
-		
-		// What is the node's name
-		String[] bits = newick.toString().split(":");
-		if (bits.length < 2 || bits[0].isEmpty()) {
-			throw new Exception("Cannot identify label for newick string. Please use : delimiter");
-		}
+		char char1 = newick.charAt(0);
+		boolean hasChildren = char1 == '(';
 		
 
 		// Get label
-		String labelAndAnnotations = bits[0];
-		String[] labelSplit = labelAndAnnotations.split("\\[");
+		//String[] labelSplit = labelAndAnnotations.split("\\[");
+		//System.out.println(labelSplit[0] + " -> " + acc);
 		if (!hasChildren) {
-			this.setAcc(labelSplit[0]);
+			
+			// What is the node's name
+			String[] bits = newick.toString().split(":");
+			if (bits.length < 2 || bits[0].isEmpty()) {
+				throw new Exception("Cannot identify label for newick string. Please use : delimiter");
+			}
+			
+			String acc = bits[0].replaceAll("([(]|\\[.+)", "");
+			this.setAcc(acc);
 		}
 		
 		
-	
-		
-		// Validate there is a terminal closing bracket
-		if (hasChildren && !newick.substring(newick.length()-1, newick.length()).equals(")")) {
-			//throw new Exception("Could not parse newick because there is a missing ')'.");
-		}
-		
+
 		// Find the first closing bracket on the same level
-		String char2;
+		char char2;
 		List<StringBuilder> childSubtrees = new ArrayList<>();
 		int level = 0;
 		int pos = 1;
@@ -614,27 +609,10 @@ public class Node {
 		while (pos < newick.length()) {
 			
 			
-			char2 = newick.substring(pos, pos+1);
+			char2 = newick.charAt(pos); 
 			
-			// Annotation
-			if (char2.equals("[")) {
-				annotationLevel++;
-				annotationPos = pos+1;
-			}
-			else if (char2.equals("]")) {
-				if (annotationLevel == 1) this.parseAnnotation(newick.substring(annotationPos, pos));
-				annotationLevel--;
-			}
-			
-			// Array annotation
-			else if (char2.equals("{")) {
-				annotationLevel++;
-			}
-			else if (char2.equals("}")) {
-				annotationLevel--;
-			}
-			
-			else if (annotationLevel == 1 && char2.equals(",")) {
+
+			if (annotationLevel == 1 && char2 == ',') {
 				
 				// Parse annotation
 				this.parseAnnotation(newick.substring(annotationPos, pos));
@@ -643,25 +621,25 @@ public class Node {
 			}
 			
 			// Parse node height
-			else if (annotationLevel == 0 && level == 0 && char2.equals(":")) {
-				String lengthStr = newick.substring(pos+1).split("(,|[(]|[)])")[0];
+			else if (annotationLevel == 0 && level == 0 && char2 == ':') {
+				String lengthStr = newick.substring(pos+1).replaceAll("(,|[(]|[)]).*", "");
 				length = Double.parseDouble(lengthStr);
 				if (!hasChildren) break;
 			}
 			
 			// Grandchild subtree
-			else if (annotationLevel == 0 && char2.equals("(")) {
+			else if (annotationLevel == 0 && char2 == '(') {
 				level++;
 			}
 			
 			// New child of this node
-			else if (annotationLevel == 0 && char2.equals(",") && level == 0) {
+			else if (annotationLevel == 0 && level == 0 && char2 == ',') {
 				childSubtrees.add(new StringBuilder(newick.substring(childPos, pos)));
 				childPos = pos+1;
 			}
 			
 			// Child subtree has closed
-			else if (annotationLevel == 0 && char2.equals(")")) {
+			else if (annotationLevel == 0 && char2 == ')') {
 				if (level == 0) {
 					childSubtrees.add(new StringBuilder(newick.substring(childPos, pos+1)));
 					childPos = pos+1;
@@ -670,7 +648,27 @@ public class Node {
 				level--;
 			}
 			
+			// Annotation
+			else if (char2 == '[') {
+				annotationLevel++;
+				annotationPos = pos+1;
+			}
+			else if (char2 == ']') {
+				if (annotationLevel == 1) this.parseAnnotation(newick.substring(annotationPos, pos));
+				annotationLevel--;
+			}
+			
+			// Array annotation
+			else if (char2 == '{') {
+				annotationLevel++;
+			}
+			else if (char2 == '}') {
+				annotationLevel--;
+			}
+			
+			
 			pos ++;
+			
 		}
 		
 		
@@ -709,14 +707,20 @@ public class Node {
 		
 		//System.out.println(annotation);
 		
-		String[] pair = annotation.split("=");
-		if (pair.length == 2) {
-			String key = pair[0];
+		int pos = annotation.indexOf("=");
+		
+		
+		//String[] pair = annotation.split("=", 2);
+		String key = annotation.substring(0, pos);
+		String val = annotation.substring(pos+1);
+		//if (pair.length == 2) {
+			//String key = pair[0];
 			key = key.replace("&", "");
-			String val = pair[1];
+			//String val = pair[1];
 			val = val.replace("{", "").replace("}", "");
 			this.annotations.put(key, val);
-		}
+			//System.out.println(key + " =" + val);
+		//}
 			
 		
 	}

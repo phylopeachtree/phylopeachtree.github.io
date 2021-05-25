@@ -1,6 +1,7 @@
 package peachtree.phy;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,8 @@ public class Tree {
 	 * @throws Exception
 	 */
 	public void parseFromNexus(String nexus) throws Exception {
+		
+		
 		
 		this.parsedFromFile = true;
 		
@@ -104,7 +107,6 @@ public class Tree {
 			}
 		}
 		
-	
 		
 		
 		// Get the last tree's newick
@@ -134,6 +136,10 @@ public class Tree {
 		}
 		
 		
+		
+		
+		
+		
 		// Remove trailing ; and all spaces
 		newick = new StringBuilder(newick.toString().replace(";", "").replace(" ", ""));
 		
@@ -141,6 +147,8 @@ public class Tree {
 		this.root.setHeight(0);
 		this.root.parseFromNewick(newick);
 		this.initArray();
+		
+		
 		
 		
 		
@@ -159,11 +167,6 @@ public class Tree {
 				}
 			}
 		}
-		
-		
-		//System.out.println("Parsed " + this.toNewick());
-		
-		
 		
 		
 	}

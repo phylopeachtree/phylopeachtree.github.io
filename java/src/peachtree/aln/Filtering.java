@@ -107,8 +107,8 @@ public class Filtering {
 			for (int site = 0; site < alignment.getLength(); site ++) {
 				
 				boolean includeSite = false;
-				String uniqueSymbol = null;
-				for (int taxa = 0; taxa < alignment.getNtaxa(); taxa ++) {
+				int uniqueSymbol = -1;
+				for (int taxa = 0; taxa < alignment.getNtaxa(); taxa++) {
 					
 					Taxon taxon = alignment.getSequence(taxa).getTaxon();
 					
@@ -118,25 +118,22 @@ public class Filtering {
 					Sequence sequence = alignment.getSequence(taxa);
 					
 					// What is the symbol?
-					String symbol = sequence.getSymbol(site);
+					int symbol = sequence.getSymbolInt(site);
 					if (Alignment.isAmbiguousOrGap(symbol, sequence.isNucleotide())) continue;
 					
-					if (uniqueSymbol == null) {
+					if (uniqueSymbol == -1) {
 						uniqueSymbol = symbol;
 					}
-					else if (!uniqueSymbol.equals(symbol)) {
+					else if (uniqueSymbol != symbol) {
 						includeSite = true;
 						break;
 					}
-					
-					
 					
 				}
 				
 				
 				// Include the site
 				if (includeSite) {
-					//System.out.println("including site " + site);
 					this.sitesToIncludeMap.put(site, true);
 					this.sitesToIncludeList.add(site);
 				}

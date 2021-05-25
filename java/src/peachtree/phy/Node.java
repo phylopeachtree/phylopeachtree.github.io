@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import peachtree.aln.Filtering;
 import peachtree.aln.Taxon;
+import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 
 
@@ -375,12 +376,33 @@ public class Node {
     	
     	StringBuilder str = new StringBuilder();
     	str.append(this.getAcc());
-    	str.append("\nheight=").append(this.getHeight());
+    	str.append("\nheight=").append(OptionsAPI.sf(this.getHeight()));
     	if (this.annotations.isEmpty()) return str.toString();
     	str.append("\n");
     	int i = 0;
     	for (String key : this.annotations.keySet()) {
-    		str.append(key).append("=").append(this.annotations.get(key));
+    		String value = this.annotations.get(key);
+    		
+    		
+    		try {
+	    		String[] bits = value.split(",");
+	    		String roundedValue = "";
+	    		for (int j = 0; j < bits.length; j ++) {
+	    			double val = Double.parseDouble(bits[j]);
+	    			val = OptionsAPI.sf(val);
+	    			roundedValue += Double.toString(val);
+	    			if (j < bits.length-1) roundedValue += ", ";
+	    		}
+	    		value = roundedValue;
+    			
+    		}catch (Exception e) {
+    			
+    			
+    			
+    			
+    			
+    		}
+    		str.append(key).append("=").append(value);
     		if (i < this.annotations.size()-1) str.append("\n");
     		i++;
     	}
@@ -397,7 +419,8 @@ public class Node {
      * @return y
      */
 	public Double getGraphics(boolean isRoot, JSONArray objs, Filtering filtering, Scaling scaling, double branchWidth, 
-			boolean showTaxaOnTree, double yshift, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
+			boolean showTaxaOnTree, double yshift, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding,
+			boolean transmissionTree) {
 		
 		//System.out.println("node height " + this.getHeight() + " max height " + scaling.xmax() + "/" + scaling.xmin());
 		
@@ -423,7 +446,7 @@ public class Node {
 			
 			
 			for (Node child : this.getChildren()) {
-				Double ychild = child.getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
+				Double ychild = child.getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
 				if (ychild != null) {
 					if (y == null) y = 0.0;
 					y += ychild;
@@ -432,7 +455,10 @@ public class Node {
 					nValidChildren ++;
 				}
 			}
-			if (y != null) y = y / nValidChildren;
+			if (y != null) {
+				if (transmissionTree) y = minY;
+				else y = y / nValidChildren;
+			}
 			
 			
 		}

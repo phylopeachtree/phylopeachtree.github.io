@@ -305,7 +305,7 @@ public class Tree {
 	 * @return
 	 */
 	public JSONArray getTreeGraphics(Scaling scaling, double branchWidth, Filtering filtering, boolean showTaxaOnTree, 
-			double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
+			double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding, boolean transmissionTree) {
 		
 		JSONArray objs = new JSONArray();
 		if (!scaling.inView()) return objs;
@@ -322,7 +322,7 @@ public class Tree {
 		}
 		
 		Node subtree = filtering.getSubtreeRoot() != null ? filtering.getSubtreeRoot() : this.root;
-		subtree.getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
+		subtree.getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
 		return objs;
 		
 	}

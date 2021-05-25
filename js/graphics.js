@@ -149,7 +149,7 @@ function renderGraphics(){
 					plotNextObject(mainGroup);
 					
 					
-				}, 50);
+				}, 1);
 			}
 
 

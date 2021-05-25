@@ -151,8 +151,8 @@ public class PhylogenyAPI {
 	 * @param branchWidth
 	 * @return
 	 */
-	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding) {
-		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree, nodeRadius, internalLabel, leafLabel, fontSize, rounding);
+	public static JSONArray getTreeGraphics(Scaling scaling, double branchWidth, boolean showTaxaOnTree, double nodeRadius, String internalLabel, String leafLabel, double fontSize, int rounding, boolean transmissionTree) {
+		return THE_TREE.getTreeGraphics(scaling, branchWidth, AlignmentAPI.getFiltering(), showTaxaOnTree, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
 	}
 	
 	

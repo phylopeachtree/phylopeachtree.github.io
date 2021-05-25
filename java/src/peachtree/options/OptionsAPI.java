@@ -1,6 +1,8 @@
 package peachtree.options;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class OptionsAPI {
 	static NumericalOption nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 3, 0, 20, 0.5);
 	static NumericalOption treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 	static BooleanOption showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
+	static BooleanOption transmissionTree = new BooleanOption("transmissionTree", "Phylogeny", "Display as a transmission tree", false);
 	static DiscreteOption internalNodeLabels;
 	static DiscreteOption leafNodeLabels;
 	static NumericalOption annotationFontSize = new NumericalOption("annotationFontSize", "Phylogeny", "Tree annotation font size", 8, 0, 14, 1, true);
@@ -65,7 +68,7 @@ public class OptionsAPI {
 	// Alignment
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 	static NumericalOption fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 0, 50, 1);
-	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show variant sites only", true);
+	static BooleanOption variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show segregating sites only", true);
 	static DiscreteOption siteColourType;
 	static DiscreteOption colourings;
 	
@@ -429,7 +432,7 @@ public class OptionsAPI {
 				double fontSize = Math.min(ntHeight, annotationFontSize.getVal());
 				int rounding = (int)annotationRounding.getVal();
 				
-				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal(), nodeRad, internalLabel, leafLabels, fontSize, rounding);
+				JSONArray tree = PhylogenyAPI.getTreeGraphics(scaling, branchW, showTaxaOnTree.getVal(), nodeRad, internalLabel, leafLabels, fontSize, rounding, transmissionTree.getVal());
 				objs.putAll(tree);
 				
 				
@@ -729,5 +732,20 @@ public class OptionsAPI {
 	public static void focusOnClade(boolean val) {
 		focusOnClade.setVal(val);
 	}
+	
+	
+	
+    
+    /**
+     * Round to to 4sf
+     * @param d
+     * @return
+     */
+    public static double sf(double d) {
+    	BigDecimal bd = new BigDecimal(d);
+    	bd = bd.round(new MathContext(4));
+    	return bd.doubleValue();
+    }
+	
 
 }

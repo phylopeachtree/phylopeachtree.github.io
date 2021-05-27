@@ -64,6 +64,28 @@ public class PhylogenyAPI {
 	}
 	
 	
+	
+	/**
+	 * Rotate the subtree at the specified internal node
+	 * @param index
+	 * @throws Exception
+	 */
+	public static String flipSubree(int index) throws Exception {
+		
+		if (THE_TREE == null) return "{}";
+		
+		try {
+			THE_TREE.flipSubtree(index);
+			return "{}";
+		}catch (Exception e){
+			e.printStackTrace();
+			return OptionsAPI.getErrorJSON(e);
+		}
+		
+	}
+	
+	
+	
 	/**
 	 * Prepare the labelling between tree and alignment if necessary
 	 * @param alignment
@@ -141,7 +163,7 @@ public class PhylogenyAPI {
 	 * Apply the filtering to this tree
 	 */
 	public static void applyFiltering(Filtering filtering) {
-		if (THE_TREE == null) return;
+		if (THE_TREE == null || filtering == null) return;
 		THE_TREE.applyFiltering(filtering);
 	}
 	

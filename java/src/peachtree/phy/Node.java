@@ -375,7 +375,12 @@ public class Node {
     	
     	
     	StringBuilder str = new StringBuilder();
-    	str.append(this.getAcc());
+    	if (this.isLeaf()) {
+    		str.append(this.getAcc());
+    	}
+    	else {
+    		str.append("Click node to switch child ordering.");
+    	}
     	str.append("\nheight=").append(OptionsAPI.sf(this.getHeight()));
     	if (this.annotations.isEmpty()) return str.toString();
     	str.append("\n");
@@ -546,6 +551,7 @@ public class Node {
 		if (nodeRadius > 0 && inrangeY) {
 			JSONObject node_json = new JSONObject();
 			node_json.put("ele", "circle").put("cx", x2Scaled).put("cy", yscaled).put("r", nodeRadius).put("fill", "black");
+			if (!this.isLeaf()) node_json.put("class", "node").put("i", this.nodeNr);
 			if (!this.annotations.isEmpty())  node_json.put("title", this.getTidyMetaData());
 			objs.put(node_json);
 		}
@@ -777,6 +783,21 @@ public class Node {
 		for (Node child : this.getChildren()) {
 			child.getAllAnnotations(annotations);
 		}
+		
+	}
+
+	
+	/**
+	 * Rotate the ordering of the children
+	 */
+	public void rotateChildren() {
+		
+		if (this.getChildCount() == 0) return;
+		
+		Node lastChild = this.getChild(this.getChildCount()-1);
+		this.children.add(0, lastChild);
+		this.children.remove(this.getChildCount()-1);
+		
 		
 	}
 	

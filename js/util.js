@@ -140,6 +140,19 @@ function initUtil(){
 }
 
 
+
+/*
+	Return to the upload screen
+*/
+function reupload(){
+
+	$("#graphics_div").hide(0);
+	$("#upload_div").show(0);
+	
+}
+
+
+
 /*
 	Error message for uploader
 */
@@ -499,6 +512,19 @@ function toggleTaxon(ele){
 	
 }
 
+
+/*
+	Flip a subtree
+*/
+function flipSubtree(ele){
+	let index = parseFloat(ele.attr("i"));
+	console.log("flipping " + index)
+
+	cjCall("peachtree.phy.PhylogenyAPI", "flipSubree", index).then(function(val){
+		renderGraphics();
+	});
+
+}
 
 /*
 	Clears all taxa selection

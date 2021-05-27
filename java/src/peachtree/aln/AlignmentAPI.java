@@ -235,6 +235,8 @@ public class AlignmentAPI {
 	public static void initFiltering(boolean variantSitesOnly, boolean focus, Tree tree) {
 		
 		
+		if (THE_ALIGNMENT == null) return;
+		
 		boolean initRequired = false;
 		if (filtering == null) initRequired = true;
 		else if (filtering.focusing() && selectionIsDirty) initRequired = true;

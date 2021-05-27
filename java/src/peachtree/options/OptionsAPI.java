@@ -58,12 +58,12 @@ public class OptionsAPI {
 	static NumericalOption annotationRounding = new NumericalOption("annotationRounding", "Phylogeny", "Tree annotation sf", 3, 1, 8, 1, true);
 	
 	// Taxa
-	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Taxa", "Row heights", 20, 1, 100, 5);
-	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Taxa", "Font size of taxa", 13, 0, 50, 1);
-	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Taxa", "Padding before taxon names", 5, 0, 50, 1);
-	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Taxa", "Show taxon numbers", true);
-	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Taxa", "Show only selected taxa", false, true);
-	static BooleanOption focusOnClade = new BooleanOption("focusOnClade", "Taxa", "Show only clade of selected taxa", false, true);
+	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Samples", "Row heights", 20, 1, 100, 5);
+	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Samples", "Font size of samples", 13, 0, 50, 1);
+	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Samples", "Padding before sample names", 5, 0, 50, 1);
+	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false);
+	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Samples", "Show only selected samples", false, true);
+	static BooleanOption focusOnClade = new BooleanOption("focusOnClade", "Samples", "Show only clade of selected samples", false, true);
 	
 	// Alignment
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
@@ -321,9 +321,6 @@ public class OptionsAPI {
 			
 			// Height of taxa
 			double ntHeight = siteHeight.getVal();
-			if (AlignmentAPI.isReady()) {
-				//ntHeight = Math.max(Math.max(ntHeight,  fontSizeTaxa.getVal()), fontSizeAln.getVal());
-			}
 			System.out.println("ntHeight " + ntHeight);
 			
 			
@@ -682,10 +679,8 @@ public class OptionsAPI {
 	 * @return
 	 */
 	public static boolean isReady() {
-		
-		boolean ready = AlignmentAPI.isReady();
+		boolean ready = AlignmentAPI.isReady(); // || PhylogenyAPI.isReady();
 		return ready;
-		
 	}
 
 

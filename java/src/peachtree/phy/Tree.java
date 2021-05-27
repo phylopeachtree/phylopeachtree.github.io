@@ -138,8 +138,6 @@ public class Tree {
 		
 		
 		
-		
-		
 		// Remove trailing ; and all spaces
 		newick = new StringBuilder(newick.toString().replace(";", "").replace(" ", ""));
 		
@@ -147,8 +145,6 @@ public class Tree {
 		this.root.setHeight(0);
 		this.root.parseFromNewick(newick);
 		this.initArray();
-		
-		
 		
 		
 		
@@ -338,6 +334,8 @@ public class Tree {
 	 */
 	public void applyFiltering(Filtering filtering) {
 		
+		if (filtering == null) return;
+		
 		int nr = 0;
 		for (Node leaf : this.getLeavesAsArray()) {
 			
@@ -462,6 +460,24 @@ public class Tree {
 		root.getAllAnnotations(annotations);
 		Collections.sort(annotations);
 		return annotations;
+	}
+
+	/**
+	 * Rotate the subtree at the specified internal node
+	 * @param index
+	 */
+	public void flipSubtree(int index) {
+		
+		
+		// Find the node
+		if (index < 0 || index >= this.nodes.length) return;
+		Node node = this.nodes[index];
+		if (node.isLeaf()) return;
+		node.rotateChildren();
+		
+		
+		this.initArray();
+		
 	}
 	
 	

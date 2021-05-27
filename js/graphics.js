@@ -379,6 +379,12 @@ function plotNextObject(svg, iteration = 0){
 				$(svg).find(".taxon").click(function(){
 					toggleTaxon($(this));
 				});
+
+
+				// Node selection
+				$(svg).find(".node").click(function(){
+					flipSubtree($(this));
+				});
 				
 				
 				updateSelectionCSS();

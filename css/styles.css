@@ -171,6 +171,10 @@ body {
 	cursor:pointer;
 }
 
+#svg .node {
+	cursor:pointer;
+}
+
 #svg .taxon.selected {
 	fill:blue;
 	font-weight:bold;

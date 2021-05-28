@@ -7,9 +7,86 @@ CANCEL_GRAPHICS = false;
 function initGraphics(){
 	
 	
-	
-	
-	
+
+	MOUSEWHEEL_DY = 0;
+	SCROLLING = false;
+	$(document).ready(function() {
+
+
+
+		// No main page scroll when mouse is on svg
+		$('#svg').mouseenter(function(e) {
+			//console.log('no scroll');
+			$("body").css("overflow", "hidden");
+		});
+
+
+		// Enable main page scroll when mouse is out of svg
+		$('#svg').mouseleave(function(e) {
+			//console.log('yes scroll');
+			$("body").css("overflow", "auto");
+		});
+
+		 $('#svg').bind('mousewheel', function(e){
+
+
+
+		 	let goingUp = e.originalEvent.wheelDelta/120 > 0;
+		 	let goingUpInt = goingUp ? -1 : 1;
+
+		 	MOUSEWHEEL_DY += goingUpInt;
+
+			clearTimeout($.data(this, 'timer'));
+			$.data(this, 'timer', setTimeout(function() {
+				//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
+				
+				if (SCROLLING) return;
+
+				let mw = MOUSEWHEEL_DY;
+				MOUSEWHEEL_DY = 0;
+				if (mw != 0){
+
+					SCROLLING = true;
+					cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
+		        		renderGraphics(function() { SCROLLING = false; });
+		        		//setTimeout(function() {
+		        			//clearTimeout($.data(this, 'timer'));
+	        			
+		        		//}, 100);
+		        		
+		        	});
+				}
+
+
+			 //do something
+			}, 30));
+
+
+
+
+		 	
+
+		 	/*
+	        if(goingUp) {
+	            console.log('scrolling up !');
+	        }
+	        else{
+	            console.log('scrolling down !');
+	        }
+			*/
+
+
+
+
+
+	    });
+
+
+	});
+
+
+
+
 	
 }
 
@@ -22,7 +99,7 @@ function initGraphics(){
 /*
 	Draw if possible
 */
-function renderGraphics(){
+function renderGraphics(resolve = function() {}){
 	
 	isReadyToRender(function(ready){
 		
@@ -146,7 +223,7 @@ function renderGraphics(){
 
 
 					// Plot json objects 1 chunk at a time
-					plotNextObject(mainGroup);
+					plotNextObject(mainGroup, 0, resolve);
 					
 					
 				}, 1);
@@ -239,6 +316,8 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
 
 	// Make it draggable
 	$("#" + id).draggable(options);
+
+
 
 
 	
@@ -354,7 +433,7 @@ function makeDraggable(evt) {
 */
 
 
-function plotNextObject(svg, iteration = 0){
+function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 
 	if (CANCEL_GRAPHICS){
 		CANCEL_GRAPHICS = false;
@@ -386,14 +465,19 @@ function plotNextObject(svg, iteration = 0){
 					flipSubtree($(this));
 				});
 				
+
+
 				
 				updateSelectionCSS();
+
+				resolve();
+
 				return;
 				
 			}else{
 
 				// Repeat
-				plotNextObject(svg, iteration + 1)
+				plotNextObject(svg, iteration + 1, resolve)
 
 				// And render thes objects asynchronously...
 				for (var i = 0; i < objects.length; i ++){

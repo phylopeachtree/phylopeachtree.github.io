@@ -32,6 +32,7 @@ public class OptionsAPI {
 	static final double INIT_WIDTH = 1000;
 	static final double INIT_HEIGHT = INIT_WIDTH*0.618;
 	
+	static final double SCROLL_Y_NROWS = 10; 
 	
 	// Boundaries
 	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, 2000, 100, true);
@@ -102,6 +103,19 @@ public class OptionsAPI {
 	public static void resetScroll() {
 		scrollX.setVal(0);
 		scrollY.setVal(0);
+	}
+	
+	
+	/**
+	 * Scroll up/down slightly
+	 * @param goingUp
+	 */
+	public static void scrollABit(int dir) {
+		double y1 = scrollY.getVal();
+		double relativeScrollAmnt = SCROLL_Y_NROWS/AlignmentAPI.getNtaxaDisplayed();
+		double y2 = y1 + dir*relativeScrollAmnt;
+		scrollY.setVal(y2);
+		System.out.println("scrolling " + y1 + " -> " + y2 + " / " + scrollY.getVal());
 	}
 	
 	

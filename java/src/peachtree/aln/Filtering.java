@@ -144,9 +144,12 @@ public class Filtering {
 			}
 			
 			numSites = sitesToIncludeMap.size();
-			if (numSites == 0) numSites = alignment.getLength();
 		
-		}else {
+		}
+		
+		if (numSites == 0) this.variantSitesOnly = false;
+		
+		if (!this.variantSitesOnly) {
 			numSites = alignment.getLength();
 			for (int i = 0; i < numSites; i ++) {
 				this.sitesToIncludeList.add(i);

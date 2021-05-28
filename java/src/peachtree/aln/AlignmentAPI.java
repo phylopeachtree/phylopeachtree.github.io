@@ -20,6 +20,7 @@ public class AlignmentAPI {
 	private static Filtering filtering = null;
 	private static boolean selectionIsDirty = false;
 	private static boolean orderingIsDirty = false;
+	private static int mostRecentlySelectedTaxon = -1;
 	
 	public static void init() {
 		THE_ALIGNMENT = null;
@@ -92,6 +93,7 @@ public class AlignmentAPI {
 		System.out.println("Uploading alignment " + str.length());
 		filtering = null;
 		selectionIsDirty = false;
+		mostRecentlySelectedTaxon = -1;
 		
 		try {
 			long start = Calendar.getInstance().getTimeInMillis();
@@ -140,21 +142,70 @@ public class AlignmentAPI {
 	
 	/**
 	 * Select the taxon
-	 * Return whether or not a graphical update is needed
 	 * @param taxonNum
 	 */
-	public static boolean selectTaxon(int taxonNum) {
+	public static void selectTaxon(int taxonNum) {
+		mostRecentlySelectedTaxon = taxonNum;
 		THE_ALIGNMENT.selectTaxon(taxonNum);
 		setSelectionToDirty();
-		return filtering.focusing();
+		
 	}
 	
+	/**
+	 * Select/deselect everything between the most recently selected taxon and this one
+	 */
+	public static String selectUpToTaxon(int newTaxonNum) {
+		
+		
+		JSONArray toColour = new JSONArray();
+		
+		
+		// Toggle the currently selected one
+		if (newTaxonNum == mostRecentlySelectedTaxon) {
+			boolean isSelected = THE_ALIGNMENT.selectTaxon(newTaxonNum);
+			JSONObject obj = new JSONObject().put("i", newTaxonNum).put("select", isSelected);
+			toColour.put(obj);
+		}
+		else {
+			
+			// Set all the selected ones to the same state as the previously selected one
+			boolean setTo = THE_ALIGNMENT.taxonIsSelected(mostRecentlySelectedTaxon);
+			
+			if (newTaxonNum > mostRecentlySelectedTaxon) {
+				for (int i = mostRecentlySelectedTaxon+1; i <= newTaxonNum; i ++ ) {
+					
+					Taxon taxon = THE_ALIGNMENT.getTaxon(i);
+					if (filtering != null && !filtering.includeTaxon(taxon)) continue;
+					
+					THE_ALIGNMENT.selectTaxon(i, setTo);
+					JSONObject obj = new JSONObject().put("i", i).put("select", setTo);
+					toColour.put(obj);
+				}
+			}else {
+				for (int i = mostRecentlySelectedTaxon-1; i >= newTaxonNum; i -- ) {
+					
+					Taxon taxon = THE_ALIGNMENT.getTaxon(i);
+					if (filtering != null && !filtering.includeTaxon(taxon)) continue;
+					
+					THE_ALIGNMENT.selectTaxon(i, setTo);
+					JSONObject obj = new JSONObject().put("i", i).put("select", setTo);
+					toColour.put(obj);
+				}
+			}
+		}
+		
+		setSelectionToDirty();
+		
+		return toColour.toString();
+		
+	}
 	
 	/**
 	 * Deselect all taxa
 	 */
 	public static boolean clearSelection() {
 		THE_ALIGNMENT.clearSelection();
+		mostRecentlySelectedTaxon=-1;
 		OptionsAPI.focusingOnTaxa(false);
 		OptionsAPI.focusOnClade(false);
 		OptionsAPI.resetWindowSize();
@@ -240,7 +291,7 @@ public class AlignmentAPI {
 		boolean initRequired = false;
 		if (filtering == null) initRequired = true;
 		else if (filtering.focusing() && selectionIsDirty) initRequired = true;
-		else if (filtering.variantSitesOnly() != variantSitesOnly) initRequired = true;
+		else if (filtering.variantSitesOnlyParsed() != variantSitesOnly) initRequired = true;
 		else if (filtering.focusing() != focus) initRequired = true;
 		else if (filtering.getTree() != tree) initRequired = true;
 		else if (orderingIsDirty) initRequired = true;
@@ -248,6 +299,11 @@ public class AlignmentAPI {
 		
 		// Default filtering
 		if (initRequired) {
+			
+
+
+			
+			
 			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
 			selectionIsDirty = false;
 			orderingIsDirty = false;

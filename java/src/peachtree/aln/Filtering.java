@@ -20,6 +20,7 @@ public class Filtering {
 
 	
 	boolean variantSitesOnly;
+	boolean variantSitesOnly_parsed; // Value parsed in construction
 	boolean focusing;
 	Map<Integer, Boolean> taxaIDsToInclude;
 	Map<Integer, Boolean> sitesToIncludeMap;
@@ -46,6 +47,7 @@ public class Filtering {
 		this.alignment = alignment;
 		this.focusing = focus;
 		this.variantSitesOnly = variantSitesOnly;
+		this.variantSitesOnly_parsed = variantSitesOnly;
 		this.isNucleotide = alignment.isNucleotide;
 		this.subtree = null;
 		this.numUniqueSeqs = -1;
@@ -193,6 +195,12 @@ public class Filtering {
 	public boolean variantSitesOnly() {
 		return this.variantSitesOnly;
 	}
+	
+	
+	public boolean variantSitesOnlyParsed() {
+		return this.variantSitesOnly_parsed;
+	}
+	
 	
 	
 	public Tree getTree() {
@@ -452,7 +460,9 @@ public class Filtering {
 		this.numUniqueSeqs = seqClasses.size();
 		return this.numUniqueSeqs;
 	}
-	
+
+
+
 	
 	
 }

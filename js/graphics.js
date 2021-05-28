@@ -456,7 +456,14 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 				
 				// Taxon selection
 				$(svg).find(".taxon").click(function(){
-					toggleTaxon($(this));
+
+					if (SHIFT_KEY_IS_DOWN){
+						selectUpToTaxon($(this));
+					}else{
+						toggleTaxon($(this));
+					}
+
+					
 				});
 
 

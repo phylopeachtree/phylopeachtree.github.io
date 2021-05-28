@@ -7,8 +7,23 @@ function initUtil(){
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
 	BUILDING_TREE = false;
-	
-	
+
+	// Is shift key down right now
+	SHIFT_KEY_IS_DOWN = false;
+
+	window.onkeyup = function(e) { 
+		if (SHIFT_KEY_IS_DOWN && e.keyCode == 16) {
+			//console.log("shift up");
+			SHIFT_KEY_IS_DOWN = false;
+		}
+	}
+	window.onkeydown = function(e) { 
+		if (!SHIFT_KEY_IS_DOWN && e.keyCode == 16) {
+			//console.log("shift down");
+			SHIFT_KEY_IS_DOWN = true;
+		}
+	}
+		
 
 	// Alignment uploader
 	var alignmentDropzone = new Dropzone("#aln_upload", { url: "/file/post"});
@@ -512,6 +527,40 @@ function toggleTaxon(ele){
 	
 }
 
+
+/*
+	Select everything between the previously selected taxon and the currently selected one 
+*/
+function selectUpToTaxon(ele){
+
+
+	
+	// Inform the model
+	let index = parseFloat(ele.attr("i"));
+	cjCall("peachtree.aln.AlignmentAPI", "selectUpToTaxon", index).then(function(val){
+
+		var objects = JSON.parse(cjStringJavaToJs(val));
+		for (let i = 0; i < objects.length; i ++){
+			
+
+			var nodeIndex = objects[i].i;
+			var nodeSelected = objects[i].select;
+			var nodeEle = $("#svg").find("text[i='" + nodeIndex + "']");
+
+			//console.log(objects[i], nodeEle)
+			if (nodeSelected){
+				$(nodeEle).addClass("selected");
+			}else{
+				$(nodeEle).removeClass("selected");
+			}
+			
+
+		}
+
+		updateSelectionCSS();
+	});
+
+}
 
 /*
 	Flip a subtree

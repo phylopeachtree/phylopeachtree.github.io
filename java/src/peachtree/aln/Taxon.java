@@ -5,10 +5,12 @@ public class Taxon {
 	int id;
 	String name;
 	boolean isSelected; // Is the taxon selected
+	boolean isHighlighted;
 	
 	public Taxon(int id, String name) {
 		this.id = id;
 		this.name = name;
+		this.isHighlighted = false;
 		this.isSelected = false;
 	}
 	
@@ -35,7 +37,21 @@ public class Taxon {
 	public boolean isSelected() {
 		return this.isSelected;
 	}
-
+	
+	
+	public void toggleHighlighting() {
+		this.isHighlighted = !this.isHighlighted;
+	}
+	
+	
+	public void isHighlighted(boolean val) {
+		this.isHighlighted = val;
+	}
+	
+	public boolean isHighlighted() {
+		return this.isHighlighted;
+	}
+	
 
 	
 }

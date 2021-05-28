@@ -599,10 +599,30 @@ public class Alignment {
 	 * Toggle selection of this taxon
 	 * @param taxonNum
 	 */
-	public void selectTaxon(int taxonNum) {
+	public boolean selectTaxon(int taxonNum) {
 		this.sequences.get(taxonNum).getTaxon().toggleSelection();
+		return this.sequences.get(taxonNum).getTaxon().isSelected();
 	}
 
+	
+	
+	/**
+	 * Check if the taxon is selected
+	 * @param taxonNum
+	 * @return
+	 */
+	public boolean taxonIsSelected(int taxonNum) {
+		return this.sequences.get(taxonNum).getTaxon().isSelected();
+	}
+	
+	/**
+	 * Select/deselect taxon
+	 * @param taxonNum
+	 * @return
+	 */
+	public void selectTaxon(int taxonNum, boolean setTo) {
+		this.sequences.get(taxonNum).getTaxon().isSelected(setTo);
+	}
 
 	
 	/**
@@ -636,6 +656,11 @@ public class Alignment {
 			if (taxon.getName().equals(label)) return taxon;
 		}
 		return null;
+	}
+
+
+	public Taxon getTaxon(int i) {
+		return this.sequences.get(i).getTaxon();
 	}
 
 

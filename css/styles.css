@@ -59,13 +59,16 @@ body {
 
 #mainHeader h4{
 	font-size:1.2em;
-	margin:0em;
+	margin-top:0em;
+	margin-left:2em;
+	margin-right:2em;
+	margin-bottom:1em;
 	%color:black;
 }
 
 #mainHeader h4 b{
 	color:white;
-	%font-size:1.25em;
+	%font-size:1.1em;
 }
 
 .mediumfont{

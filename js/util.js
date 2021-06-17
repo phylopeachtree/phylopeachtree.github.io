@@ -39,6 +39,7 @@ function initUtil(){
 		reader.onload = (function(theFile) {
 			
 			addLoader($("#aln_upload_title"));
+
 			
 			return function(e) {
 				

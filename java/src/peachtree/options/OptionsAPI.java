@@ -29,16 +29,18 @@ public class OptionsAPI {
 	static final double LEFT_MARGIN = 16; // Left hand margin
 	static final double TOP_MARGIN = 16; // Top margin
 	
-	static final double INIT_WIDTH = 1000;
+	static final double INIT_WIDTH = 1200;
 	static final double INIT_HEIGHT = INIT_WIDTH*0.618;
+	static final double INIT_DIV1 = 0.3;
+	static final double INIT_DIV2 = 0.5;
 	
 	static final double SCROLL_Y_NROWS = 10; 
 	
 	// Boundaries
 	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, 2000, 100, true);
 	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, 2000, 100, true);
-	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0.3, 0, 1, 0.1, true);
-	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.5, 0, 1, 0.1, true);
+	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0, 0, 1, 0.1, true);
+	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", INIT_DIV2, 0, 1, 0.1, true);
 	
 	
 	// Scroll bars
@@ -172,6 +174,9 @@ public class OptionsAPI {
 	 */
 	public static void prepareTreeAnnotationOptions() throws Exception {
 		
+		
+		
+		division1.setVal(INIT_DIV1);
 		
 		List<String> annotations = PhylogenyAPI.getAllAnnotations();
 		if (annotations.isEmpty()) {
@@ -393,6 +398,14 @@ public class OptionsAPI {
 			}
 			
 
+			
+			// Ensure divs are within margins
+			if (xdivide1*width < LEFT_MARGIN) {
+				xdivide1 = LEFT_MARGIN / width;
+			}
+			if (xdivide2*width < LEFT_MARGIN) {
+				xdivide2 = LEFT_MARGIN / width;
+			}
 			
 			// x-boundary objects
 			JSONObject xboundaries = new JSONObject();

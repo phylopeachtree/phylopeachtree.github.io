@@ -37,6 +37,9 @@
 			addLoader($("#main"), true);
 
 
+			//return;
+
+
 			//cheerpjRunJar("/app/peachtree.jar", 1);
 			
 			cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar").then(function(val){
@@ -54,9 +57,7 @@
 				//$("#graphics_div").show(0);
 				
 				
-				
-				
-	
+
 				
 			});
 		  
@@ -82,37 +83,70 @@
 	<div id="main">
 	
 		<div id="mainHeader"  style="text-align:center">
-			<h1> PEACHTree </h1>
+			<h1> PEACH Tree </h1>
+			<h4> <b>P</b>lotting <b>E</b>pidemiological and <b>A</b>lignment <b>CH</b>aracters onto phylogenetic <b>Tree</b>s </h4>
 		</div>
-		
-		
-		
-		<div id="upload_div" style="display:none"/>
-		
-		
-			
-			<div id="aln_upload" class="uploader"  title="Accepted format: fasta">
-				<div id="aln_upload_title">Drag and drop a multiple sequence alignment</div>
-				<div class="usermsg mediumfont"></div>
-				<div class="smallfont">(And we will make a tree for you!)</div>
-				
-			</div>
-			
-			
-			AND
 
-			
-			<div id="phy_upload" class="uploader" title="Accepted formats: nexus, newick">
-				<div id="phy_upload_title">Drag and drop a phylogenetic tree (optional)</div>
-				<div class="usermsg mediumfont"></div>
-			</div>
-			
+
+		
+		
+		<div id="upload_div" style="display:none">
+		
+		
+
+			<table cellpadding="0">
+
+				<tr>
+
+					<td colspan="2">
+
+					
+						<div id="aln_upload" class="uploader top"  title="Accepted format: fasta">
+							<div id="aln_upload_title">Drag and drop a multiple sequence alignment</div>
+							<div class="usermsg mediumfont"></div>
+							<!--<div class="smallfont">(And we will make a tree for you!)</div>-->
+							
+						</div>
+
+					</td>
+
+				</tr>
+				<tr>
+				
+				
+					<td style="width:50%">
+				
+						<div id="phy_upload" class="uploader left side" title="Accepted formats: nexus, newick">
+							<div id="phy_upload_title">Drag and drop a phylogenetic tree <br> (optional)</div>
+							<div class="usermsg mediumfont"></div>
+						</div>
+
+					</td> 
+
+
+					<td style="width:50%">
+
+						<div id="epi_upload" class="uploader right side" title="Accepted formats: csv, tsv">
+							<div id="phy_upload_title">Drag and drop epidemiological annotations <br>  (out of order)</div>
+							<div class="usermsg mediumfont"></div>
+						</div>
+
+					</td> 
+
+				</tr>
+				
+			</table>
+
+			<br><br>
 
 			Upload one or more of the above to begin
 			<br><br>
 			
 				<span id="renderBtn" onclick="renderGraphics();" class="button large disabled" title="Upload one or more of the above to begin">Display</span>
-			
+								
+				<span id="upload_loading_div">
+				
+				</span>
 				
 
 		</div>
@@ -157,12 +191,10 @@
 				</div>
 				
 				
-	
+				<span id="ctrl_loading_div"> </span>
 				
 				
-				<div id="ctrl_loading_div">
-				
-				</div>
+
 			
 			
 			

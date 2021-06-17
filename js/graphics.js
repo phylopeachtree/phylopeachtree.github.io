@@ -120,7 +120,9 @@ function renderGraphics(resolve = function() {}){
 		
 
 	
-		addLoader($("#ctrl_loading_div"));
+		addLoader($("#upload_loading_div"));
+		$("#renderBtn").hide();
+	
 
 		// Generate the graphics objects
 		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
@@ -141,6 +143,9 @@ function renderGraphics(resolve = function() {}){
 				// Hide the upload menu
 				$("#graphics_div").show(0);
 				$("#upload_div").hide(0);
+
+				removeLoader($("#upload_loading_div"));
+				$("#renderBtn").show();
 				
 				
 				// Search bar
@@ -224,6 +229,8 @@ function renderGraphics(resolve = function() {}){
 
 					// Plot json objects 1 chunk at a time
 					plotNextObject(mainGroup, 0, resolve);
+
+
 					
 					
 				}, 1);
@@ -280,9 +287,12 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
 	
 	var canvas = document.getElementById(id);
 	var ctx = canvas.getContext('2d');
-	ctx.fillStyle = "#29465b";
+	//ctx.fillStyle = "#29465b";
+	ctx.fillStyle = "#5ca904";
+	
 	//ctx.fillRect(0, 0, canvas.width, canvas.height);
-	roundRect(ctx, 0, 0, canvas.width, canvas.height, 300/scrollLength, "#29465b");
+	roundRect(ctx, 0, 0, canvas.width, canvas.height, 300/scrollLength, "#5ca904");
+	
 	
 	
 	// Draggable options

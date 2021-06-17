@@ -9,6 +9,7 @@
 body {
 	font-family: "Source Sans Pro", "Arial"; 
 	background-color:white;
+	color:#222;
 	width:100%;
 	min-width:500px;
 	height:300px;
@@ -26,7 +27,46 @@ body {
 
 	
 }
+/*
+	leaf green #5ca904
+	peach pink #FFDAB9
+*/
 
+#mainHeader{
+	background-color:#b0fb5aaa;
+	color:#333;
+	width:50%;
+	margin:auto;
+	font-weight: bold;
+	border-radius:0em 0em 10em 10em;
+	%font-size:120%;
+	%margin: 0.1em;
+	border-width:0.05em;
+	border-color:black;
+	border-style:solid;
+	margin-bottom: -1em;
+	padding: 0.5em;
+	box-shadow: inset 0em -4em 4em #5ca904aa; 
+
+}
+
+
+#mainHeader h1{
+	font-size:4em;
+	margin:0em;
+	margin-bottom:-0.2em;
+}
+
+#mainHeader h4{
+	font-size:1.2em;
+	margin:0em;
+	%color:black;
+}
+
+#mainHeader h4 b{
+	color:white;
+	%font-size:1.25em;
+}
 
 .mediumfont{
 	font-size: 80%!important;
@@ -37,28 +77,98 @@ body {
 }
 
 
+#upload_div table{
+	text-align:center; 
+	margin:auto; 
+	width:80%
+}
+
+
+.uploader {
+	height:18em;
+	border-style:dashed;
+	border-width: 0.05em;
+	color:#333;
+	%padding:0;
+	border-color:black;
+	text-align:center;
+	vertical-align:middle;
+	margin: 0.1em;
+	%overflow-y:auto;
+	%overflow-x:auto;
+	%max-width:800px;
+}
+
+
+.uploader.top{
+	%border-radius: 1em;
+	background-color:#FFDAB9;
+	box-shadow: inset 0 -7em 7em #ffb26d;
+	border-radius: 10em 10em 0em 0em;
+}
+
+.uploader.left{
+	border-radius: 0em 0em 5em 10em;
+}
+
+.uploader.right{
+	border-radius: 0em 0em 10em 5em;
+
+}
+
+
+.uploader.side {
+	background-color:#ffb26d;
+	box-shadow: inset 0 -6em 6em #ff973a;
+	
+}
+
+
+.uploader.dz-drag-hover, .uploader:hover {
+	color: #565656;
+	%cursor:pointer;
+}
+
+
+.uploader.top.dz-drag-hover, .uploader.top:hover {
+	background-color:#5ca904;
+	box-shadow: inset 0 -10em 10em #b0fb5a;
+}
+
+
+
+.uploader.side.dz-drag-hover, .uploader.side:hover {
+	background-color:#b0fb5a;
+	box-shadow: inset 0 -3em 3em #5ca904;
+}
+
+
+
+
+
+.uploader > div {
+	text-size-adjust:200%;
+	font-size:180%;
+	margin-top: 3em;
+	padding: 1em;
+
+	
+}
+
+
+
 
 #main {
 	
 	padding: 2em;
+	width:80%;
+	min-width:600px;
+	margin:auto;
 	
 }
 
 
 
-.uploader.dz-drag-hover, .uploader:hover {
-	background-color:#FFDAB9;
-	color: #565656;
-}
-
-.uploader > div {
-	text-size-adjust:200%;
-	font-size:200%;
-	margin-top: 1em;
-	padding: 10;
-
-	
-}
 
 
 .dz-preview, .dz-file-preview {
@@ -70,12 +180,14 @@ body {
 	margin: 1em 0em;
 }
 
-
+#graphics_div{
+	margin-top: 3em;
+}
 
 
 
 .button{
-	transition: all 0.2s ease 0s;
+	transition: all 0.1s ease 0s;
 	border-radius:0.2em;
 	font-size:110%;
 	padding: 0.1em;
@@ -88,21 +200,18 @@ body {
 	-moz-user-select: none; /* Firefox */
 	-ms-user-select: none; /* IE10+ */
 	color:black;
-
-
+	background-color:#5ca904;
+	color:white;
 }
 
 
 
 
-.button.large{
-	font-size:130%;
-	padding: 0.5em;
-}
+
 
 .button:hover{
-	color:#565656;
-	background-color:#FFDAB9; %peach
+	background-color:#FFDAB9; /* %peach */
+	color:black;
 }
 
 .button.disabled {
@@ -116,6 +225,10 @@ body {
 	%float:right;
 }
 
+.button.large{
+	font-size:130%;
+	padding: 0.5em;
+}
 
 
 
@@ -188,7 +301,7 @@ body {
 }
 
 #svg .taxon.selected {
-	fill:#008cba;
+	fill:#5ca904;
 	font-weight:bold;
 }
 
@@ -419,10 +532,7 @@ ul.tabs li.active:hover::after {
 }
 
 
-
-
-
-
+/*
 .loader {
 	border-top: 0.25em solid #565656; 
 	border-bottom: 0.25em solid #565656; 
@@ -432,41 +542,42 @@ ul.tabs li.active:hover::after {
 	width: 0.5em !important;
 	height: 0.5em  !important;
 	animation: spin 2.5s linear infinite;
-	%text-align:center;
 	margin: auto;
-	%float:right;
+}
+*/
+
+
+.loader {
+	border-top: 0.1em solid #5ca904aa; 
+	border-left: 0.1em solid #5ca904aa; 
+	border-bottom: 0.8em solid white; 
+	border-right: 0.8em solid white; 
+	border-radius: 100%;
+	background-color:#FFDAB9;
+	box-shadow: inset 0 -0.5em 0.5em #ffb26d;
+	width: 2em  !important;
+	height: 2em  !important;
+	animation: spin 2.5s linear infinite;
+	margin: auto;
 }
 
 
 .loader.large {
-	border-top: 5em solid white; 
-	border-bottom: 5em solid white; 
-	border-left: 5em solid #FFDAB9; 
-	border-right: 5em solid #FFDAB9; 
-	border-radius: 100%;
+	border-top: 0.5em solid #5ca904aa; 
+	border-left: 0.5em solid #5ca904aa; 
+	border-bottom: 4em solid white; 
+	border-right: 4em solid white; 
+	background-color:#FFDAB9;
+	box-shadow: inset 0 -6em 8em #ffb26d;
 	width: 15em  !important;
 	height: 15em  !important;
 	animation: spin 2.5s linear infinite;
-	%text-align:center;
 	margin: auto;
-	%float:right;
+	margin-top:5em;
 }
 
 
-.uploader {
-	height:10em;
-	border-style:dashed;
-	border-width: 1.5px;
-	color:#333;
-	border-radius: 1em;
-	border-color:#bbb;
-	text-align:center;
-	vertical-align:middle;
-	margin: 2em;
-	overflow-y:auto;
-	overflow-x:auto;
-	%max-width:800px;
-}
+
 
 /* The switch - the box around the slider */
 .switch {
@@ -543,7 +654,7 @@ input:checked + .sliderboolean:before {
 }
 
 #control_panel_div .button{
-	padding: 0.1em;
+	padding: 0.2em;
 }
 	
 	

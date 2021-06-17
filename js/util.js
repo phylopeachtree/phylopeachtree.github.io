@@ -151,6 +151,73 @@ function initUtil(){
 	});
 	
 	
+
+
+	// Epi uploader
+	var alignmentDropzone = new Dropzone("#epi_upload", { url: "/file/post"});
+	alignmentDropzone.on("addedfile", function(file) {
+		
+		
+		var reader = new FileReader();
+
+
+		// Closure to capture the file information.
+		reader.onload = (function(theFile) {
+			
+			addLoader($("#epi_upload_title"));
+
+			
+			return function(e) {
+				
+				try {
+
+
+
+				
+					
+					//parseSpeciesTree(e, util_file);
+					if (e == null || e.target == null || e.target.result == null){
+						throw {message: "Cannot open file"};
+					}
+					var contents = e.target.result;
+					cjCall("peachtree.epi.EpiAPI", "uploadEpi", contents).then(function(val){
+						
+						try {
+							var val = JSON.parse(cjStringJavaToJs(val));
+							console.log(val);
+							if (val.err != null) {
+								throw {message: val.err};
+							}
+						}catch(err){
+							 return plotUploadErrorMsg(err, "#epi_upload");
+							 
+						}
+						
+				
+						return plotUploadSuccessMsg(file.name, val.time, "#epi_upload");
+					});
+					
+					
+				}catch(err){
+					return plotUploadErrorMsg(err, "#epi_upload");
+				}
+				
+			
+				
+				
+			};
+
+		})(file);
+
+		reader.readAsText(file);
+		
+		
+		
+
+	});
+
+
+
 	
 	
 }

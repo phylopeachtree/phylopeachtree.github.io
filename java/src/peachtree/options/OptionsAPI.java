@@ -18,6 +18,7 @@ import peachtree.aln.colourings.Colouring;
 import peachtree.aln.colourings.Drums;
 import peachtree.aln.colourings.Jalview;
 import peachtree.aln.colourings.SiteColourFilter;
+import peachtree.epi.EpiAPI;
 import peachtree.phy.PhylogenyAPI;
 import peachtree.phy.util.LinkType;
 
@@ -61,12 +62,12 @@ public class OptionsAPI {
 	static NumericalOption annotationRounding = new NumericalOption("annotationRounding", "Phylogeny", "Tree annotation sf", 3, 1, 8, 1, true);
 	
 	// Taxa
-	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Samples", "Row heights", 20, 1, 100, 5);
-	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Samples", "Font size of samples", 13, 0, 50, 1);
-	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Samples", "Padding before sample names", 5, 0, 50, 1);
-	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false);
-	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Samples", "Show only selected samples", false, true);
-	static BooleanOption focusOnClade = new BooleanOption("focusOnClade", "Samples", "Show only clade of selected samples", false, true);
+	static NumericalOption siteHeight = new NumericalOption("siteHeight", "Sample", "Row heights", 20, 1, 100, 5);
+	static NumericalOption fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Sample", "Font size of samples", 13, 0, 50, 1);
+	static NumericalOption taxaSpacing = new NumericalOption("taxaSpacing", "Sample", "Padding before sample names", 5, 0, 50, 1);
+	static BooleanOption showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Sample", "Show sample numbers", false);
+	static BooleanOption focusOnTaxa = new BooleanOption("focusOnTaxa", "Sample", "Show only selected samples", false, true);
+	static BooleanOption focusOnClade = new BooleanOption("focusOnClade", "Sample", "Show only clade of selected samples", false, true);
 	
 	// Alignment
 	static NumericalOption ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
@@ -75,7 +76,11 @@ public class OptionsAPI {
 	static DiscreteOption siteColourType;
 	static DiscreteOption colourings;
 	
-
+	
+	// Epidemiology
+	static DiscreteOption epiSymptomDate;
+	
+	
 		
 	static List<Class<? extends Colouring>> colouringClasses;
 	
@@ -91,6 +96,7 @@ public class OptionsAPI {
 		focalTaxon = null;
 		internalNodeLabels = null;
 		leafNodeLabels = null;
+		epiSymptomDate = null;
 		
 		treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
 		siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", SiteColourFilter.all, SiteColourFilter.values());
@@ -194,6 +200,26 @@ public class OptionsAPI {
 		internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.get(0), annotations);
 		leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.get(0), annotations);
 		
+		
+	}
+	
+	
+	
+	/**
+	 * Prepare epidemiology annotations
+	 * @throws Exception
+	 */
+	public static void prepareEpiAnnotations() throws Exception {
+		
+		
+		// Get annotations
+		List<String> annotations = EpiAPI.getAllAnnotations();
+		List<String> vals = new ArrayList<>();
+		vals.add("none");
+		if (annotations != null) vals.addAll(annotations);
+		
+		// Options
+		epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.get(0), vals);
 		
 	}
 	

@@ -175,7 +175,9 @@ public class OptionsAPI {
 	public static void prepareTreeAnnotationOptions() throws Exception {
 		
 		
-		
+		if (INIT_DIV1 > division2.getVal()) {
+			division2.setVal(INIT_DIV2);
+		}
 		division1.setVal(INIT_DIV1);
 		
 		List<String> annotations = PhylogenyAPI.getAllAnnotations();

@@ -71,6 +71,15 @@ body {
 	%font-size:1.1em;
 }
 
+
+#softwareDescDiv{
+	
+	width:60%;
+	margin:auto;
+	margin-top:5em;
+	text-align:justify;
+}
+
 .mediumfont{
 	font-size: 80%!important;
 }

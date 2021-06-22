@@ -35,7 +35,7 @@ body {
 #mainHeader{
 	background-color:#b0fb5aaa;
 	color:#333;
-	width:50%;
+	width:60%;
 	margin:auto;
 	font-weight: bold;
 	border-radius:0em 0em 10em 10em;
@@ -52,7 +52,7 @@ body {
 
 
 #mainHeader h1{
-	font-size:4em;
+	font-size:3em;
 	margin:0em;
 	margin-bottom:-0.2em;
 }
@@ -92,12 +92,12 @@ body {
 #upload_div table{
 	text-align:center; 
 	margin:auto; 
-	width:70%
+	width:60%
 }
 
 
 .uploader {
-	height:18em;
+	height:20em;
 	border-style:dashed;
 	border-width: 0.05em;
 	color:#333;

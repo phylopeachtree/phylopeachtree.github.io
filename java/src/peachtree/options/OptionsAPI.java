@@ -41,7 +41,7 @@ public class OptionsAPI {
 	static NumericalOption canvasWidth  = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, 2000, 100, true);
 	static NumericalOption canvasHeight  = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, 2000, 100, true);
 	static NumericalOption division1  = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0, 0, 1, 0.1, true);
-	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", INIT_DIV2, 0, 1, 0.1, true);
+	static NumericalOption division2  = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.2, 0, 1, 0.1, true);
 	
 	
 	// Scroll bars
@@ -79,6 +79,8 @@ public class OptionsAPI {
 	
 	// Epidemiology
 	static DiscreteOption epiSymptomDate;
+	static NumericalOption infectiousPeriodBefore = new NumericalOption("infectiousPeriodBefore", "Epidemiology", "Number of days infectious before symptom onset", 3, 0, 28, 1);
+	static NumericalOption infectiousPeriodAfter = new NumericalOption("infectiousPeriodAfter", "Epidemiology", "Number of days infectious after symptom onset", 7, 0, 28, 1);
 	
 	
 		
@@ -186,7 +188,9 @@ public class OptionsAPI {
 		}
 		division1.setVal(INIT_DIV1);
 		
-		List<String> annotations = PhylogenyAPI.getAllAnnotations();
+		List<String> annotations = new ArrayList<>();
+		annotations.addAll(PhylogenyAPI.getAllAnnotations());
+		//annotations.addAll(EpiAPI.getAllAnnotations());
 		if (annotations.isEmpty()) {
 			annotationFontSize.hide();
 			annotationRounding.hide();
@@ -216,7 +220,7 @@ public class OptionsAPI {
 		List<String> annotations = EpiAPI.getAllAnnotations();
 		List<String> vals = new ArrayList<>();
 		vals.add("none");
-		if (annotations != null) vals.addAll(annotations);
+		vals.addAll(annotations);
 		
 		// Options
 		epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.get(0), vals);
@@ -247,9 +251,6 @@ public class OptionsAPI {
 					break;
 				}
 			}
-			
-			
-
 			
 			
 			if (option == null) {
@@ -354,13 +355,14 @@ public class OptionsAPI {
 			double width = canvasWidth.getVal();
 			double height = canvasHeight.getVal();
 			
-			
 			// Initialise filterings if necessary
 			AlignmentAPI.initFiltering(variantSitesOnly.getVal(), focusOnTaxa.getVal(), (focusOnClade.getVal() ? PhylogenyAPI.getTree() : null));
 			
 			// Prepare tree-alignment labellings if necessary
 			PhylogenyAPI.prepareLabelling(AlignmentAPI.getAlignment());
 			
+			// Validate epi mapping
+			EpiAPI.validateAccessions(AlignmentAPI.getAlignment());
 			
 			// Scroll bars
 			JSONObject scrolls = new JSONObject();
@@ -446,8 +448,6 @@ public class OptionsAPI {
 			JSONObject yboundaries = new JSONObject();
 			yboundaries.put(canvasHeight.getName(), height);
 			json.put("yboundaries", yboundaries);
-			
-
 			
 			
 			

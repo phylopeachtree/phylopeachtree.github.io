@@ -1,6 +1,7 @@
 package peachtree.epi;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class Case {
 	
@@ -21,9 +22,27 @@ public class Case {
 	}
 
 	
-	
+	/**
+	 * Get the value of this variable
+	 * @param var
+	 * @return
+	 */
 	public String getValue(String var) {
 		return this.annotations.get(var);
+	}
+
+
+	/**
+	 * Get this accession
+	 * @return
+	 */
+	public String getAccession() {
+		return this.accession;
+	}
+
+
+	public Set<String> getVariables() {
+		return this.annotations.keySet();
 	}
 	
 	

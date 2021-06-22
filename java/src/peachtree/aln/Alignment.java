@@ -546,7 +546,10 @@ public class Alignment {
 	}
 
 
-
+	/**
+	 * Get a list of sequence accessions
+	 * @return
+	 */
 	public List<String> getNames() {
 		List<String> names = new ArrayList<>();
 		for (Sequence seq : sequences) {

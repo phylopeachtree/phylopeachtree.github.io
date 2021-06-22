@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import peachtree.aln.Filtering;
 import peachtree.aln.Taxon;
+import peachtree.epi.Case;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 
@@ -798,6 +799,20 @@ public class Node {
 		this.children.add(0, lastChild);
 		this.children.remove(this.getChildCount()-1);
 		
+		
+	}
+
+	
+	/**
+	 * Add annotations
+	 * @param c
+	 */
+	public void addAnnotations(Case c) {
+		
+		for (String var : c.getVariables()) {
+			String val = c.getValue(var);
+			annotations.put(var, val);
+		}
 		
 	}
 	

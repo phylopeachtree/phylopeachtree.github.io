@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import peachtree.aln.colourings.Colouring;
+import peachtree.epi.EpiAPI;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 import peachtree.phy.PhylogenyAPI;
@@ -105,8 +106,11 @@ public class AlignmentAPI {
 			
 			// If tree has been uploaded, check the alignment matches the tree
 			PhylogenyAPI.prepareLabelling(THE_ALIGNMENT);
+			EpiAPI.setEpiAccessionsToDirty();
+			EpiAPI.validateAccessions(THE_ALIGNMENT);
 			OptionsAPI.resetScroll();
 			OptionsAPI.resetWindowSize();
+			
 			
 			System.out.println((finish-t0) + "ms on filtering" );
 			System.out.println("Parsed successfully (" + (finish-start) + "ms)" );

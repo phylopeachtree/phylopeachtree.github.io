@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import peachtree.aln.Alignment;
+import peachtree.phy.Node;
+import peachtree.phy.Tree;
+
 /**
  * Stores epidemiological information
  * @author jdou557
@@ -147,6 +151,83 @@ public class Epidemiology {
 	 */
 	public List<String> getAnnotations() {
 		return this.annotations;
+	}
+
+
+	
+	/**
+	 * Validate the accessions in the alignment
+	 * @param alignment
+	 */
+	public void validateAccessions(Alignment alignment) throws Exception {
+		
+		
+		
+		// Ensure that every sequence is matched by at least one accession 
+		// Bipartite is not required
+		for (String acc1 : alignment.getNames()) {
+			boolean match = false;
+			for (Case c : this.cases) {
+				String acc2 = c.getAccession();
+				if (acc1.equals(acc2)) {
+					match = true;
+					break;
+				}
+			}
+			
+			
+			if (!match) {
+				throw new Exception("Cannot find epidemiological annotations for " + acc1);
+			}
+		}
+		
+		
+		
+	}
+
+
+	/**
+	 * Add all annotations to the tree (and check for duplicate variable names)
+	 * @param tree
+	 */
+	public void addAnnotationsToTree(Tree tree) throws Exception {
+		
+		
+		// Check for duplicate annotations
+		List<String> treeAnnotations = new ArrayList<>();
+		tree.getRoot().getAllAnnotations(treeAnnotations);
+		for (String var : treeAnnotations) {
+			if (this.annotations.contains(var)) {
+				throw new Exception("Duplicate annotation '" + var + "' found in the tree and the epidemiological data. "
+						+ "Please ensure annotation names are unique.");
+			}
+		}
+		
+		
+		// Annotate each node
+		for (Node node : tree.getNodesAsArray()) {
+			
+			// Find the matching case
+			Case c = null;
+			for (Case c2 : this.cases) {
+				if (c2.getAccession().equals(node.getAcc())){
+					c = c2;
+					break;
+				}
+			}
+			if (c == null) continue;
+			
+			
+			node.addAnnotations(c);
+			
+			
+			
+			
+			
+			
+		}
+		
+		
 	}
 	
 }

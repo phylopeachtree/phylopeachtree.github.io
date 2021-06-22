@@ -173,6 +173,10 @@ public class Tree {
 		this.initArray();
 	}
 	
+	public Node getRoot() {
+		return this.root;
+	}
+	
 
 	public Tree copy() {
 		return new Tree(this.root.copy(), this.alignment);

@@ -1,16 +1,24 @@
 package peachtree.epi;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.json.JSONObject;
 
+import peachtree.aln.Alignment;
+import peachtree.aln.AlignmentAPI;
 import peachtree.options.OptionsAPI;
+import peachtree.phy.PhylogenyAPI;
+import peachtree.phy.Tree;
 
 public class EpiAPI {
 	
 	
 	private static Epidemiology EPIDEMIOLOGY = null;
+	
+	private static boolean epiAccessionsAreDirty = false;
+	private static boolean epiAnnotationsAreDirty = false;
 	
 	
 	/**
@@ -20,7 +28,7 @@ public class EpiAPI {
 	 */
 	public static String uploadEpi(String contents) {
 		
-		System.out.println("Uploading epidemiological information " + contents.length());
+		System.out.println("Uploading epidemiological information");
 		
 		
 		try {
@@ -29,6 +37,10 @@ public class EpiAPI {
 			
 			EPIDEMIOLOGY = new Epidemiology();
 			EPIDEMIOLOGY.parseFile(contents);
+			EpiAPI.setEpiAccessionsToDirty();
+			EpiAPI.setEpiAnnotationsToDirty();
+			EpiAPI.validateAccessions(AlignmentAPI.getAlignment());
+			EpiAPI.addAnnotationsToTree(PhylogenyAPI.getTree());
 			
 			OptionsAPI.prepareEpiAnnotations();
 			
@@ -45,10 +57,59 @@ public class EpiAPI {
 		
 		
 	}
+	
+	
+	/**
+	 * Indicate that the accessions need to be revalidated
+	 */
+	public static void setEpiAccessionsToDirty() {
+		epiAccessionsAreDirty = true;
+	}
+	
+	
+	/**
+	 * Indicate that the annotations need to be added to the tree
+	 */
+	public static void setEpiAnnotationsToDirty() {
+		epiAnnotationsAreDirty = true;
+	}
+	
+	
+	
+	
+	/**
+	 * Validate the accessions in the epidemiology with those in the alignment
+	 * @param alignment
+	 * @throws Exception
+	 */
+	public static void validateAccessions(Alignment alignment) throws Exception {
+		if (!epiAccessionsAreDirty) return;
+		if (alignment == null) return;
+		if (EPIDEMIOLOGY == null) return;
+		EPIDEMIOLOGY.validateAccessions(alignment);
+		epiAccessionsAreDirty = false;
+	}
+	
+	
+	
+	
+	/**
+	 * Add annotations to the tree
+	 * @param epi
+	 * @throws Exception
+	 */
+	public static void addAnnotationsToTree(Tree tree) throws Exception {
+		if (!epiAnnotationsAreDirty) return;
+		if (tree == null) return;
+		if (EPIDEMIOLOGY == null) return;
+		EPIDEMIOLOGY.addAnnotationsToTree(tree);
+		epiAnnotationsAreDirty = false;
+	}
+	
 
 
 	public static List<String> getAllAnnotations() {
-		if (EPIDEMIOLOGY == null) return null;
+		if (EPIDEMIOLOGY == null) return new ArrayList<String>();
 		return EPIDEMIOLOGY.getAnnotations();
 	}
 

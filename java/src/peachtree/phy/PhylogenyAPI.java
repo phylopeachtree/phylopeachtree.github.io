@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import peachtree.aln.Alignment;
 import peachtree.aln.AlignmentAPI;
 import peachtree.aln.Filtering;
+import peachtree.epi.EpiAPI;
+import peachtree.epi.Epidemiology;
 import peachtree.options.OptionsAPI;
 import peachtree.options.Scaling;
 import peachtree.phy.util.LinkType;
@@ -40,6 +42,10 @@ public class PhylogenyAPI {
 			// Prepare tree annotation options
 			OptionsAPI.prepareTreeAnnotationOptions();
 			OptionsAPI.resetScroll();
+			
+			// Epidemiological annotations
+			EpiAPI.setEpiAnnotationsToDirty();
+			EpiAPI.addAnnotationsToTree(THE_TREE);
 			
 			
 			long finish = Calendar.getInstance().getTimeInMillis();
@@ -126,6 +132,8 @@ public class PhylogenyAPI {
 			// Sort taxa by tree
 			sortTaxaByTree(THE_TREE, alignment);
 			AlignmentAPI.setOrderingToDirty();
+			EpiAPI.setEpiAnnotationsToDirty();
+			EpiAPI.addAnnotationsToTree(THE_TREE);
 			orderingIsDirty = false;
 			
 			
@@ -157,6 +165,8 @@ public class PhylogenyAPI {
 		alignment.sortByTree(tree);
 	}
 	
+	
+
 	
 	
 	/**

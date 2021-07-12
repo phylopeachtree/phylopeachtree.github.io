@@ -51,10 +51,17 @@ function initUtil(){
 						throw {message: "Cannot open file"};
 					}
 					var contents = e.target.result;
-					cjCall("peachtree.aln.AlignmentAPI", "uploadAlignment", contents).then(function(val){
+					callWasmFunction("uploadAlignment", [contents], function(val){
+					//cjCall("peachtree.aln.AlignmentAPI", "uploadAlignment", contents).then(function(val){
+						
+						console.log("val", val);
+
+						//val = JSON.parse(val);
+						
+
 						
 						try {
-							var val = JSON.parse(cjStringJavaToJs(val));
+							//var val = JSON.parse(cjStringJavaToJs(val));
 							console.log(val);
 							if (val.err != null) {
 								throw {message: val.err};
@@ -66,7 +73,8 @@ function initUtil(){
 						
 				
 						return plotUploadSuccessMsg(file.name, val.time, "#aln_upload");
-					});
+						
+					}, true);
 					
 					
 				}catch(err){
@@ -114,10 +122,11 @@ function initUtil(){
 						throw {message: "Cannot open file"};
 					}
 					var contents = e.target.result;
-					cjCall("peachtree.phy.PhylogenyAPI", "uploadTree", contents).then(function(val){
+					callWasmFunction("uploadTree", [contents], function(val){
+					//cjCall("peachtree.phy.PhylogenyAPI", "uploadTree", contents).then(function(val){
 						
 						try {
-							var val = JSON.parse(cjStringJavaToJs(val));
+							//var val = JSON.parse(cjStringJavaToJs(val));
 							console.log(val);
 							if (val.err != null) {
 								throw {message: val.err};
@@ -129,7 +138,7 @@ function initUtil(){
 						
 				
 						return plotUploadSuccessMsg(file.name, val.time, "#phy_upload");
-					});
+					}, true);
 					
 					
 				}catch(err){
@@ -251,8 +260,12 @@ function plotUploadErrorMsg(err, uploadSelector){
 	Clear error message on success
 */
 function plotUploadSuccessMsg(filename, time, uploadSelector){
-	if (time == "0" || time == 0) time = "<1";
-	$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + Math.round(time*10)/10 + "s!");
+	if (time == "0" || time == 0) {
+		$(uploadSelector + " .usermsg").html(filename + " successfully parsed in <1s!");
+	}else{
+		$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + Math.round(time*10)/10 + "s!");
+	}
+	
 	updateRenderBtn();
 	removeLoader($(uploadSelector + "_title"));
 	return true;
@@ -281,10 +294,11 @@ function removeLoader(ele){
 */
 function renderOptions(){
 	
-	cjCall("peachtree.options.OptionsAPI", "getOptions").then(function(val){
+	callWasmFunction("getOptions", [], function(options){
+	//cjCall("peachtree.options.OptionsAPI", "getOptions").then(function(options){
 						
 			
-		var options = JSON.parse(cjStringJavaToJs(val));
+		//var options = JSON.parse(cjStringJavaToJs(options));
 		console.log("options", options);
 
 
@@ -364,11 +378,8 @@ function renderOptions(){
 					}
 					
 					
-					if (opt.type == "BooleanOption"){
+					else if (opt.type == "BooleanOption"){
 						
-						
-						
-
 						
 						// Switch html
 						let optionsHTML = `
@@ -387,7 +398,7 @@ function renderOptions(){
 					}
 					
 					
-					if (opt.type == "DiscreteOption"){
+					else if (opt.type == "DiscreteOption"){
 						
 						
 						
@@ -461,9 +472,12 @@ function setOptionFromEle(ele){
 function setOptionToVal(optionID, newVal){
 	
 	console.log("Setting", optionID, "to", newVal);
+
+	newVal = "" + newVal;
 	
 	CANCEL_GRAPHICS = true;
-	cjCall("peachtree.options.OptionsAPI", "setOption", optionID, newVal).then(function(val){
+	callWasmFunction("setOption", [optionID, newVal], function(val){
+	//cjCall("peachtree.options.OptionsAPI", "setOption", optionID, newVal).then(function(val){
 		
 		//console.log("done", val);
 		CANCEL_GRAPHICS = false;
@@ -566,12 +580,15 @@ function updateRenderBtn(){
 */
 function isReadyToRender(callback = function(response) { }){
 	
-	cjCall("peachtree.options.OptionsAPI", "isReady").then(function(val){
-		val =  val.value0 == 1;
-		console.log("ready", val);
+	callWasmFunction("isReady", [], function(val){
+	//cjCall("peachtree.options.OptionsAPI", "isReady").then(function(val){
+		
+		console.log("ready?", val);
+		//val = JSON.parse(val);
+		var ready = val.ready;
 		//var val = cjStringJavaToJs(val);
 		
-		callback(val);
+		callback(ready);
 	});
 	
 }

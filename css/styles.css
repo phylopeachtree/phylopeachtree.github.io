@@ -120,11 +120,11 @@ body {
 }
 
 .uploader.left{
-	border-radius: 0em 0em 5em 10em;
+	border-radius: 0em 0em 8em 10em;
 }
 
 .uploader.right{
-	border-radius: 0em 0em 10em 5em;
+	border-radius: 0em 0em 10em 8em;
 
 }
 
@@ -582,15 +582,14 @@ ul.tabs li.active:hover::after {
 
 
 .loader.large {
-	border-top: 0.5em solid #5ca904aa; 
-	border-left: 0.5em solid #5ca904aa; 
-	border-bottom: 4em solid white; 
-	border-right: 4em solid white; 
+	border-top: 0.6em solid #5ca904aa; 
+	border-left: 0.6em solid #5ca904aa; 
+	border-bottom: 5em solid white; 
+	border-right: 5em solid white; 
 	background-color:#FFDAB9;
-	box-shadow: inset 0 -6em 8em #ffb26d;
+	box-shadow: inset 0 -6em 8em #ffb26d; /*, inset -4em 3em 1em #ffb26d; */
 	width: 15em  !important;
 	height: 15em  !important;
-	animation: spin 2.5s linear infinite;
 	margin: auto;
 	margin-top:5em;
 }

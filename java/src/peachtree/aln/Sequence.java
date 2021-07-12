@@ -1,9 +1,5 @@
 package peachtree.aln;
 
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -274,14 +270,9 @@ public class Sequence {
 				arr.put(nt_font);
 			}
 			
-			
-			
 			x ++;
 			
-			
 		}
-		
-	
 		
 		
 		return arr;

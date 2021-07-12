@@ -20,7 +20,6 @@ public abstract class Option {
 	}
 	
 	public String getTitle() {
-		
 		return title;
 	}
 	

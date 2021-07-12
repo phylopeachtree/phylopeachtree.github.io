@@ -47,7 +47,8 @@ function initGraphics(){
 				if (mw != 0){
 
 					SCROLLING = true;
-					cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
+					callWasmFunction("scrollABit", [mw], function(val){
+					//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
 		        		renderGraphics(function() { SCROLLING = false; });
 		        		//setTimeout(function() {
 		        			//clearTimeout($.data(this, 'timer'));
@@ -59,7 +60,7 @@ function initGraphics(){
 
 
 			 //do something
-			}, 30));
+			}, 40));
 
 
 
@@ -125,14 +126,15 @@ function renderGraphics(resolve = function() {}){
 	
 
 		// Generate the graphics objects
-		cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
+		callWasmFunction("initGraphics", [], function(initialVal){
+		//cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
 			
 			
 			CANCEL_GRAPHICS = false;
 
 
 			
-			var initialVal = JSON.parse(cjStringJavaToJs(initialVal));
+			//var initialVal = JSON.parse(initialVal);
 			console.log("initialVal", initialVal)
 
 			if (initialVal.err != null){
@@ -149,7 +151,7 @@ function renderGraphics(resolve = function() {}){
 				
 				
 				// Search bar
-				populateTaxonSearchBar();
+				// TODO populateTaxonSearchBar();
 				
 				// Async
 				setTimeout(function() {
@@ -450,13 +452,14 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 		return;
 	}
 
-	cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
+	callWasmFunction("getGraphics", [], function(objects){
+	//cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
 								
 
 
 
 			//console.log("graphics", cjStringJavaToJs(val));
-			var objects = JSON.parse(cjStringJavaToJs(val));
+			//var objects = JSON.parse(cjStringJavaToJs(val));
 			//console.log("iteration", iteration, "graphics", objects);
 
 

@@ -429,7 +429,7 @@ public class Tree {
 	
 	
 	/**
-	 * Gets thr MRCA of these two nodes
+	 * Gets the MRCA of these two nodes
 	 * @param taxon1
 	 * @param taxon2
 	 * @return

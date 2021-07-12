@@ -5,6 +5,7 @@
     <title>PEACHTree</title>
 	<link rel="stylesheet" href="css/styles.css">
     <script src="https://cjrtnc.leaningtech.com/2.1/loader.js"></script>
+    <script defer src="cpp/peachtree/peachtree.js"></script>
     <!-- https://cjrtnc.leaningtech.com/2.2/loader.js -->
 	<!--<script src="https://cjrtnc.leaningtech.com/20200727/loader.js"></script>-->
 	
@@ -17,7 +18,7 @@
   	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
-	
+	<script language='JavaScript' type='text/JavaScript' src="js/WW_controller.js"></script>
 	<script language='JavaScript' type='text/JavaScript' src="js/util.js"></script>
 	<script language='JavaScript' type='text/JavaScript' src="js/graphics.js"></script>
 	<script language='JavaScript' type='text/JavaScript' src="js/lib/dropzone.js"></script>
@@ -29,48 +30,39 @@
   <script>
   
 		FADE_IN_TIME = 100;
+		WEB_WORKER_WASM = null;
   
 		function init() {
-		
-			
-			cheerpjInit();
+
+
+
 			addLoader($("#main"), true);
 
+			register_WebWorker(function(){
 
-			//return;
+				callWasmFunction("init", [], function(){
+
+					console.log("done");
+
+					initGraphics();
+					initUtil();
+
+					removeLoader($("#main"));
+
+				});
 
 
-			//cheerpjRunJar("/app/peachtree.jar", 1);
-			
-			cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar").then(function(val){
-			
-				console.log("Loaded!");
-				removeLoader($("#main"));
-				
-				// Initialise js
-				initGraphics();
-				initUtil();
-				
-				
-				
-				//renderOptions();
-				//$("#graphics_div").show(0);
-				
-				
-
-				
-			});
-		  
-			//
-			
-			
-
+			})
 
 			
-			//addLoader("#aln_upload_title");
-
-			 
+			return;
 		
+			
+			//cheerpjInit();
+			//cheerpjRunMain("peachtree.MainApplication", "/app/peachtree.jar").then(function(val){
+				
+			//});
+		  
 	  
 	  
 	  }
@@ -127,7 +119,7 @@
 					<td style="width:50%">
 
 						<div id="epi_upload" class="uploader right side" title="Accepted formats: csv, tsv">
-							<div id="epi_upload_title">Drag and drop epidemiological annotations <br>  (out of order)</div>
+							<div id="epi_upload_title">Drag and drop epidemiological annotations <br>  (optional)</div>
 							<div class="usermsg mediumfont"></div>
 						</div>
 
@@ -153,7 +145,7 @@
 
 
 				<div id="softwareDescDiv">
-					<b>PEACH Tree</b> is a web tool for visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogenic surveillance. 
+					<b>PEACH Tree</b> is a high-performance web tool for visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogenic surveillance. 
 					By default, only segregating alignment sites (i.e. sites which vary among the samples) are displayed, making the program suitable for viewing full genomic data.
 					A phylogenetic tree can be generated from the alignment or uploaded separately.
 					Epidemiological annotations can be uploaded (such as symptom onset date) and viewed alongside the rest of the data.

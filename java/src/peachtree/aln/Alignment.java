@@ -363,7 +363,7 @@ public class Alignment {
 		int padding = (this.sequences.size() + "").length();
 		
 		// Add some yshift to the first row so it doesn't get clipped by top margin
-		Double[] yshift = new Double[1];
+		Double[] yshift = new Double[1]; // -1
 
 		int seqNumDisplayed = 0;
 		for (int seqNum = 0; seqNum < this.sequences.size(); seqNum++) {

@@ -41,8 +41,6 @@ public class Filtering {
 	public Filtering(boolean variantSitesOnly, boolean focus, Alignment alignment, Tree tree) {
 		
 		
-		
-		
 		System.out.println("...preparing filtering...");
 		this.alignment = alignment;
 		this.focusing = focus;

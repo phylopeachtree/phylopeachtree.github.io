@@ -56,7 +56,7 @@ public:
 
 
 
-private:
+protected:
 	Node* root;
 	vector<Node*> nodes;
 	Alignment* alignment;

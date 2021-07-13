@@ -93,6 +93,52 @@ jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, b
 
 }
 
+
+/*
+ * Build a tree from the alignment using the specified method
+ */
+jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
+
+
+	//String str = new String(contents);
+	//cout << "Creating tree " << method << endl;
+
+
+	auto start = high_resolution_clock::now();
+
+
+	// Build tree
+	THE_TREE = new ClusterTree(alignment, method);
+
+
+	// Sort taxa by tree
+	sortTaxaByTree(THE_TREE, alignment);
+	AlignmentAPI::setOrderingToDirty();
+	// TODO EpiAPI.setEpiAnnotationsToDirty();
+	// TODO EpiAPI.addAnnotationsToTree(THE_TREE);
+	PhylogenyAPI::orderingIsDirty = false;
+
+
+	// Prepare tree annotation options
+	OptionsAPI::prepareTreeAnnotationOptions();
+	OptionsAPI::resetScroll();
+
+	auto finish = high_resolution_clock::now();
+	auto duration = duration_cast<seconds>(finish - start);
+
+
+
+	jsonObject j;
+	j["time"] = duration.count();
+	j["newick"] = THE_TREE->toNewick();
+	return j;
+
+
+
+}
+
+
+
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
@@ -151,6 +197,12 @@ extern "C" {
 
 
 	}
+
+
+
+
+
+
 
 
 }

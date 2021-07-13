@@ -535,9 +535,9 @@ function buildTree(){
 	
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {
-		cjCall("peachtree.options.OptionsAPI", "buildTree").then(function(results){
+		callWasmFunction("buildTree", [], function(results){
+		//cjCall("peachtree.options.OptionsAPI", "buildTree").then(function(results){
 			
-			var results = JSON.parse(cjStringJavaToJs(results));
 			
 			//console.log("tree", results.newick);
 			removeLoader($("#ctrl_loading_div"));

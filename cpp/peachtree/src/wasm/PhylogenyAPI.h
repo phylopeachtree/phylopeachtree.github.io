@@ -9,6 +9,7 @@
 #include <iostream>
 #include "WasmAPI.h"
 #include "../phy/Tree.h"
+#include "../phy/ClusterTree.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
 	static void applyFiltering(Filtering* filtering);
 	static double getHeight();
 	static jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree);
-
+	static jsonObject buildTree(Alignment* alignment, LinkType method);
 
 	//Variables
 	static Tree* THE_TREE;

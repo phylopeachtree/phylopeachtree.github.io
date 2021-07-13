@@ -5,6 +5,7 @@
  *      Author: jdou557
  */
 
+#include <emscripten.h>
 #include "OptionsAPI.h"
 #include "AlignmentAPI.h"
 #include "PhylogenyAPI.h"
@@ -15,7 +16,8 @@
 #include "../aln/colourings/JalView.h"
 #include "../aln/colourings/Drums.h"
 #include "../aln/colourings/ClustalAmino.h"
-#include <emscripten.h>
+#include "../phy/ClusterTree.h"
+
 
 
 const long OptionsAPI::CHUNK_SIZE = 40000;
@@ -269,12 +271,12 @@ extern "C" {
 		//epiSymptomDate = null;
 
 
-		//treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", LinkType.neighborjoining, LinkType.values());
+		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain());
 
 
 		// Site colour filter values
 		vector<string> domain = Colouring::getSiteColourFilters();
-		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), domain);
+		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), domain, true);
 
 
 
@@ -285,6 +287,26 @@ extern "C" {
 		OptionsAPI::colouringClasses.push_back(new Drums());
 
 		WasmAPI::messageFromWasmToJS("done");
+
+	}
+
+
+
+	/**
+	 * Build a tree from the alignment
+	 */
+	void EMSCRIPTEN_KEEPALIVE buildTree() {
+
+
+		LinkType method = ClusterTree::getLinkType(OptionsAPI::treeMethods->getVal());
+
+		jsonObject j = PhylogenyAPI::buildTree(AlignmentAPI::getAlignment(), method);
+
+		if (Error::wasError()) {
+			return;
+		}
+
+		WasmAPI::messageFromWasmToJS(j.dump(0));
 
 	}
 

@@ -132,29 +132,26 @@ void Alignment::initPatterns(){
 	this->patterns.clear();
 	this->patternWeights.clear();
 
-	// TODO
 
-
-	/*
-	int[] site = new int[this.getNtaxa()];
-	for (int siteNum = 0; siteNum < this.getLength(); siteNum ++) {
+	vector<int> site(this->getNtaxa());
+	for (int siteNum = 0; siteNum < this->getLength(); siteNum ++) {
 
 
 
 		// Get pattern of this column
-		for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
-			Sequence sequence = this.getSequence(taxonNum);
-			site[taxonNum] = sequence.getSymbolInt(siteNum);
+		for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
+			Sequence* sequence = this->getSequence(taxonNum);
+			site[taxonNum] = sequence->getSymbolInt(siteNum);
 		}
 
 
 		// Check if it is unique
 		int patternMatch = -1;
-		for (int patternNum = 0; patternNum < this.patterns.size(); patternNum ++) {
-			int[] pattern = this.patterns.get(patternNum);
-			boolean isUniqueFromThisPattern = false;
-			for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
-				if (site[taxonNum] != pattern[taxonNum]) {
+		for (int patternNum = 0; patternNum < this->patterns.size(); patternNum ++) {
+			vector<int> pattern = this->patterns.at(patternNum);
+			bool isUniqueFromThisPattern = false;
+			for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
+				if (site.at(taxonNum) != pattern.at(taxonNum)) {
 					isUniqueFromThisPattern = true;
 					break;
 				}
@@ -171,23 +168,23 @@ void Alignment::initPatterns(){
 
 		// If unique site, then add to list
 		if (patternMatch == -1) {
-			int[] siteCpy = new int[site.length];
-			for (int taxonNum = 0; taxonNum < site.length; taxonNum++) {
+			vector<int> siteCpy(site.size());
+			for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
 				siteCpy[taxonNum] = site[taxonNum];
 			}
 
-			this.patterns.add(siteCpy);
-			this.patternWeights.add(1.0);
+			this->patterns.push_back(siteCpy);
+			this->patternWeights.push_back(1.0);
 		}
 
 		// Otherwise increment the pattern weight
 		else {
-			double weight = this.patternWeights.get(patternMatch);
-			this.patternWeights.set(patternMatch, weight + 1.0);
+			double weight = this->patternWeights.at(patternMatch);
+			this->patternWeights.at(patternMatch) = weight + 1.0;
 		}
 
 	}
-	*/
+
 
 	cout << "There are " << this->patterns.size() << " patterns" << endl;
 

@@ -290,6 +290,8 @@ public class ClusterTree extends Tree {
             clusters--;
         }
     } 
+    
+    
     void merge(int min1, int min2, double dist1, double dist2, final List<Integer>[] clusterID, final NodeX[] clusterNodes) {
         if (min1 > min2) {
             final int h = min1;
@@ -529,15 +531,11 @@ public class ClusterTree extends Tree {
     } 
 
 
-    
-
-    
-
-    
-   
-
-
-
 
 
 }
+
+
+
+
+

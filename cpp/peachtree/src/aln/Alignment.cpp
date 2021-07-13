@@ -41,7 +41,6 @@ Alignment::Alignment(string fasta) {
 
 
 
-
 	// Parse fasta
 	fasta.erase(std::remove(fasta.begin(), fasta.end(), '\r'), fasta.end());
 	vector<string> lines = Utils::split(fasta, "\n");
@@ -118,10 +117,8 @@ Alignment::Alignment(string fasta) {
 	cout << "Parsed an alignment with " << this->alignmentLength << " sites and " << this->sequences.size() << " taxa " << endl;
 
 
-
-
-
 }
+
 
 /**
  * Initialise site patterns
@@ -191,6 +188,7 @@ void Alignment::initPatterns(){
 
 
 }
+
 
 
 /**

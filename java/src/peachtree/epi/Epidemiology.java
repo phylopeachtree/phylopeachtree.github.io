@@ -23,7 +23,6 @@ public class Epidemiology {
 
 	public Epidemiology() {
 		this.cases = new ArrayList<>();
-		
 	}
 	
 	

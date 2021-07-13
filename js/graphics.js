@@ -151,7 +151,7 @@ function renderGraphics(resolve = function() {}){
 				
 				
 				// Search bar
-				// TODO populateTaxonSearchBar();
+				populateTaxonSearchBar();
 				
 				// Async
 				setTimeout(function() {
@@ -194,19 +194,20 @@ function renderGraphics(resolve = function() {}){
 					
 					
 					// Add the scrollbars
-					if (initialVal.scrolls.scrollY != null){
-						let pos = initialVal.scrolls.scrollY;
-						let len = initialVal.scrolls.scrollYLength;
-						console.log("scrollY", pos, len);
-						createScrollbar(svg, pos, len, "scrollY", true);
+					if (initialVal.scrolls != null){
+						if (initialVal.scrolls.scrollY != null){
+							let pos = initialVal.scrolls.scrollY;
+							let len = initialVal.scrolls.scrollYLength;
+							console.log("scrollY", pos, len);
+							createScrollbar(svg, pos, len, "scrollY", true);
+						}
+						if (initialVal.scrolls.scrollX != null){
+							let pos = initialVal.scrolls.scrollX;
+							let len = initialVal.scrolls.scrollXLength;
+							console.log("scrollX", pos, len);
+							createScrollbar(svg, pos, len, "scrollX", false);
+						}
 					}
-					if (initialVal.scrolls.scrollX != null){
-						let pos = initialVal.scrolls.scrollX;
-						let len = initialVal.scrolls.scrollXLength;
-						console.log("scrollX", pos, len);
-						createScrollbar(svg, pos, len, "scrollX", false);
-					}
-
 
 
 

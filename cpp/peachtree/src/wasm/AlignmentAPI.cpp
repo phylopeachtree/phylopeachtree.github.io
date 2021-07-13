@@ -6,6 +6,7 @@
 
 #include "AlignmentAPI.h"
 #include "PhylogenyAPI.h"
+#include "EpiAPI.h"
 #include "OptionsAPI.h"
 #include "../error/Error.h"
 
@@ -28,6 +29,14 @@ int AlignmentAPI::mostRecentlySelectedTaxon = -1;
  */
 bool AlignmentAPI::isReady(){
 	return AlignmentAPI::THE_ALIGNMENT != nullptr;
+}
+
+
+/*
+ * Find the row number of this taxon in the filtering
+ */
+int AlignmentAPI::getTaxonRowNum(Taxon* taxon){
+	return filtering->getIndex(taxon);
 }
 
 
@@ -56,6 +65,14 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 	}
 
 
+}
+
+
+/*
+ * Get the taxon object
+ */
+Taxon* AlignmentAPI::getTaxon(string label){
+	return THE_ALIGNMENT->getTaxon(label);
 }
 
 
@@ -151,8 +168,8 @@ extern "C" {
 
 		// If tree has been uploaded, check the alignment matches the tree
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::THE_ALIGNMENT);
-		// TODO EpiAPI.setEpiAccessionsToDirty();
-		// TODO EpiAPI.validateAccessions(THE_ALIGNMENT);
+		EpiAPI::setEpiAccessionsToDirty();
+		EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
 		OptionsAPI::resetScroll();
 		OptionsAPI::resetWindowSize();
 
@@ -176,6 +193,115 @@ extern "C" {
 
 
 	}
+
+
+
+	/*
+	 * Return a list of taxa labels, as a json string
+	 */
+	void EMSCRIPTEN_KEEPALIVE getListOfTaxaLabels(){
+
+		jsonObject json;
+		jsonObject labels = json::array();
+		if (AlignmentAPI::THE_ALIGNMENT != nullptr) {
+
+			// Find all displayed taxa
+			for (Sequence* seq : AlignmentAPI::THE_ALIGNMENT->getSequences()) {
+				Taxon* taxon = seq->getTaxon();
+				if (AlignmentAPI::filtering->includeTaxon(taxon)) {
+					labels.push_back(taxon->getName());
+				}
+			}
+
+		}
+
+		json["labels"] = labels;
+		WasmAPI::messageFromWasmToJS(json.dump(0));
+
+	}
+
+
+	/**
+	 * Select the taxon
+	 * @param taxonNum
+	 */
+	void EMSCRIPTEN_KEEPALIVE selectTaxon(int taxonNum) {
+		AlignmentAPI::mostRecentlySelectedTaxon = taxonNum;
+		AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxonNum);
+		AlignmentAPI::setSelectionToDirty();
+		WasmAPI::messageFromWasmToJS("{}");
+	}
+
+	/**
+	 * Select/deselect everything between the most recently selected taxon and this one
+	 */
+	void EMSCRIPTEN_KEEPALIVE selectUpToTaxon(int newTaxonNum) {
+
+
+		jsonObject toColour = json::array();
+
+
+		// Toggle the currently selected one
+		if (newTaxonNum == AlignmentAPI::mostRecentlySelectedTaxon) {
+			bool isSelected = AlignmentAPI::THE_ALIGNMENT->selectTaxon(newTaxonNum);
+			jsonObject obj;
+			obj["i"] = newTaxonNum;
+			obj["select"] = isSelected;
+			toColour.push_back(obj);
+		}
+		else {
+
+			// Set all the selected ones to the same state as the previously selected one
+			bool setTo = AlignmentAPI::THE_ALIGNMENT->taxonIsSelected(AlignmentAPI::mostRecentlySelectedTaxon);
+
+			if (newTaxonNum > AlignmentAPI::mostRecentlySelectedTaxon) {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon+1; i <= newTaxonNum; i ++ ) {
+
+					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
+					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
+
+					AlignmentAPI::THE_ALIGNMENT->selectTaxon(i, setTo);
+					jsonObject obj;
+					obj["i"] = i;
+					obj["select"] = setTo;
+					toColour.push_back(obj);
+				}
+			}else {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon-1; i >= newTaxonNum; i -- ) {
+
+					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
+					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
+
+					AlignmentAPI::THE_ALIGNMENT->selectTaxon(i, setTo);
+					jsonObject obj;
+					obj["i"] = i;
+					obj["select"] = setTo;
+					toColour.push_back(obj);
+				}
+			}
+		}
+
+		AlignmentAPI::setSelectionToDirty();
+		WasmAPI::messageFromWasmToJS(toColour.dump(0));
+
+	}
+
+	/**
+	 * Deselect all taxa
+	 */
+	void EMSCRIPTEN_KEEPALIVE clearSelection() {
+		AlignmentAPI::THE_ALIGNMENT->clearSelection();
+		AlignmentAPI::mostRecentlySelectedTaxon=-1;
+		OptionsAPI::setFocusingOnTaxa(false);
+		OptionsAPI::setFocusOnClade(false);
+		OptionsAPI::resetWindowSize();
+		AlignmentAPI::setSelectionToDirty();
+		WasmAPI::messageFromWasmToJS("{}");
+	}
+
+
+
+
 
 
 }

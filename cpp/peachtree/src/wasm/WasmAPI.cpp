@@ -51,7 +51,7 @@ char* WasmAPI::getFromHeap(){
 
 void WasmAPI::putOnHeap(char* str){
 	cout << "Adding to heap " << strlen(str) << endl;
-	if (strlen(heap) > 0) delete heap;
+	//if (strlen(heap) > 0) delete heap;
 	heap = str;
 }
 

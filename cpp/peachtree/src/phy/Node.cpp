@@ -164,7 +164,7 @@ int Node::getLeafNodeCount(){
 /*
  * Gets all leaves in this subtree and adds them to the list
  */
-void Node::getLeafSet(vector<Node*> leaves){
+void Node::getLeafSet(vector<Node*>& leaves){
 	if (this->isLeaf()) leaves.push_back(this);
 	for (Node* child : this->children) {
 		child->getLeafSet(leaves);
@@ -304,7 +304,6 @@ string Node::getNewickMetaData(){
 string Node::getTidyMetaData(){
 
 
-
 	string str;
 	if (this->isLeaf()) {
 		str.append(this->getAcc());
@@ -355,8 +354,6 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		bool transmissionTree){
 
 
-
-
 	double x2 = this->getHeight();
 	double x2Scaled = scaling->scaleX(x2);
 	double maxY = -Utils::INFTY;
@@ -374,8 +371,6 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	// If parent node, y is midpoint between children
 	else {
 
-
-
 		for (Node* child : this->getChildren()) {
 			double ychild = child->getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
 			if (ychild != Utils::INFTY) {
@@ -391,9 +386,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			else y = y / nValidChildren;
 		}
 
-
 	}
-
 
 
 	// If this has y=infty, then do not plot the subtree
@@ -409,7 +402,6 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		// Only draw if this node is in y-range
 		if (inrangeY) {
 
-
 			jsonObject dashed_json;
 			dashed_json["ele"] = "line";
 			dashed_json["x1"] = x2Scaled;
@@ -424,14 +416,11 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 		}
 
-
-
 	}
 
 
-
 	// Shoulder
-	if (!this->isLeaf()) {
+	if (!this->isLeaf() && nValidChildren > 1) {
 
 
 		// Only draw if this node is in y-range
@@ -483,7 +472,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 	// Draw node and annotate it
-	if (nodeRadius > 0 && inrangeY) {
+	if (nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1)) {
 		jsonObject node_json;
 		node_json["ele"] = "circle";
 		node_json["cx"] = x2Scaled;
@@ -761,10 +750,24 @@ void Node::rotateChildren(){
 
 /*
  * Add case annotations
-
+*/
 void Node::addAnnotations(Case* c){
-	// TODO
+	for (string var : c->getVariables()) {
+		string val = c->getValue(var);
+		annotations[var] = val;
+	}
 }
- */
+
+
+
+
+
+
+
+
+
+
+
+
 
 

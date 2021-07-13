@@ -80,6 +80,11 @@ public:
 	static vector<Option*> getOptionList();
 	static Colouring* getSelectedColouring();
 	static void prepareTreeAnnotationOptions();
+	static bool getFocusingOnTaxa();
+	static bool getFocusOnClade();
+	static void setFocusingOnTaxa(bool val);
+	static void setFocusOnClade(bool val);
+	static void prepareEpiAnnotations();
 
 
 

@@ -15,7 +15,6 @@
 #include "../aln/Alignment.h"
 #include "../aln/Filtering.h"
 #include "../phy/Tree.h"
-#include "../aln/Alignment.h"
 #include "../lib/json.hpp"
 using namespace std;
 using jsonObject = nlohmann::json;
@@ -41,6 +40,9 @@ public:
 	static void setOrderingToDirty();
 	static void setSelectionToDirty();
 	static bool colouringIsApplicable(Colouring* colouring);
+	static Taxon* getTaxon(string label);
+	static int getTaxonRowNum(Taxon* taxon);
+
 
 
 	// Variables

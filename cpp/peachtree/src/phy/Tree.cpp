@@ -321,6 +321,9 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 	}
 
 	Node* subtree = filtering->getSubtreeRoot() != nullptr ? filtering->getSubtreeRoot() : this->root;
+
+	cout << "subtree is " << subtree->getAcc() << " root is " << this->root->getAcc() << endl;
+
 	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
 	return objs;
 
@@ -394,7 +397,7 @@ Node* Tree::getMRCA(vector<Taxon*> taxa){
 		Node* node1 = this->getNode(taxa.at(i));
 		for (int j = i+1; j < taxa.size(); j ++) {
 			Node* node2 = this->getNode(taxa.at(j));
-			Node* ancestor = getMRCA(node1, node2);
+			Node* ancestor = Tree::getMRCA(node1, node2);
 
 			// The mrca of the set of taxa is the pairwise mrca with the greatest height
 			if (mrca == nullptr || ancestor->getHeight() > mrca->getHeight()){
@@ -435,7 +438,7 @@ Node* Tree::getMRCA(Node* node1, Node* node2){
 	// Find the earliest node on this path from node2 to the root
 	node = node2;
 	while(node != nullptr) {
-		if (std::count(trace1.begin(), trace1.end(), node)) return node;
+		if (std::count(trace1.begin(), trace1.end(), node) > 0) return node;
 		//if (trace1.contains(node))
 		node = node->getParent();
 	}

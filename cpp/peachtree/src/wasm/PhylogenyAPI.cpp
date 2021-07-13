@@ -7,6 +7,7 @@
 
 #include "PhylogenyAPI.h"
 #include "AlignmentAPI.h"
+#include "EpiAPI.h"
 #include "OptionsAPI.h"
 #include "../error/Error.h"
 #include <emscripten.h>
@@ -114,8 +115,8 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 	// Sort taxa by tree
 	sortTaxaByTree(THE_TREE, alignment);
 	AlignmentAPI::setOrderingToDirty();
-	// TODO EpiAPI.setEpiAnnotationsToDirty();
-	// TODO EpiAPI.addAnnotationsToTree(THE_TREE);
+	EpiAPI::setEpiAnnotationsToDirty();
+	EpiAPI::addAnnotationsToTree(THE_TREE);
 	PhylogenyAPI::orderingIsDirty = false;
 
 
@@ -124,7 +125,7 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 	OptionsAPI::resetScroll();
 
 	auto finish = high_resolution_clock::now();
-	auto duration = duration_cast<seconds>(finish - start);
+	auto duration = duration_cast<milliseconds>(finish - start);
 
 
 
@@ -172,8 +173,8 @@ extern "C" {
 		OptionsAPI::resetScroll();
 
 		// Epidemiological annotations TODO
-		// EpiAPI.setEpiAnnotationsToDirty();
-		// EpiAPI.addAnnotationsToTree(THE_TREE);
+		EpiAPI::setEpiAnnotationsToDirty();
+		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 
 
 		auto finish = high_resolution_clock::now();
@@ -195,6 +196,22 @@ extern "C" {
 		WasmAPI::messageFromWasmToJS(j.dump(0));
 
 
+
+	}
+
+
+
+	/**
+	 * Rotate the subtree at the specified internal node
+	 * @param index
+	 * @throws Exception
+	 */
+	void EMSCRIPTEN_KEEPALIVE flipSubree(int index) {
+
+		if (PhylogenyAPI::THE_TREE != nullptr) {
+			PhylogenyAPI::THE_TREE->flipSubtree(index);
+		}
+		WasmAPI::messageFromWasmToJS("{}");
 
 	}
 

@@ -14,6 +14,7 @@
 #include "../aln/Taxon.h"
 #include "../options/Scaling.h"
 #include "../aln/Filtering.h"
+#include "../epi/Case.h"
 
 using namespace std;
 using jsonObject = nlohmann::json;
@@ -43,7 +44,7 @@ public:
 	Node* copy();
 	int getNodeCount();
 	int getLeafNodeCount();
-	void getLeafSet(vector<Node*> leaves);
+	void getLeafSet(vector<Node*>& leaves);
 	int getChildCount();
 	double getLength();
 	string tostring();
@@ -55,7 +56,7 @@ public:
 	double getYoungestChildHeight();
 	void getAllAnnotations(vector<string> annotations);
 	void rotateChildren();
-	// TODO void addAnnotations(Case* c);
+	void addAnnotations(Case* c);
 
 
 
@@ -85,3 +86,11 @@ protected:
 };
 
 #endif /* PHY_NODE_H_ */
+
+
+
+
+
+
+
+

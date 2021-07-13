@@ -9,6 +9,7 @@
 #include "OptionsAPI.h"
 #include "AlignmentAPI.h"
 #include "PhylogenyAPI.h"
+#include "EpiAPI.h"
 #include "WasmAPI.h"
 #include "../error/Error.h"
 #include "../aln/colourings/Colouring.h"
@@ -143,6 +144,25 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 
 
 
+/**
+ * Prepare epidemiology annotations
+*/
+void OptionsAPI::prepareEpiAnnotations() {
+
+
+	// Get annotations
+	vector<string> annotations = EpiAPI::getAllAnnotations();
+	vector<string> vals;
+	vals.push_back("none");
+	for (string a : annotations) vals.push_back(a);
+
+	// Options
+	OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
+
+}
+
+
+
 
 /*
  * Ready for graphics?
@@ -150,6 +170,46 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 bool OptionsAPI::isReady(){
 	return AlignmentAPI::isReady();
 }
+
+
+
+
+/**
+ * Set whether taxa are being focused on
+ * @return
+ */
+void OptionsAPI::setFocusingOnTaxa(bool val) {
+	OptionsAPI::focusOnTaxa->setVal(val);
+}
+
+
+/**
+ * Set whether a clade is being focused on
+ * @return
+ */
+void OptionsAPI::setFocusOnClade(bool val) {
+	OptionsAPI::focusOnClade->setVal(val);
+}
+
+
+
+/**
+ * Are selected taxa being focused on
+ * @return
+ */
+bool OptionsAPI::getFocusingOnTaxa() {
+	return OptionsAPI::focusOnTaxa->getVal();
+}
+
+
+/**
+ * Is a clade being focused on
+ * @return
+ */
+bool OptionsAPI::getFocusOnClade () {
+	return OptionsAPI::focusOnTaxa->getVal();
+}
+
 
 
 /**
@@ -234,7 +294,8 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	annotations.push_back("None");
 	vector<string> annotations2 = PhylogenyAPI::getAllAnnotations();
 	annotations.insert(annotations.end(), annotations2.begin(), annotations2.end());
-	//annotations.addAll(EpiAPI.getAllAnnotations());
+	vector<string> annotations3 = EpiAPI::getAllAnnotations();
+	annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
 
 	if (annotations.size() == 1) {
 		annotationFontSize->hide();
@@ -271,12 +332,12 @@ extern "C" {
 		//epiSymptomDate = null;
 
 
-		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain());
+		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain(), true);
 
 
 		// Site colour filter values
 		vector<string> domain = Colouring::getSiteColourFilters();
-		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), domain, true);
+		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), domain);
 
 
 
@@ -340,10 +401,10 @@ extern "C" {
 		AlignmentAPI::initFiltering(OptionsAPI::variantSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), (OptionsAPI::focusOnClade->getVal() ? PhylogenyAPI::getTree() : nullptr));
 
 		// Prepare tree-alignment labellings if necessary
-		// TODO PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
+		PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 
 		// Validate epi mapping
-		// TODO EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
+		EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
 
 		// Scroll bars
 		jsonObject scrolls;// = new JSONObject();
@@ -368,7 +429,6 @@ extern "C" {
 
 
 			// Scroll to a taxon?
-			/* TODO
 			if (OptionsAPI::focalTaxon != nullptr) {
 
 
@@ -385,7 +445,7 @@ extern "C" {
 				cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
 
 			}
-			*/
+
 
 			// Validate scrollY position
 			if (OptionsAPI::scrollY->getVal()*height + scaling->getScrollYLength() > height) {
@@ -664,37 +724,6 @@ extern "C" {
 
 
 
-
-
-
-
-
-
-
-	/**
-	 * Prepare epidemiology annotations
-	 * @throws Exception
-
-	void EMSCRIPTEN_KEEPALIVE prepareEpiAnnotations() throws Exception {
-
-
-		// Get annotations
-		List<string> annotations = EpiAPI.getAllAnnotations();
-		List<string> vals = new ArrayList<>();
-		vals.add("none");
-		vals.addAll(annotations);
-
-		// Options
-		epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.get(0), vals);
-
-	}
- */
-
-
-
-
-
-
 	/*
 	 * Set the value of this option
 	*/
@@ -798,16 +827,18 @@ extern "C" {
 	/**
 	 * Declare the current taxon label as the focal label so it can be zoomed in on and selected
 	 */
-	void EMSCRIPTEN_KEEPALIVE searchForTaxon(string label) {
+	void EMSCRIPTEN_KEEPALIVE searchForTaxon(char* c) {
 
-		/*
-		focalTaxon = null;
+
+		string label(c);
+
+		OptionsAPI::focalTaxon = nullptr;
 
 
 		// Get the taxon
-		Taxon taxon = AlignmentAPI.getTaxon(label);
-		if (taxon == null) {
-			System.out.println("Warning: cannot find " + label);
+		Taxon* taxon = AlignmentAPI::getTaxon(label);
+		if (taxon == nullptr) {
+			cout << "Warning: cannot find " << label << endl;
 			return;
 		}
 
@@ -815,12 +846,16 @@ extern "C" {
 
 
 		// Select it
-		taxon.isSelected(true);
+		taxon->setIsSelected(true);
 
 
 		// Set it as the focal taxon
-		focalTaxon = taxon;
-		*/
+		OptionsAPI::focalTaxon = taxon;
+
+
+		WasmAPI::messageFromWasmToJS("");
+
+
 
 	}
 
@@ -859,39 +894,6 @@ extern "C" {
 
 
 
-
-	/**
-	 * Are selected taxa being focused on
-	 * @return
-	 */
-	void EMSCRIPTEN_KEEPALIVE getFocusingOnTaxa() {
-		//return focusOnTaxa.getVal();
-	}
-
-
-	/**
-	 * Set whether taxa are being focused on
-	 * @return
-	 */
-	void EMSCRIPTEN_KEEPALIVE focusingOnTaxa(bool val) {
-		//focusOnTaxa.setVal(val);
-	}
-
-	/**
-	 * Is a clade being focused on
-	 * @return
-	 */
-	void EMSCRIPTEN_KEEPALIVE getFocusOnClade () {
-		//return focusOnClade.getVal();
-	}
-
-	/**
-	 * Set whether a clade is being focused on
-	 * @return
-	 */
-	void EMSCRIPTEN_KEEPALIVE focusOnClade(bool val) {
-		//OptionsAPI::focusOnClade->setVal(val);
-	}
 
 
 

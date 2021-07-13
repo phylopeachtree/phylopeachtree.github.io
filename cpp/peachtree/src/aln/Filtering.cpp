@@ -32,31 +32,25 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 	// Use the tree to find taxa
 	if (tree != nullptr) {
 
-		/*
-		 *
-		 * TODO
-
 		this->tree = tree;
 
 		// Find selected taxa
-		List<Taxon> selected = new ArrayList<>();
-		for (Sequence seq : alignment.getSequences()) {
-			Taxon taxon = seq.getTaxon();
-			if (taxon.isSelected()) selected.add(taxon);
+		vector<Taxon*> selected;
+		for (Sequence* seq : alignment->getSequences()) {
+			Taxon* taxon = seq->getTaxon();
+			if (taxon->getIsSelected()) selected.push_back(taxon);
 		}
 
 
 		// Find their mrca and take the full clade
-		selected = tree.getClade(selected);
-		this->subtree = tree.getMRCA(selected);
+		selected = tree->getClade(selected);
+		this->subtree = tree->getMRCA(selected);
 
 
 		// Select the ones to include
-		for (Taxon taxon : selected) {
-			taxon.isSelected(true);
+		for (Taxon* taxon : selected) {
+			taxon->setIsSelected(true);
 		}
-
-		*/
 
 	}
 

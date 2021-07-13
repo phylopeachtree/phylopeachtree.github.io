@@ -189,10 +189,11 @@ function initUtil(){
 						throw {message: "Cannot open file"};
 					}
 					var contents = e.target.result;
-					cjCall("peachtree.epi.EpiAPI", "uploadEpi", contents).then(function(val){
+					callWasmFunction("uploadEpi", [contents], function(val){
+					//cjCall("peachtree.epi.EpiAPI", "uploadEpi", contents).then(function(val){
 						
 						try {
-							var val = JSON.parse(cjStringJavaToJs(val));
+							//var val = JSON.parse(cjStringJavaToJs(val));
 							console.log(val);
 							if (val.err != null) {
 								throw {message: val.err};
@@ -204,7 +205,7 @@ function initUtil(){
 						
 				
 						return plotUploadSuccessMsg(file.name, val.time, "#epi_upload");
-					});
+					}, true);
 					
 					
 				}catch(err){
@@ -608,7 +609,8 @@ function toggleTaxon(ele){
 	
 	// Inform the model
 	let index = parseFloat(ele.attr("i"));
-	cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
+	callWasmFunction("selectTaxon", [index]);
+	//cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
 	
 }
 
@@ -622,9 +624,10 @@ function selectUpToTaxon(ele){
 	
 	// Inform the model
 	let index = parseFloat(ele.attr("i"));
-	cjCall("peachtree.aln.AlignmentAPI", "selectUpToTaxon", index).then(function(val){
+	callWasmFunction("selectUpToTaxon", [index], function(objects) {
+		//cjCall("peachtree.aln.AlignmentAPI", "selectUpToTaxon", index).then(function(val){
 
-		var objects = JSON.parse(cjStringJavaToJs(val));
+		//var objects = JSON.parse(cjStringJavaToJs(val));
 		for (let i = 0; i < objects.length; i ++){
 			
 
@@ -654,7 +657,8 @@ function flipSubtree(ele){
 	let index = parseFloat(ele.attr("i"));
 	console.log("flipping " + index)
 
-	cjCall("peachtree.phy.PhylogenyAPI", "flipSubree", index).then(function(val){
+	callWasmFunction("flipSubree", [index], function(val){
+	//cjCall("peachtree.phy.PhylogenyAPI", "flipSubree", index).then(function(val){
 		renderGraphics();
 	});
 
@@ -667,7 +671,9 @@ function clearSelection(){
 	//if ($("#svg .taxon.selected").length == 0) return;
 	$("#svg").find(".taxon.selected").removeClass("selected");
 	updateSelectionCSS();
-	cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
+	callWasmFunction("clearSelection", [], function(val) {
+	//callWasmFunction("clearSelection", [], function(val){
+	//cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
 		renderGraphics();
 	});
 	
@@ -720,10 +726,14 @@ function updateSelectionCSS(){
 	Populates the taxon search bar auto complete
 */
 function populateTaxonSearchBar(){
-	cjCall("peachtree.aln.AlignmentAPI", "getListOfTaxaLabels").then(function(val){
+
+
+	callWasmFunction("getListOfTaxaLabels", [], function(results){
+	//cjCall("peachtree.aln.AlignmentAPI", "getListOfTaxaLabels").then(function(val){
+	//cjCall("peachtree.aln.AlignmentAPI", "getListOfTaxaLabels").then(function(val){
 		
 		
-		var results = JSON.parse(cjStringJavaToJs(val));
+		//var results = JSON.parse(cjStringJavaToJs(val));
 		if (results.err != null){
 			console.log(results.err);
 		}else{
@@ -756,7 +766,8 @@ function searchForTaxon(){
 	setTimeout(function() {
 		let label = $("#taxon_search_input").val();
 		console.log("searchForTaxon", label);
-		cjCall("peachtree.options.OptionsAPI", "searchForTaxon", label).then(function(){
+		callWasmFunction("searchForTaxon", [label], function(results){
+		//cjCall("peachtree.options.OptionsAPI", "searchForTaxon", label).then(function(){
 			renderGraphics();
 		});
 		

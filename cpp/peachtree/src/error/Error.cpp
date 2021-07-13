@@ -14,7 +14,7 @@ bool Error::thrown = false;
  * Throw an error as per usual
  */
 void Error::throwError(string msg){
-	Error::thrown = true;
+	//Error::thrown = true;
 	throw runtime_error(msg);
 }
 
@@ -23,12 +23,12 @@ void Error::throwError(string msg){
  * Was an error thrown?
  */
 bool Error::wasError(){
-	return Error::thrown;
+	return false; //Error::thrown;
 }
 
 /*
  * Clear error
  */
 void Error::clear(){
-	Error::thrown = false;
+	//Error::thrown = false;
 }

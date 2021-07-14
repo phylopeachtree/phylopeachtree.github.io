@@ -35,6 +35,7 @@ public:
 	bool isAboveRangeX(double x);
 	bool isAboveRangeX(double x, double margin);
 	double scaleX(double x);
+	void cleanup();
 
 	double getXmax();
 	double getXmin();

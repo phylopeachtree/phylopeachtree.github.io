@@ -46,6 +46,9 @@ public:
 	string getSymbol(int site);
 	void editSiteInt(int siteNum, int newSymbol);
 	double getY0(int seqNum, Scaling* scaling);
+	void cleanup();
+
+
 private:
 
 	Taxon* taxon;

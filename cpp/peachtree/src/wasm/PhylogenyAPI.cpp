@@ -43,6 +43,7 @@ vector<string> PhylogenyAPI::getAllAnnotations(){
  * Sort the taxa in the alignment by the tree
  */
 void PhylogenyAPI::sortTaxaByTree(Tree* tree, Alignment* alignment){
+	if (alignment == nullptr) return;
 	alignment->sortByTree(tree);
 }
 
@@ -66,6 +67,21 @@ double PhylogenyAPI::getHeight(){
 
 bool PhylogenyAPI::isReady(){
 	return PhylogenyAPI::THE_TREE != nullptr;
+}
+
+
+
+
+void PhylogenyAPI::cleanup(){
+	if (PhylogenyAPI::THE_TREE != nullptr){
+		PhylogenyAPI::THE_TREE->cleanup();
+		delete PhylogenyAPI::THE_TREE;
+		PhylogenyAPI::THE_TREE = nullptr;
+	}
+
+	AlignmentAPI::filtering = nullptr;
+	AlignmentAPI::selectionIsDirty = false;
+	AlignmentAPI::mostRecentlySelectedTaxon = -1;
 }
 
 
@@ -103,6 +119,8 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 
 	//String str = new String(contents);
 	//cout << "Creating tree " << method << endl;
+
+	PhylogenyAPI::cleanup();
 
 
 	auto start = high_resolution_clock::now();
@@ -146,9 +164,8 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE uploadTree() {
 
 		char* str = WasmAPI::getFromHeap();
-		AlignmentAPI::filtering = nullptr;
-		AlignmentAPI::selectionIsDirty = false;
-		AlignmentAPI::mostRecentlySelectedTaxon = -1;
+
+		PhylogenyAPI::cleanup();
 
 		cout << "uploading tree " << strlen(str) << endl;
 
@@ -182,7 +199,7 @@ extern "C" {
 
 
 		if (Error::wasError()) {
-			PhylogenyAPI::THE_TREE = nullptr;
+			PhylogenyAPI::cleanup();
 			return;
 		}
 

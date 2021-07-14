@@ -25,7 +25,7 @@ int Alignment::gapAlphaIndex;
 
 
 
-Alignment::Alignment(string fasta) {
+Alignment::Alignment(string& fasta) {
 
 
 	if (Alignment::nt_chars.size() == 0) this->prepareAlignmentChars();
@@ -120,6 +120,25 @@ Alignment::Alignment(string fasta) {
 }
 
 
+/*
+ * Clear memory
+ */
+void Alignment::cleanup(){
+
+	for (vector<int> patt : patterns){
+		patt.clear();
+	}
+	this->patterns.clear();
+	this->patternWeights.clear();
+
+	for (Sequence* seq : this->sequences){
+		seq->cleanup();
+		delete seq;
+	}
+	this->sequences.clear();
+}
+
+
 /**
  * Initialise site patterns
  */
@@ -196,7 +215,10 @@ void Alignment::initPatterns(){
  */
 void Alignment::parseSequence(string acc, string seq, int seqID){
 
+
 	Sequence* sequence = new Sequence(seqID, acc, seq, this->isNucleotide);
+
+
 	if (this->sequences.empty()) {
 		this->alignmentLength = sequence->getLength();
 		this->isNucleotide = sequence->getIsNucleotide();
@@ -204,10 +226,7 @@ void Alignment::parseSequence(string acc, string seq, int seqID){
 
 		// All sequences must have same length
 		if (sequence->getLength() != alignmentLength) {
-			string err = "Cannot parse sequence ";
-			err.append(sequence->getAcc());
-			err.append(" because of length mismatch (");
-			err.append(to_string(sequence->getLength()));
+			string err = "Cannot parse sequence " + sequence->getAcc() + " because of length mismatch (" + to_string(sequence->getLength());
 			err.append(" != ");
 			err.append(to_string(alignmentLength));
 			err.append(")");
@@ -612,16 +631,12 @@ void Alignment::prepareAlignmentChars(){
 
 
 
-
 	Alignment::ambiguousNtIndex = -1;
 	Alignment::ambiguousAlphaIndex = -1;
 	Alignment::gapNtIndex = -1;
 	Alignment::gapAlphaIndex = -1;
 	Alignment::nt_chars.clear();
 	Alignment::alpha_chars.clear();
-
-
-
 
 
 	// Nucleotide

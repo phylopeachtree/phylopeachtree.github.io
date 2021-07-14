@@ -19,7 +19,7 @@ Sequence::Sequence(int id, string acc, string seq, bool couldBeNucleotide){
 	this->isNucleotide = true;
 	seqLen = seq.length();
 	if (couldBeNucleotide) {
-		this->sequenceArr.resize(this->seqLen);// = new int[this.seqLen];
+		this->sequenceArr.resize(this->seqLen);
 		string c;
 		for (int i = 0; i < seq.length(); i ++) {
 
@@ -34,6 +34,15 @@ Sequence::Sequence(int id, string acc, string seq, bool couldBeNucleotide){
 		}
 	}
 
+}
+
+
+/*
+ * Clear memory
+ */
+void Sequence::cleanup(){
+	//this->sequenceArr.clear();
+	delete taxon;
 }
 
 /**
@@ -55,7 +64,7 @@ void Sequence::prepareArray(){
 
 	//System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
 	//System.out.println("'" + this.sequence + "'");
-	this->sequenceArr.resize(this->seqLen); // = new int[this.seqLen];
+	this->sequenceArr.resize(this->seqLen);
 	for (int i = 0; i < this->seqLen; i ++) {
 		string site = this->sequence.substr(i, 1);
 		int val;

@@ -52,8 +52,13 @@ int main() {
 	cout << arr.dump(2) << endl;
 	*/
 
-	Alignment* aln = new Alignment(">aaa\nacgtacgt");
+	string str = ">aaa\nacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgtacgt";
+	//Alignment* aln;
 
+	for (int i = 0; i < 10; i ++){
+		Alignment* aln = new Alignment(str);
+		//aln->cleanup();
+	}
 
 
 	return 0;

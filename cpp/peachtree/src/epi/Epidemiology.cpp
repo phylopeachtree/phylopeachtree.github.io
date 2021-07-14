@@ -139,6 +139,17 @@ vector<string> Epidemiology::getAnnotations(){
 }
 
 
+
+/*
+ * Cleanup
+ */
+void Epidemiology::cleanup(){
+	for (Case* c: cases){
+		delete c;
+	}
+}
+
+
 /*
  * Validate the accessions in the alignment
  */

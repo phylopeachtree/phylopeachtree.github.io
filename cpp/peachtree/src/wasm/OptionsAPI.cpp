@@ -259,7 +259,12 @@ void OptionsAPI::prepareColourings() {
 
 	}
 
+	if (colourings != nullptr){
+		colourings->cleanup();
+		delete colourings;
+	}
 	colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", colourClassNames.at(0), colourClassNames);
+
 
 }
 
@@ -307,6 +312,10 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 
 	annotationFontSize->show();
 	annotationRounding->show();
+	internalNodeLabels->cleanup();
+	leafNodeLabels->cleanup();
+	delete internalNodeLabels;
+	delete leafNodeLabels;
 	internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.at(0), annotations);
 	leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.at(0), annotations);
 
@@ -322,22 +331,19 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE init(){
 
 
-		// TODO
 		cout << "Initialising options..." << endl;
 		OptionsAPI::graphicalObjects.clear();
 		OptionsAPI::focalTaxon = nullptr;
 
 		OptionsAPI::internalNodeLabels = nullptr;
 		OptionsAPI::leafNodeLabels = nullptr;
-		//epiSymptomDate = null;
-
+		// TODO epiSymptomDate = null;
 
 		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain(), true);
 
 
 		// Site colour filter values
-		vector<string> domain = Colouring::getSiteColourFilters();
-		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), domain);
+		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), Colouring::getSiteColourFilters());
 
 
 
@@ -407,7 +413,7 @@ extern "C" {
 		EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
 
 		// Scroll bars
-		jsonObject scrolls;// = new JSONObject();
+		jsonObject scrolls;
 
 
 		// Height of taxa
@@ -453,6 +459,11 @@ extern "C" {
 			}
 			scrolls["scrollY"] = OptionsAPI::scrollY->getVal()*height;
 			scrolls["scrollYLength"] = scaling->getScrollYLength();
+
+			scaling->cleanup();
+			delete scaling;
+
+
 		}else {
 			OptionsAPI::canvasHeight->setVal(fullHeight);
 			height = OptionsAPI::canvasHeight->getVal();

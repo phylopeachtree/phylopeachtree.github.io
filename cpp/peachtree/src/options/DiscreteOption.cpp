@@ -34,7 +34,10 @@ jsonObject DiscreteOption::toJSON() {
 	jsonObject arr;
 	json["value"] = this->value;
 	json["type"] = "DiscreteOption";
-	for (string dom : this->domain) arr.push_back(dom);
+	for (int i = 0; i < this->domain.size(); i ++){
+		string dom = this->domain.at(i);
+		arr.push_back(dom);
+	}
 	json["domain"] = arr;
 	json = modifyJSON(json);
 	return json;
@@ -51,7 +54,8 @@ vector<string> DiscreteOption::getDomain(){
 }
 
 void DiscreteOption::setVal(string value) {
-	for (string dom : this->domain){
+	for (int i = 0; i < this->domain.size(); i ++){
+		string dom = this->domain.at(i);
 		if (dom == value){
 			this->value = value;
 			return;
@@ -61,7 +65,11 @@ void DiscreteOption::setVal(string value) {
 }
 
 
-
+void DiscreteOption::cleanup(){
+	//this->domain->clear();
+	//this->value.clear();
+	//delete this->domain;
+}
 
 
 

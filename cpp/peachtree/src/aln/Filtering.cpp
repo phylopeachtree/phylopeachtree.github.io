@@ -83,8 +83,6 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 
 
 	// Which sites to include?
-	//this->sitesToIncludeMap = new LinkedHashMap<>();
-	//this->sitesToIncludeList = new ArrayList<>();
 	if (this->variantSitesOnly) {
 		for (int site = 0; site < alignment->getLength(); site ++) {
 
@@ -208,6 +206,18 @@ vector<int> Filtering::getSites(){
 
 
 
+void Filtering::cleanup(){
+	if (this->subtree != nullptr) {
+		this->subtree->cleanup();
+		delete this->subtree;
+	}
+	this->taxaIDsToInclude.clear();
+	this->sitesToIncludeMap.clear();
+	this->sitesToIncludeList.clear();
+	this->majors.clear();
+}
+
+
 /**
  * Number of sites included by filter
  * @return
@@ -275,7 +285,7 @@ int Filtering::getNumUniqueSequences(){
 
 
 	// Get list of sequences
-	vector<Sequence*> seqsToInclude; // = new ArrayList<>();
+	vector<Sequence*> seqsToInclude;
 	Alignment* aln = this->alignment;
 	for (Sequence* seq : aln->getSequences()) {
 		if (this->includeTaxon(seq->getTaxon())) {
@@ -286,7 +296,7 @@ int Filtering::getNumUniqueSequences(){
 
 
 	// Create a list of sequence classes and try to match each subsequent sequence to a class
-	vector<Sequence*> seqClasses; // = new ArrayList<>();
+	vector<Sequence*> seqClasses;
 	Sequence* copy = seqsToInclude.at(0)->copy();
 	seqClasses.push_back(copy);
 
@@ -399,7 +409,7 @@ void Filtering::prepareMajorAlleles(Alignment* alignment){
 
 	this->majors.clear();
 	if (numTaxa < 2 || this->sitesToIncludeList.empty()) return;
-	std::map<int, int> freqs; // = new HashMap<>();
+	std::map<int, int> freqs;
 	int siteNum, count, character;
 	for (int s = 0; s < this->numSites; s ++) {
 

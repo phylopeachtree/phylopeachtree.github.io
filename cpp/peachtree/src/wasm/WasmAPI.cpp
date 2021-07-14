@@ -44,14 +44,14 @@ void WasmAPI::messageFromWasmToJS(const string & msg) {
 char* WasmAPI::getFromHeap(){
 	cout << "Getting from heap " << strlen(WasmAPI::heap) << endl;
 	char* toReturn = WasmAPI::heap;
-	heap = NULL;
+
 	return toReturn;
 }
 
 
 void WasmAPI::putOnHeap(char* str){
 	cout << "Adding to heap " << strlen(str) << endl;
-	//if (strlen(heap) > 0) delete heap;
+	//delete []heap;
 	heap = str;
 }
 

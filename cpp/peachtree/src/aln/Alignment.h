@@ -31,7 +31,7 @@ using json = nlohmann::json;
 class Alignment {
 public:
 
-	Alignment(string fasta);
+	Alignment(string& fasta);
 
 	static int getNucleotideInt(string val);
 	static int getAlphaInt(string val);
@@ -43,11 +43,13 @@ public:
 	static void prepareAlignmentChars();
 
 
+
 	Sequence* getSequence(int i);
 	vector<Sequence*> getSequences();
 	bool getIsNucleotide();
 	int getLength();
 	int getNtaxa();
+	void cleanup();
 
 
 	void sortByTree(Tree* tree);

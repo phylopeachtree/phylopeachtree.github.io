@@ -79,6 +79,13 @@ vector<string> EpiAPI::getAllAnnotations(){
 }
 
 
+void EpiAPI::cleanup(){
+	EPIDEMIOLOGY->cleanup();
+	delete EPIDEMIOLOGY;
+	EPIDEMIOLOGY = nullptr;
+}
+
+
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
@@ -92,6 +99,8 @@ extern "C" {
 
 		auto start = high_resolution_clock::now();
 
+
+		EpiAPI::cleanup();
 
 		EpiAPI::EPIDEMIOLOGY = new Epidemiology();
 		EpiAPI::EPIDEMIOLOGY->parseFile(contents);
@@ -107,7 +116,7 @@ extern "C" {
 
 
 		if (Error::wasError()) {
-			EpiAPI::EPIDEMIOLOGY = nullptr;
+			EpiAPI::cleanup();
 			return;
 		}
 

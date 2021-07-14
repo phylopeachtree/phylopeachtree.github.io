@@ -50,6 +50,7 @@ public:
 	int getIndex(Taxon* taxon);
 	int getNumUniqueSequences();
 	void prepareMajorAlleles(Alignment* alignment);
+	void cleanup();
 
 
 private:

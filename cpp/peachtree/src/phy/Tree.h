@@ -53,6 +53,7 @@ public:
 	Node* getMRCA(Node* node1, Node* node2);
 	vector<string> getAllAnnotations();
 	void flipSubtree(int index);
+	void cleanup();
 
 
 

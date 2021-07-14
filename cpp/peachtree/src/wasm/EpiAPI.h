@@ -25,6 +25,7 @@ public:
 	static void validateAccessions(Alignment* alignment);
 	static void addAnnotationsToTree(Tree* tree);
 	static vector<string> getAllAnnotations();
+	static void cleanup();
 
 
 	static Epidemiology* EPIDEMIOLOGY;

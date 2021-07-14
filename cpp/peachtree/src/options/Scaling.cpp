@@ -248,6 +248,11 @@ double Scaling::getCanvasMaxY(){
 }
 
 
+void Scaling::cleanup(){
+	// Nothing to do
+}
+
+
 /**
  * Is the width and height > 0
  * @return

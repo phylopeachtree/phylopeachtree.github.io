@@ -42,6 +42,7 @@ public:
 	static bool colouringIsApplicable(Colouring* colouring);
 	static Taxon* getTaxon(string label);
 	static int getTaxonRowNum(Taxon* taxon);
+	static void cleanup();
 
 
 

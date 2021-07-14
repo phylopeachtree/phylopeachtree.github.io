@@ -26,6 +26,7 @@ public:
 	vector<string> getAnnotations();
 	void addAnnotationsToTree(Tree* tree);
 	void validateAccessions(Alignment* alignment);
+	void cleanup();
 
 private:
 	vector<Case*> cases;

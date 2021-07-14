@@ -122,6 +122,7 @@ onmessage = function(e) {
 
 
     // Large data?
+    var bufferPtr = null;
     if (useHeap){
 
         //console.log("A lot of data. Using malloc")
@@ -137,12 +138,12 @@ onmessage = function(e) {
                 console.log(param, "is a large string", p.length);
 
                 const bufferSize = lengthBytesUTF8(p);
-                const bufferPtr = Module._malloc(bufferSize + 1);
+                bufferPtr = Module._malloc(bufferSize + 1);
                 stringToUTF8(p, bufferPtr, bufferSize + 1);
 
-                const putOnHeap = Module.cwrap('putOnHeap', null, ['number']); // not 'string', pointer is a number
+                const putOnHeap = Module.cwrap("putOnHeap", null, ["number"]); // Pointer is a number
                 putOnHeap(bufferPtr);
-                Module._free(bufferPtr);
+                
 
                 params.splice(param, 1);
                 types.splice(param, 1);
@@ -186,6 +187,7 @@ onmessage = function(e) {
 
     // Resolve
     var resolve = function(resultStr) {
+        if (bufferPtr != null) Module._free(bufferPtr);
         var json = {msgID: id, result: resultStr}
         postMessage(JSON.stringify(json));
     }

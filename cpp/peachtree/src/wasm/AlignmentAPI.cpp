@@ -144,6 +144,25 @@ bool AlignmentAPI::colouringIsApplicable(Colouring* colouring){
 	return AlignmentAPI::THE_ALIGNMENT->getIsNucleotide() == colouring->isNucleotide();
 }
 
+
+void AlignmentAPI::cleanup(){
+	if (AlignmentAPI::THE_ALIGNMENT != nullptr) {
+		AlignmentAPI::THE_ALIGNMENT->cleanup();
+		delete AlignmentAPI::THE_ALIGNMENT;
+		AlignmentAPI::THE_ALIGNMENT = nullptr;
+	}
+	if (AlignmentAPI::filtering != nullptr){
+		AlignmentAPI::filtering->cleanup();
+		delete AlignmentAPI::filtering;
+		AlignmentAPI::filtering = nullptr;
+	}
+
+
+	AlignmentAPI::selectionIsDirty = false;
+	AlignmentAPI::mostRecentlySelectedTaxon = -1;
+
+}
+
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
@@ -151,17 +170,18 @@ extern "C" {
 
 
 		auto start = high_resolution_clock::now();
-
 		char* str = WasmAPI::getFromHeap();
-		AlignmentAPI::filtering = nullptr;
-		AlignmentAPI::selectionIsDirty = false;
-		AlignmentAPI::mostRecentlySelectedTaxon = -1;
+
+		AlignmentAPI::cleanup();
+
 
 		cout << "uploading alignment " << strlen(str) << endl;
 
 
 		string fasta(str);
 		AlignmentAPI::THE_ALIGNMENT = new Alignment(fasta);
+
+
 		AlignmentAPI::initFiltering(OptionsAPI::getVariantSitesOnly(), false, nullptr);
 		OptionsAPI::prepareColourings();
 
@@ -181,7 +201,7 @@ extern "C" {
 
 
 		if (Error::wasError()) {
-			AlignmentAPI::THE_ALIGNMENT = nullptr;
+			AlignmentAPI::cleanup();
 			return;
 		}
 
@@ -190,6 +210,8 @@ extern "C" {
 		json j;
 		j["time"] = duration.count();
 		WasmAPI::messageFromWasmToJS(j.dump(0));
+
+
 
 
 	}

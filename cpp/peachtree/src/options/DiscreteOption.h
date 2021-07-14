@@ -26,6 +26,7 @@ public:
 	string getVal();
 	vector<string> getDomain();
 	void setVal(string val);
+	void cleanup();
 
 private:
 	vector<string> domain;

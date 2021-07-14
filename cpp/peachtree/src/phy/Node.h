@@ -57,7 +57,7 @@ public:
 	void getAllAnnotations(vector<string> annotations);
 	void rotateChildren();
 	void addAnnotations(Case* c);
-
+	void cleanup();
 
 
 

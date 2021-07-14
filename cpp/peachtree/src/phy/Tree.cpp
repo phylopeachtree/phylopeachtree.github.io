@@ -31,6 +31,19 @@ bool Tree::getParsedFromFile(){
 
 
 /*
+ * Cleanup
+ */
+void Tree::cleanup(){
+
+	for (Node* node : nodes){
+		//node->cleanup();
+		delete node;
+	}
+
+}
+
+
+/*
  * Parse from nexus/newick
  */
 void Tree::parseFromNexus(string nexus){

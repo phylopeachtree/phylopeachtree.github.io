@@ -29,6 +29,7 @@ public:
 	static double getHeight();
 	static jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
+	static void cleanup();
 
 	//Variables
 	static Tree* THE_TREE;

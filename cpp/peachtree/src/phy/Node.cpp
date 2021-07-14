@@ -171,6 +171,14 @@ void Node::getLeafSet(vector<Node*>& leaves){
 	}
 }
 
+
+/*
+ * Cleanup
+ */
+void Node::cleanup(){
+	// Nothing to do
+}
+
 /*
  * Number of immediate children
  */

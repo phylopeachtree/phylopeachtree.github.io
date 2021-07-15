@@ -22,6 +22,7 @@ class DiscreteOption : public Option {
 public:
 	DiscreteOption(string name, string section, string title, string value, vector<string> domain);
 	DiscreteOption(string name, string section, string title, string value, vector<string> domain, bool hide);
+	void setValAndDomain(string value, vector<string> domain);
 	virtual jsonObject toJSON() override;
 	string getVal();
 	vector<string> getDomain();

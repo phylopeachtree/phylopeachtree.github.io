@@ -54,7 +54,7 @@ public:
 			bool transmissionTree);
 	void parseFromNewick(string newick);
 	double getYoungestChildHeight();
-	void getAllAnnotations(vector<string> annotations);
+	void getAllAnnotations(vector<string>& annots);
 	void rotateChildren();
 	void addAnnotations(Case* c);
 	void cleanup();

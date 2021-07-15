@@ -66,6 +66,7 @@ double PhylogenyAPI::getHeight(){
 }
 
 bool PhylogenyAPI::isReady(){
+	cout << "phy ready " << (PhylogenyAPI::THE_TREE != nullptr) << endl;
 	return PhylogenyAPI::THE_TREE != nullptr;
 }
 
@@ -89,10 +90,16 @@ void PhylogenyAPI::cleanup(){
  * Prepare the labelling between tree and alignment if necessary
  */
 void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
-	if (alignment == nullptr) return;
 	if (THE_TREE == nullptr) return;
 	if (!orderingIsDirty) return;
-	PhylogenyAPI::sortTaxaByTree(THE_TREE, alignment);
+	if (alignment == nullptr) {
+		// Make a mock alignment so that taxa exist
+		AlignmentAPI::makeMockAlignment(THE_TREE);
+	}else{
+		PhylogenyAPI::sortTaxaByTree(THE_TREE, alignment);
+	}
+
+
 	AlignmentAPI::setOrderingToDirty();
 	orderingIsDirty = false;
 }
@@ -180,7 +187,10 @@ extern "C" {
 		PhylogenyAPI::orderingIsDirty = true;
 
 
-
+		if (Error::wasError()) {
+			PhylogenyAPI::cleanup();
+			return;
+		}
 
 		// If alignment has been uploaded, check it matches the tree
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
@@ -198,10 +208,7 @@ extern "C" {
 		auto duration = duration_cast<seconds>(finish - start);
 
 
-		if (Error::wasError()) {
-			PhylogenyAPI::cleanup();
-			return;
-		}
+
 
 		cout << "Parsed tree successfully (" << duration.count() << "s)" << endl;
 

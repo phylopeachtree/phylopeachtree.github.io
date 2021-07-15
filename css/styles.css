@@ -99,7 +99,7 @@ body {
 .uploader {
 	height:20em;
 	border-style:dashed;
-	border-width: 0.05em;
+	border-width: 0.1em;
 	color:#333;
 	%padding:0;
 	border-color:black;
@@ -110,6 +110,7 @@ body {
 	%overflow-x:auto;
 	%max-width:800px;
 }
+
 
 
 .uploader.top{
@@ -165,6 +166,15 @@ body {
 	%padding: 1em;
 }
 
+.uploader.loading{
+	background-color:white;
+	box-shadow:none;
+}
+
+.uploader.loading:hover{
+	background-color:white;
+	box-shadow:none;
+}
 
 
 

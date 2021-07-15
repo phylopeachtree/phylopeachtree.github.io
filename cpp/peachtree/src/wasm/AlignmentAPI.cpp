@@ -28,6 +28,7 @@ int AlignmentAPI::mostRecentlySelectedTaxon = -1;
  * Is the alignment ready to render?
  */
 bool AlignmentAPI::isReady(){
+	cout << "aln ready " << (AlignmentAPI::THE_ALIGNMENT != nullptr) << endl;
 	return AlignmentAPI::THE_ALIGNMENT != nullptr;
 }
 
@@ -162,6 +163,27 @@ void AlignmentAPI::cleanup(){
 	AlignmentAPI::mostRecentlySelectedTaxon = -1;
 
 }
+
+
+/*
+ * Make a mock alignment so that taxa are labelled
+ */
+void AlignmentAPI::makeMockAlignment(Tree* tree){
+
+	AlignmentAPI::cleanup();
+	AlignmentAPI::THE_ALIGNMENT = new Alignment(tree);
+
+	//AlignmentAPI::initFiltering(OptionsAPI::getVariantSitesOnly(), tree, nullptr);
+	OptionsAPI::prepareColourings();
+
+	EpiAPI::setEpiAccessionsToDirty();
+	EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
+	OptionsAPI::resetWindowSize();
+
+}
+
+
+
 
 // Interface between javascript and cpp for webassembly
 extern "C" {

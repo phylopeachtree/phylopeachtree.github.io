@@ -29,6 +29,12 @@ DiscreteOption::DiscreteOption(string name, string section, string title, string
 }
 
 
+void DiscreteOption::setValAndDomain(string value, vector<string> domain){
+	this->domain = domain;
+	this->setVal(value);
+}
+
+
 jsonObject DiscreteOption::toJSON() {
 	jsonObject json;
 	jsonObject arr;
@@ -66,9 +72,8 @@ void DiscreteOption::setVal(string value) {
 
 
 void DiscreteOption::cleanup(){
-	//this->domain->clear();
-	//this->value.clear();
-	//delete this->domain;
+
+
 }
 
 

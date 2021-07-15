@@ -25,6 +25,8 @@ int Alignment::gapAlphaIndex;
 
 
 
+
+
 Alignment::Alignment(string& fasta) {
 
 
@@ -35,10 +37,8 @@ Alignment::Alignment(string& fasta) {
 		return;
 	}
 
-	this->sequences.clear();
 	this->alignmentLength = -1;
 	this->isNucleotide = true;
-
 
 
 	// Parse fasta
@@ -118,6 +118,30 @@ Alignment::Alignment(string& fasta) {
 
 
 }
+
+
+
+/**
+ * Prepare an empty alignment around tree sequences
+ */
+Alignment::Alignment(Tree* tree){
+
+	this->alignmentLength = 0;
+	this->isNucleotide = true;
+
+	int i = 0;
+	for (Node* leaf : tree->getLeavesAsArray()){
+		Sequence* seq = new Sequence(i, leaf->getAcc(), "", true);
+		this->sequences.push_back(seq);
+		i++;
+	}
+
+	cout << "Created a mock alignment with " << this->alignmentLength << " sites and " << this->sequences.size() << " taxa " << endl;
+
+}
+
+
+
 
 
 /*

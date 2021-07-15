@@ -43,6 +43,7 @@ public:
 	static Taxon* getTaxon(string label);
 	static int getTaxonRowNum(Taxon* taxon);
 	static void cleanup();
+	static void makeMockAlignment(Tree* tree);
 
 
 

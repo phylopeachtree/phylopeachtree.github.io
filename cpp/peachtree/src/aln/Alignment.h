@@ -32,6 +32,7 @@ class Alignment {
 public:
 
 	Alignment(string& fasta);
+	Alignment(Tree* tree);
 
 	static int getNucleotideInt(string val);
 	static int getAlphaInt(string val);

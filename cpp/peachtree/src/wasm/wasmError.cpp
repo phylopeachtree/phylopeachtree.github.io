@@ -10,7 +10,8 @@ bool Error::thrown = false;
  * Throw an error using webassembly
  */
 void Error::throwError(string msg){
-	 WasmAPI::returnErrorJSON(msg);
+	Error::thrown = true;
+	WasmAPI::returnErrorJSON(msg);
 	 //std::abort();
 }
 

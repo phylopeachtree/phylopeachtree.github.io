@@ -731,13 +731,15 @@ double Node::getYoungestChildHeight(){
 /*
  * Populate the list with a unique list of annotations in the subtree
  */
-void Node::getAllAnnotations(vector<string> annotations){
+void Node::getAllAnnotations(vector<string>& annots){
 	for (const auto &pair : this->annotations) {
 		string key = pair.first;
-		if (this->annotations.count(key) == 0) annotations.push_back(key);
+		if (std::count(annots.begin(), annots.end(), key) == 0) {
+			annots.push_back(key);
+		}
 	}
 	for (Node* child : this->getChildren()) {
-		child->getAllAnnotations(annotations);
+		child->getAllAnnotations(annots);
 	}
 }
 

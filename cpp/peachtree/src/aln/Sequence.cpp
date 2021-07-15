@@ -18,19 +18,21 @@ Sequence::Sequence(int id, string acc, string seq, bool couldBeNucleotide){
 	// Is it nucleotide or amino acid?
 	this->isNucleotide = true;
 	seqLen = seq.length();
-	if (couldBeNucleotide) {
-		this->sequenceArr.resize(this->seqLen);
-		string c;
-		for (int i = 0; i < seq.length(); i ++) {
+	if (seqLen > 0){
+		if (couldBeNucleotide) {
+			this->sequenceArr.resize(this->seqLen);
+			string c;
+			for (int i = 0; i < seq.length(); i ++) {
 
-			c = seq.at(i);
-			int val = Alignment::getNucleotideInt(c);
-			if (val == -1) {
-				this->isNucleotide = false;
-				return;
+				c = seq.at(i);
+				int val = Alignment::getNucleotideInt(c);
+				if (val == -1) {
+					this->isNucleotide = false;
+					return;
+				}
+
+				this->sequenceArr.at(i) = val;
 			}
-
-			this->sequenceArr.at(i) = val;
 		}
 	}
 
@@ -61,6 +63,8 @@ Sequence* Sequence::copy(){
  */
 void Sequence::prepareArray(){
 
+
+	if (this->seqLen == 0) return;
 
 	//System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
 	//System.out.println("'" + this.sequence + "'");

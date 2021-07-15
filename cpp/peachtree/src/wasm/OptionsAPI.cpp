@@ -157,7 +157,12 @@ void OptionsAPI::prepareEpiAnnotations() {
 	for (string a : annotations) vals.push_back(a);
 
 	// Options
-	OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
+	if (OptionsAPI::epiSymptomDate == nullptr){
+		OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
+	}else{
+		OptionsAPI::epiSymptomDate->setValAndDomain(vals.at(0), vals);
+	}
+
 
 }
 
@@ -168,7 +173,7 @@ void OptionsAPI::prepareEpiAnnotations() {
  * Ready for graphics?
  */
 bool OptionsAPI::isReady(){
-	return AlignmentAPI::isReady();
+	return AlignmentAPI::isReady() || PhylogenyAPI::isReady();
 }
 
 
@@ -256,14 +261,14 @@ void OptionsAPI::prepareColourings() {
         	 cout << col->getName() << " is applicable" << endl;
         	 colourClassNames.push_back(col->getName());
         }
-
 	}
 
-	if (colourings != nullptr){
-		colourings->cleanup();
-		delete colourings;
+
+	if (OptionsAPI::colourings == nullptr){
+		OptionsAPI::colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", colourClassNames.at(0), colourClassNames);
+	}else{
+		OptionsAPI::colourings->setValAndDomain(colourClassNames.at(0), colourClassNames);
 	}
-	colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", colourClassNames.at(0), colourClassNames);
 
 
 }
@@ -302,22 +307,38 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	vector<string> annotations3 = EpiAPI::getAllAnnotations();
 	annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
 
+
+	// Internal node labels
+	if (internalNodeLabels == nullptr){
+		internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.at(0), annotations);
+	}else{
+		internalNodeLabels->setValAndDomain(annotations.at(0), annotations);
+	}
+
+	// Leaves
+	if (leafNodeLabels == nullptr){
+		leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.at(0), annotations);
+	}else{
+		leafNodeLabels->setValAndDomain(annotations.at(0), annotations);
+	}
+
+	cout << "There are " << annotations.size() << " annotations" << endl;
+
+
+	// Hide / show
 	if (annotations.size() == 1) {
 		annotationFontSize->hide();
 		annotationRounding->hide();
-		internalNodeLabels = nullptr;
-		leafNodeLabels = nullptr;
-		return;
+		internalNodeLabels->hide();
+		leafNodeLabels->hide();
+	}else{
+		annotationFontSize->show();
+		annotationRounding->show();
+		internalNodeLabels->show();
+		leafNodeLabels->show();
 	}
 
-	annotationFontSize->show();
-	annotationRounding->show();
-	internalNodeLabels->cleanup();
-	leafNodeLabels->cleanup();
-	delete internalNodeLabels;
-	delete leafNodeLabels;
-	internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.at(0), annotations);
-	leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.at(0), annotations);
+
 
 
 
@@ -337,7 +358,7 @@ extern "C" {
 
 		OptionsAPI::internalNodeLabels = nullptr;
 		OptionsAPI::leafNodeLabels = nullptr;
-		// TODO epiSymptomDate = null;
+		OptionsAPI::epiSymptomDate = nullptr;
 
 		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain(), true);
 
@@ -398,6 +419,15 @@ extern "C" {
 		// Bounds
 		double xdivide1 = OptionsAPI::division1->getVal();
 		double xdivide2 = OptionsAPI::division2->getVal();
+
+
+		// Hide alignment?
+		if (AlignmentAPI::getNsites() == 0){
+			xdivide2 = 1.0;
+		}
+
+
+
 
 		jsonObject json;
 		double width = OptionsAPI::canvasWidth->getVal();
@@ -880,7 +910,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE isReady() {
 		jsonObject json;
 		json["ready"] = OptionsAPI::isReady();
-		cout << "checking for readiness" << endl;
+		cout << "checking for readiness: " << json["ready"] << endl;
 		WasmAPI::messageFromWasmToJS(json.dump(0));
 	}
 

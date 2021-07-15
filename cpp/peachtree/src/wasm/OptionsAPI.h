@@ -65,9 +65,11 @@ public:
 
 
 	// Epidemiology
+	static DiscreteOption* epiSampleDate;
 	static DiscreteOption* epiSymptomDate;
 	static NumericalOption* infectiousPeriodBefore;
 	static NumericalOption* infectiousPeriodAfter;
+	static DiscreteOption* dateFormat;
 
 
 

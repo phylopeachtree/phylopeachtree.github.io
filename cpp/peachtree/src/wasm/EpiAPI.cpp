@@ -18,12 +18,39 @@
 using namespace std::chrono;
 
 
-Epidemiology* EpiAPI::EPIDEMIOLOGY;
-bool EpiAPI::epiAccessionsAreDirty;
-bool EpiAPI::epiAnnotationsAreDirty;
+Epidemiology* EpiAPI::EPIDEMIOLOGY = nullptr;
+Timeline* EpiAPI::timeline = nullptr;
+bool EpiAPI::epiAccessionsAreDirty = false;
+bool EpiAPI::epiAnnotationsAreDirty = false;
 
 
 
+/*
+ * Get timeline graphics
+ */
+jsonObject EpiAPI::getTimelineGraphics(Scaling* scaling, string sampleDateVariable){
+	if (EpiAPI::EPIDEMIOLOGY == nullptr) {
+		jsonObject arr = json::array();
+		return arr;
+	}
+	return EpiAPI::EPIDEMIOLOGY->getTimelineGraphics(scaling, sampleDateVariable);
+}
+
+
+
+/*
+ * Prepare timeline
+ */
+void EpiAPI::prepareTimeline(string sampleDateVariable, string dateFormat){
+	if (EpiAPI::EPIDEMIOLOGY == nullptr) return;
+
+	if (timeline == nullptr){
+		timeline = new Timeline(EpiAPI::EPIDEMIOLOGY, sampleDateVariable, dateFormat);
+	}else{
+		timeline->setSampleDateVariable(sampleDateVariable, dateFormat);
+	}
+
+}
 
 /*
  * Indicate that the accessions need to be revalidated
@@ -80,9 +107,16 @@ vector<string> EpiAPI::getAllAnnotations(){
 
 
 void EpiAPI::cleanup(){
-	EPIDEMIOLOGY->cleanup();
-	delete EPIDEMIOLOGY;
-	EPIDEMIOLOGY = nullptr;
+	if (EPIDEMIOLOGY != nullptr){
+		EPIDEMIOLOGY->cleanup();
+		delete EPIDEMIOLOGY;
+		EPIDEMIOLOGY = nullptr;
+	}
+	if (timeline != nullptr){
+		timeline->cleanup();
+		delete timeline;
+		timeline = nullptr;
+	}
 }
 
 

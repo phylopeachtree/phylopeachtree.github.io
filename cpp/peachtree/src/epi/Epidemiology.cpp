@@ -131,6 +131,25 @@ void Epidemiology::parseFile(string contents){
 }
 
 
+
+
+/*
+ * Json array of timeline graphics
+ */
+jsonObject Epidemiology::getTimelineGraphics(Scaling* scaling, string sampleDateVariable){
+
+	jsonObject arr = json::array();
+
+
+	// Get all dates
+	//for ()
+
+
+	return arr;
+
+}
+
+
 /*
  * List of column headers / annotations / variable names
  */
@@ -138,6 +157,11 @@ vector<string> Epidemiology::getAnnotations(){
 	return this->annotations;
 }
 
+
+
+vector<Case*> Epidemiology::getCases(){
+	return this->cases;
+}
 
 
 /*

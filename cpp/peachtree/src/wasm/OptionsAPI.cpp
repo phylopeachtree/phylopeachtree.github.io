@@ -18,7 +18,7 @@
 #include "../aln/colourings/Drums.h"
 #include "../aln/colourings/ClustalAmino.h"
 #include "../phy/ClusterTree.h"
-
+#include "../epi/Timeline.h"
 
 
 const long OptionsAPI::CHUNK_SIZE = 40000;
@@ -74,10 +74,11 @@ DiscreteOption* OptionsAPI::colourings;
 
 
 // Epidemiology
+DiscreteOption* OptionsAPI::epiSampleDate;
 DiscreteOption* OptionsAPI::epiSymptomDate;
 NumericalOption* OptionsAPI::infectiousPeriodBefore = new NumericalOption("infectiousPeriodBefore", "Epidemiology", "Number of days infectious before symptom onset", 3, 0, 28, 1);
 NumericalOption* OptionsAPI::infectiousPeriodAfter = new NumericalOption("infectiousPeriodAfter", "Epidemiology", "Number of days infectious after symptom onset", 7, 0, 28, 1);
-
+DiscreteOption* OptionsAPI::dateFormat;
 
 
 // Variables
@@ -133,9 +134,12 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(colourings);
 
 	// Epidemiology
+	options.push_back(dateFormat);
+	options.push_back(epiSampleDate);
 	options.push_back(epiSymptomDate);
 	options.push_back(infectiousPeriodBefore);
 	options.push_back(infectiousPeriodAfter);
+
 
 
 	return options;
@@ -156,7 +160,15 @@ void OptionsAPI::prepareEpiAnnotations() {
 	vals.push_back("none");
 	for (string a : annotations) vals.push_back(a);
 
-	// Options
+
+	// Sample date
+	if (OptionsAPI::epiSampleDate == nullptr){
+		OptionsAPI::epiSampleDate = new DiscreteOption("epiSampleDate", "Epidemiology", "Sample date", vals.at(0), vals);
+	}else{
+		OptionsAPI::epiSampleDate->setValAndDomain(vals.at(0), vals);
+	}
+
+	// Symptom date
 	if (OptionsAPI::epiSymptomDate == nullptr){
 		OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
 	}else{
@@ -304,8 +316,8 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	annotations.push_back("None");
 	vector<string> annotations2 = PhylogenyAPI::getAllAnnotations();
 	annotations.insert(annotations.end(), annotations2.begin(), annotations2.end());
-	vector<string> annotations3 = EpiAPI::getAllAnnotations();
-	annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
+	//vector<string> annotations3 = EpiAPI::getAllAnnotations();
+	//annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
 
 
 	// Internal node labels
@@ -365,6 +377,12 @@ extern "C" {
 
 		// Site colour filter values
 		OptionsAPI::siteColourType = new DiscreteOption("siteColourType", "Alignment", "Which sites should be coloured", Colouring::getDefaultSiteColourFilter(), Colouring::getSiteColourFilters());
+
+
+
+		// Date formats
+		OptionsAPI::dateFormat  = new DiscreteOption("dateFormat", "Epidemiology", "Date format", Timeline::getDefaultDateFormat(), Timeline::dateFormats);
+
 
 
 
@@ -568,9 +586,15 @@ extern "C" {
 			double fontSize = std::min(ntHeight, OptionsAPI::annotationFontSize->getVal());
 			int rounding = (int)OptionsAPI::annotationRounding->getVal();
 
+
+			// Epi calendar
+			EpiAPI::prepareTimeline(OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
+			jsonObject timeline = EpiAPI::getTimelineGraphics(scaling, OptionsAPI::epiSampleDate->getVal());
+			objs.insert(objs.end(), timeline.begin(), timeline.end());
+
 			jsonObject tree = PhylogenyAPI::getTreeGraphics(scaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad, internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal());
 			//objs.putAll(tree);
-			objs.insert(objs.end(), tree.begin(), tree.end()); //test
+			objs.insert(objs.end(), tree.begin(), tree.end());
 
 
 		}

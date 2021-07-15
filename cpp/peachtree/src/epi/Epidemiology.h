@@ -26,7 +26,9 @@ public:
 	vector<string> getAnnotations();
 	void addAnnotationsToTree(Tree* tree);
 	void validateAccessions(Alignment* alignment);
+	vector<Case*> getCases();
 	void cleanup();
+	jsonObject getTimelineGraphics(Scaling* scaling, string sampleDateVariable);
 
 private:
 	vector<Case*> cases;

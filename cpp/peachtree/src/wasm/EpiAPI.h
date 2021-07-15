@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include "../epi/Epidemiology.h"
+#include "../epi/Timeline.h"
 #include "../aln/Alignment.h"
 #include "../aln/Filtering.h"
 #include "../phy/Tree.h"
@@ -26,12 +27,13 @@ public:
 	static void addAnnotationsToTree(Tree* tree);
 	static vector<string> getAllAnnotations();
 	static void cleanup();
-
+	static void prepareTimeline(string sampleDateVariable, string dateFormat);
+	static jsonObject getTimelineGraphics(Scaling* scaling, string sampleDateVariable);
 
 	static Epidemiology* EPIDEMIOLOGY;
 	static bool epiAccessionsAreDirty;
 	static bool epiAnnotationsAreDirty;
-
+	static Timeline* timeline;
 
 };
 

@@ -157,11 +157,8 @@ void AlignmentAPI::cleanup(){
 		delete AlignmentAPI::filtering;
 		AlignmentAPI::filtering = nullptr;
 	}
-
-
 	AlignmentAPI::selectionIsDirty = false;
 	AlignmentAPI::mostRecentlySelectedTaxon = -1;
-
 }
 
 

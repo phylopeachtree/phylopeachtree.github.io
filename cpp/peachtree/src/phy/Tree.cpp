@@ -9,6 +9,7 @@
 #include "../Utils.h"
 #include "../aln/Filtering.h"
 #include "../error/Error.h"
+#include "../epi/Timeline.h"
 
 
 Tree::Tree(){
@@ -316,7 +317,7 @@ int Tree::getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos){
  * Get a json array of graphics
  */
 jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
-						double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree){
+						double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline){
 
 
 	jsonObject objs = json::array();
@@ -337,7 +338,8 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 
 	cout << "subtree is " << subtree->getAcc() << " root is " << this->root->getAcc() << endl;
 
-	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
+	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius,
+				internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
 	return objs;
 
 

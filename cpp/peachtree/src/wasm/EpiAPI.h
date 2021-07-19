@@ -27,8 +27,9 @@ public:
 	static void addAnnotationsToTree(Tree* tree);
 	static vector<string> getAllAnnotations();
 	static void cleanup();
-	static void prepareTimeline(string sampleDateVariable, string dateFormat);
-	static jsonObject getTimelineGraphics(Scaling* scaling, string sampleDateVariable);
+	static void prepareTimeline(Tree* tree, string sampleDateVariable, string dateFormat);
+	static jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize);
+	static Timeline* getTimeline();
 
 	static Epidemiology* EPIDEMIOLOGY;
 	static bool epiAccessionsAreDirty;

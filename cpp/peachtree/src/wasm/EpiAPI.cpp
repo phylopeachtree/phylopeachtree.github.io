@@ -28,12 +28,12 @@ bool EpiAPI::epiAnnotationsAreDirty = false;
 /*
  * Get timeline graphics
  */
-jsonObject EpiAPI::getTimelineGraphics(Scaling* scaling, string sampleDateVariable){
-	if (EpiAPI::EPIDEMIOLOGY == nullptr) {
+jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize){
+	if (EpiAPI::timeline == nullptr || !EpiAPI::timeline->isReady()) {
 		jsonObject arr = json::array();
 		return arr;
 	}
-	return EpiAPI::EPIDEMIOLOGY->getTimelineGraphics(scaling, sampleDateVariable);
+	return EpiAPI::timeline->getTimelineGraphics(subtree, scaling, axisFontSize);
 }
 
 
@@ -41,11 +41,11 @@ jsonObject EpiAPI::getTimelineGraphics(Scaling* scaling, string sampleDateVariab
 /*
  * Prepare timeline
  */
-void EpiAPI::prepareTimeline(string sampleDateVariable, string dateFormat){
-	if (EpiAPI::EPIDEMIOLOGY == nullptr) return;
+void EpiAPI::prepareTimeline(Tree* tree, string sampleDateVariable, string dateFormat){
 
-	if (timeline == nullptr){
-		timeline = new Timeline(EpiAPI::EPIDEMIOLOGY, sampleDateVariable, dateFormat);
+	if (EpiAPI::EPIDEMIOLOGY == nullptr) return;
+	if (timeline == nullptr || epiAccessionsAreDirty){
+		timeline = new Timeline(tree, EpiAPI::EPIDEMIOLOGY, sampleDateVariable, dateFormat);
 	}else{
 		timeline->setSampleDateVariable(sampleDateVariable, dateFormat);
 	}
@@ -57,6 +57,13 @@ void EpiAPI::prepareTimeline(string sampleDateVariable, string dateFormat){
  */
 void EpiAPI::setEpiAccessionsToDirty(){
 	epiAccessionsAreDirty = true;
+}
+
+/*
+ * Return the timeline
+ */
+Timeline* EpiAPI::getTimeline(){
+	return EpiAPI::timeline;
 }
 
 /*

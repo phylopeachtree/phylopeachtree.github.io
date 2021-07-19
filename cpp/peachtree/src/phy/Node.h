@@ -16,9 +16,11 @@
 #include "../aln/Filtering.h"
 #include "../epi/Case.h"
 
+
 using namespace std;
 using jsonObject = nlohmann::json;
 
+class Timeline;
 
 class Node {
 public:
@@ -33,6 +35,9 @@ public:
 	void setFilteredNr(int nr);
 	int getFilteredNr();
 	double getHeight();
+	double getHeight(Timeline* timeline);
+	double getYoungestChildHeight();
+	double getYoungestChildHeight(Timeline* timeline);
 	void setHeight(double h);
 	Node* getParent();
 	void addChild(Node* child);
@@ -51,10 +56,11 @@ public:
    	string toSortedNewick(int&, bool printMetaData);
 	double getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
 			bool showTaxaOnTree, double yshift, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding,
-			bool transmissionTree);
+			bool transmissionTree, Timeline* timeline);
 	void parseFromNewick(string newick);
-	double getYoungestChildHeight();
+
 	void getAllAnnotations(vector<string>& annots);
+	string getAnnotationValue(string var);
 	void rotateChildren();
 	void addAnnotations(Case* c);
 	void cleanup();

@@ -28,9 +28,54 @@ int main() {
 	cout << "hello there" << endl; // prints !!!Hello World!!!
 
 
+	/*
+	tm t1;
+	std::fill((char*)&t1, (char*)&t1 + sizeof(t1), 0);
+	t1.tm_year = 2021;
+	t1.tm_mon = 4;
+	t1.tm_mday = 1;
 
 
-	//testAlignment(1);
+
+	auto result = Utils::addYears(t1, -0.5);
+
+	std::cout << result.tm_year << '/' << result.tm_mon << '/' << result.tm_mday << std::endl;
+
+
+	vector<double> heights;
+	vector<string> labels;
+	Utils::getNiceTimes(t1, 0.9, 5, heights, labels);
+	for (int i = 0; i < heights.size(); i ++){
+		cout << heights.at(i) << " / " << labels.at(i) << endl;
+	}
+
+	cout << "-------------" << endl;
+	Utils::getNiceTimes(t1, 0.2, 5, heights, labels);
+	for (int i = 0; i < heights.size(); i ++){
+		cout << heights.at(i) << " / " << labels.at(i) << endl;
+	}
+
+
+
+	cout << "-------------" << endl;
+	Utils::getNiceTimes(t1, 1.5, 5, heights, labels);
+	for (int i = 0; i < heights.size(); i ++){
+		cout << heights.at(i) << " / " << labels.at(i) << endl;
+	}
+	*/
+
+	/*
+
+
+	cout << tm1.tm_year << "/" << tm1.tm_mon << "/" << tm1.tm_mday << endl;
+
+	tm out = Utils::addTimeToDate(tm1, -0.1);
+	cout << out.tm_year << "/" << out.tm_mon << "/" << out.tm_mday << endl;
+
+	tm out2 = Utils::addTimeToDate(tm1, 1.5);
+	cout << out2.tm_year << "/" << out2.tm_mon << "/" << out2.tm_mday << endl;
+	*/
+
 
 	/*
 	vector<int>* vec1 = new vector<int>();

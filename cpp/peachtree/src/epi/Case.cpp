@@ -17,7 +17,7 @@ Case::Case(string accession, map<string, string> annotations) {
  * Get the value of this variable
  */
 string Case::getValue(string var){
-	if (this->annotations.find(var) != this->annotations.end()) return "";
+	if (this->annotations.find(var) == this->annotations.end()) return "";
 	return this->annotations[var];
 }
 

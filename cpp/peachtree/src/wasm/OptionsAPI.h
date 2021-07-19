@@ -70,7 +70,7 @@ public:
 	static NumericalOption* infectiousPeriodBefore;
 	static NumericalOption* infectiousPeriodAfter;
 	static DiscreteOption* dateFormat;
-
+	static NumericalOption* timelineFontSize;
 
 
 	// Methods

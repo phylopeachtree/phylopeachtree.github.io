@@ -11,7 +11,7 @@
 #include "Node.h"
 #include "../Utils.h"
 #include "../error/Error.h"
-
+#include "../epi/Timeline.h"
 
 Node::Node(){
 	this->acc = "";
@@ -80,6 +80,43 @@ void Node::removeParent(){
 double Node::getHeight(){
 	return this->height;
 }
+
+
+/*
+ * Node height as adjusted by timeline sample dates
+ */
+double Node::getHeight(Timeline* timeline){
+	if (timeline == nullptr || !timeline->isReady()) return this->getHeight();
+	return timeline->getSampleHeight(this);
+}
+
+
+/*
+ * Return the height of the youngest child in the subtree
+ */
+double Node::getYoungestChildHeight(){
+	double minHeight = this->getHeight();
+	for (Node* child : this->getChildren()) {
+		minHeight = std::min(minHeight, child->getYoungestChildHeight());
+	}
+	return minHeight;
+}
+
+
+/*
+ * Return the height of the youngest child in the subtree, with node heights informed by sample dates
+ */
+double Node::getYoungestChildHeight(Timeline* timeline){
+	if (timeline == nullptr || !timeline->isReady()) return this->getYoungestChildHeight();
+	double minHeight = this->getHeight(timeline);
+	for (Node* child : this->getChildren()) {
+		minHeight = std::min(minHeight, child->getYoungestChildHeight(timeline));
+	}
+	return minHeight;
+}
+
+
+
 
 void Node::setHeight(double h){
 	this->height = h;
@@ -353,16 +390,26 @@ string Node::getTidyMetaData(){
 
 }
 
+/*
+ * Get annotation value
+ */
+string Node::getAnnotationValue(string var){
+	if (this->annotations.find(var) == this->annotations.end()) return "";
+	return annotations[var];
+}
+
 
 /*
  * Get the svg graphics of this subtree
  */
 double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
 		bool showTaxaOnTree, double yshift, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding,
-		bool transmissionTree){
+		bool transmissionTree, Timeline* timeline){
 
 
-	double x2 = this->getHeight();
+	double x2 = this->getHeight(timeline);
+
+
 	double x2Scaled = scaling->scaleX(x2);
 	double maxY = -Utils::INFTY;
 	double minY =  Utils::INFTY;
@@ -380,7 +427,8 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	else {
 
 		for (Node* child : this->getChildren()) {
-			double ychild = child->getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
+			double ychild = child->getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift,
+												nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
 			if (ychild != Utils::INFTY) {
 				if (y == Utils::INFTY) y = 0.0;
 				y += ychild;
@@ -405,15 +453,15 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	bool inrangeY = scaling->inRangeY(y);
 
 	// Dashed line to taxa
-	if (this->isLeaf() && showTaxaOnTree && this->getHeight() > 0) {
+	if (this->isLeaf() && showTaxaOnTree && this->getHeight(timeline) > 0) {
 
 		// Only draw if this node is in y-range
 		if (inrangeY) {
 
 			jsonObject dashed_json;
 			dashed_json["ele"] = "line";
-			dashed_json["x1"] = x2Scaled;
-			dashed_json["x2"] = scaling->getCanvasMaxX();
+			dashed_json["x1"] = scaling->getCanvasMaxX();
+			dashed_json["x2"] = x2Scaled;
 			dashed_json["y1"] = yscaled;
 			dashed_json["y2"] = yscaled;
 			dashed_json["stroke_width"] = branchWidth/2;
@@ -458,7 +506,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		// Only draw if this node is in y-range
 		if (inrangeY) {
 
-			double x1 = this->getParent()->getHeight();
+			double x1 = this->getParent()->getHeight(timeline);
 
 			// Branch
 			jsonObject branch_json;
@@ -714,18 +762,6 @@ void Node::parseAnnotation(string annotation){
 
 }
 
-
-
-/*
- * Return the height of the youngest child in the subtree
- */
-double Node::getYoungestChildHeight(){
-	double minHeight = this->getHeight();
-	for (Node* child : this->getChildren()) {
-		minHeight = std::min(minHeight, child->getYoungestChildHeight());
-	}
-	return minHeight;
-}
 
 
 /*

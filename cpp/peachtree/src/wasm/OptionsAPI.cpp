@@ -79,6 +79,7 @@ DiscreteOption* OptionsAPI::epiSymptomDate;
 NumericalOption* OptionsAPI::infectiousPeriodBefore = new NumericalOption("infectiousPeriodBefore", "Epidemiology", "Number of days infectious before symptom onset", 3, 0, 28, 1);
 NumericalOption* OptionsAPI::infectiousPeriodAfter = new NumericalOption("infectiousPeriodAfter", "Epidemiology", "Number of days infectious after symptom onset", 7, 0, 28, 1);
 DiscreteOption* OptionsAPI::dateFormat;
+NumericalOption* OptionsAPI::timelineFontSize = new NumericalOption("timelineFontSize", "Epidemiology", "Font size of dates on timeline", 12, 0, 28, 1);
 
 
 // Variables
@@ -139,6 +140,7 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(epiSymptomDate);
 	options.push_back(infectiousPeriodBefore);
 	options.push_back(infectiousPeriodAfter);
+	options.push_back(timelineFontSize);
 
 
 
@@ -556,6 +558,8 @@ extern "C" {
 		// Create graphics
 		jsonObject objs = json::array();
 
+		// Plot tree
+		Scaling* treeScaling = nullptr;
 		if (PhylogenyAPI::isReady()) {
 
 			PhylogenyAPI::applyFiltering(AlignmentAPI::getFiltering());
@@ -566,19 +570,24 @@ extern "C" {
 			double spacing = std::max(OptionsAPI::treeSpacing->getVal(), nodeRad);
 
 
-			// How tall is the tree?
-			double treeHeight = PhylogenyAPI::getHeight();
+			// Prepare epi calendar
+			EpiAPI::prepareTimeline(PhylogenyAPI::getTree(), OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
+
+
+
+			// Tree range
+			double treeHeight = PhylogenyAPI::getTree()->getRoot()->getHeight(EpiAPI::getTimeline());
 			double treeMin = 0;
 			if (AlignmentAPI::getFiltering()->getSubtreeRoot() != nullptr) {
-				treeHeight = AlignmentAPI::getFiltering()->getSubtreeRoot()->getHeight();
-				treeMin = AlignmentAPI::getFiltering()->getSubtreeRoot()->getYoungestChildHeight();
+				treeHeight = AlignmentAPI::getFiltering()->getSubtreeRoot()->getHeight(EpiAPI::getTimeline());
+				treeMin = AlignmentAPI::getFiltering()->getSubtreeRoot()->getYoungestChildHeight(EpiAPI::getTimeline());
 			}
 
 
 			// Scaling
-			Scaling* scaling = new Scaling(OptionsAPI::LEFT_MARGIN + spacing,  xdivide1*width - spacing, OptionsAPI::TOP_MARGIN, height, treeHeight, treeMin);
-			scaling->setRowHeight(ntHeight);
-			scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+			treeScaling = new Scaling(OptionsAPI::LEFT_MARGIN + spacing,  xdivide1*width - spacing, OptionsAPI::TOP_MARGIN, height, treeHeight, treeMin);
+			treeScaling->setRowHeight(ntHeight);
+			treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
 			// Annotations
 			string internalLabel = OptionsAPI::internalNodeLabels == nullptr ? nullptr : OptionsAPI::internalNodeLabels->getVal();
@@ -587,13 +596,9 @@ extern "C" {
 			int rounding = (int)OptionsAPI::annotationRounding->getVal();
 
 
-			// Epi calendar
-			EpiAPI::prepareTimeline(OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
-			jsonObject timeline = EpiAPI::getTimelineGraphics(scaling, OptionsAPI::epiSampleDate->getVal());
-			objs.insert(objs.end(), timeline.begin(), timeline.end());
-
-			jsonObject tree = PhylogenyAPI::getTreeGraphics(scaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad, internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal());
-			//objs.putAll(tree);
+			// Plot tree
+			jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
+					internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline());
 			objs.insert(objs.end(), tree.begin(), tree.end());
 
 
@@ -669,6 +674,14 @@ extern "C" {
 			}
 
 
+		}
+
+
+		// Finally, plot the EPI timeline
+		if (PhylogenyAPI::isReady() && treeScaling != nullptr) {
+			Node* subtree = AlignmentAPI::getFiltering()->getSubtreeRoot() == nullptr ? PhylogenyAPI::getTree()->getRoot() : AlignmentAPI::getFiltering()->getSubtreeRoot();
+			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal());
+			objs.insert(objs.end(), timeline.begin(), timeline.end());
 		}
 
 

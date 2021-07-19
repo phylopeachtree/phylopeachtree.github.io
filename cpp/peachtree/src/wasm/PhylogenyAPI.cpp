@@ -110,9 +110,10 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
  */
 jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
 									string internalLabel, string leafLabel, double fontSize, int rounding,
-									bool transmissionTree){
+									bool transmissionTree, Timeline* timeline){
 
-	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree, nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree);
+	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
+				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
 
 
 }

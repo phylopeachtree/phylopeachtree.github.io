@@ -10,6 +10,7 @@
 #include "WasmAPI.h"
 #include "../phy/Tree.h"
 #include "../phy/ClusterTree.h"
+#include "../epi/Timeline.h"
 
 using namespace std;
 
@@ -27,7 +28,8 @@ public:
 	static bool isReady();
 	static void applyFiltering(Filtering* filtering);
 	static double getHeight();
-	static jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree);
+	static jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
+			string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
 	static void cleanup();
 

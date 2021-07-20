@@ -36,6 +36,9 @@ public:
 	double getSampleHeightOfCase(int caseNum);
 	double getSampleHeight(Node* node);
 	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
+	void prepareNodeSampleHeights(Node* subtree);
+
+
 
 	tm getLatestDate();
 	tm getEarliestDate();
@@ -52,6 +55,7 @@ private:
 	string dateFormat;
 	string dateFormatCanonical;
 	vector<tm> caseDates;
+	Node* sampleSubtree;
 
 	tm latestDate;
 	tm earliestDate;
@@ -62,6 +66,9 @@ private:
 
 	double meanTipHeight_cases;
 	double meanTipHeight_tree;
+
+
+	void resetNodeSampleTimes(Node* node);
 
 
 

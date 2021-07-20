@@ -228,15 +228,15 @@ void Utils::getNiceTimes(tm lastDate, double timeSpan, int maxNTimes, vector<dou
 		// Round the days?
 		if (countDays){
 
-			// If theres more than maxNTimes/2 months, round it back to the 1st or the 15th of the month
-			if (timeSpan*12 > maxNTimes/2) {
+			// If theres more than 3 months, round it back to the 1st or the 15th of the month
+			if (nMonthsInTimespan > 3) {
 				if (date.tm_mday < 15) date.tm_mday = 1;
 				else date.tm_mday = 15;
 			}
 
 
-			// Otherwise, try round it back to the 1/10/21 of the month
-			else if (timeSpan*12 > maxNTimes/3) {
+			// If more than 1 month, round it to 1, 11, 21
+			else if (nMonthsInTimespan > 1) {
 				if (date.tm_mday < 11) date.tm_mday = 1;
 				else if (date.tm_mday < 21) date.tm_mday = 11;
 				else date.tm_mday = 21;

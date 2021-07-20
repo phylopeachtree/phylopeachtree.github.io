@@ -30,6 +30,7 @@ public:
 	static void prepareTimeline(Tree* tree, string sampleDateVariable, string dateFormat);
 	static jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
 	static Timeline* getTimeline();
+	static void prepareNodeSampleHeights(Node* subtree);
 
 	static Epidemiology* EPIDEMIOLOGY;
 	static bool epiAccessionsAreDirty;

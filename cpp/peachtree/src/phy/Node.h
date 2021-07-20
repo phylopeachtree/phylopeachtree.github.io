@@ -21,7 +21,6 @@ using namespace std;
 using jsonObject = nlohmann::json;
 
 class Timeline;
-
 class Node {
 public:
 	Node();
@@ -65,6 +64,10 @@ public:
 	void addAnnotations(Case* c);
 	void cleanup();
 
+	double getSampleTime();
+	void setSampleTime(double time);
+	void clearSampleTime();
+	bool hasSampleTime();
 
 
 
@@ -78,6 +81,7 @@ private:
 	int filteredNodeNr;
 	string acc;
 	double height;
+	double sampleTime;
 	Node* parent;
 	vector<Node*> children;
 	Taxon* taxon;

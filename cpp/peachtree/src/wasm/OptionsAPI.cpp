@@ -560,6 +560,7 @@ extern "C" {
 
 		// Plot tree
 		Scaling* treeScaling = nullptr;
+		Node* subtree = AlignmentAPI::getFiltering()->getSubtreeRoot() == nullptr ? PhylogenyAPI::getTree()->getRoot() : AlignmentAPI::getFiltering()->getSubtreeRoot();
 		if (PhylogenyAPI::isReady()) {
 
 			PhylogenyAPI::applyFiltering(AlignmentAPI::getFiltering());
@@ -572,7 +573,7 @@ extern "C" {
 
 			// Prepare epi calendar
 			EpiAPI::prepareTimeline(PhylogenyAPI::getTree(), OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
-
+			EpiAPI::prepareNodeSampleHeights(subtree);
 
 
 			// Tree range
@@ -677,14 +678,13 @@ extern "C" {
 		}
 
 
+
 		// Finally, plot the EPI timeline
-		if (PhylogenyAPI::isReady() && treeScaling != nullptr) {
-			Node* subtree = AlignmentAPI::getFiltering()->getSubtreeRoot() == nullptr ? PhylogenyAPI::getTree()->getRoot() : AlignmentAPI::getFiltering()->getSubtreeRoot();
-			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal(), OptionsAPI::epiSymptomDate->getVal(), OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
+		if (PhylogenyAPI::isReady() && treeScaling != nullptr && subtree != nullptr) {
+			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal(), OptionsAPI::epiSymptomDate->getVal(),
+										OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
 			objs.insert(objs.end(), timeline.begin(), timeline.end());
 		}
-
-
 
 
 

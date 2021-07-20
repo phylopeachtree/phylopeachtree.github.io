@@ -20,6 +20,7 @@ Node::Node(){
 	this->height = 0;
 	this->parent = nullptr;
 	this->taxon = nullptr;
+	this->sampleTime = Utils::INFTY;
 }
 
 
@@ -30,6 +31,7 @@ Node::Node(int index){
 	this->height = 0;
 	this->parent = nullptr;
 	this->taxon = nullptr;
+	this->sampleTime = Utils::INFTY;
 }
 
 
@@ -810,12 +812,37 @@ void Node::addAnnotations(Case* c){
 
 
 
+/*
+ * Get the sample time
+ */
+double Node::getSampleTime(){
+	return this->sampleTime;
+}
+
+
+/*
+ * Set the sample time
+ */
+void Node::setSampleTime(double time){
+	this->sampleTime = time;
+}
 
 
 
 
+/*
+ * Clear the sample time
+ */
+void Node::clearSampleTime(){
+	this->sampleTime = Utils::INFTY;
+}
 
-
+/*
+ * Is there a sample time?
+ */
+bool Node::hasSampleTime(){
+	return this->sampleTime != Utils::INFTY;
+}
 
 
 

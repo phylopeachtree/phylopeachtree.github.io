@@ -18,6 +18,7 @@ Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVari
 
 	this->epidemiology = epidemiology;
 	this->setSampleDateVariable(sampleDateVariable, dateFormat);
+	this->sampleSubtree = nullptr;
 
 	// Calculate earliest tip height in tree
 	this->earliestTreeLeafHeight = 0;
@@ -29,6 +30,36 @@ Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVari
 
 }
 
+
+
+/*
+ * Prepare node sample heights for this subtree
+ * If the tree has not changed, then do not do any new calculations
+ */
+void Timeline::prepareNodeSampleHeights(Node* subtree){
+
+	if (this->sampleSubtree != nullptr && this->sampleSubtree == subtree) return;
+	this->sampleSubtree = subtree;
+	cout << "prepareNodeSampleHeights" << endl;
+
+	this->resetNodeSampleTimes(subtree);
+
+}
+
+
+/*
+ * Reset all node sample times
+ */
+void Timeline::resetNodeSampleTimes(Node* node){
+
+	node->clearSampleTime();
+
+	// Reset all node dates to nullptr
+	for (Node* child : node->getChildren()){
+		this->resetNodeSampleTimes(child);
+	}
+
+}
 
 /*
  * Date of latest tip
@@ -178,29 +209,46 @@ double Timeline::getSampleHeightOfCase(int caseNum){
  */
 double Timeline::getSampleHeight(Node* node){
 
+
+	double sampleTime = 0;
 	string sampleDate = node->getAnnotationValue(this->sampleDateVariable);
 
-	struct tm tm;
-	if (!Utils::parseDate(sampleDate, this->dateFormatCanonical, tm)) {
 
-		// Scale by max-min
-		double h = node->getHeight();
-		//double scale = (this->latestTime - this->earliestTime) / this->earliestTreeLeafHeight;
-		double scale = this->meanTipHeight_cases / this->meanTipHeight_tree;
-		//cout << "scaled node " << h << " into " << h*scale << endl;
-		double hprime = h*scale;
-
-		for (Node* child : node->getChildren()){
-			double hc = this->getSampleHeight(child);
-			if (hc > hprime) hprime = hc;
-		}
-
-		return hprime;
+	// There is already a time
+	if (node->hasSampleTime()){
+		sampleTime = node->getSampleTime();
 	}
 
+	// Calculate time again
+	else{
+
+
+		struct tm tm;
+		//struct tm* existingDate = node->getSampleTime();
+		if (sampleDate == "" || !Utils::parseDate(sampleDate, this->dateFormatCanonical, tm)) {
+
+			// Scale by max-min
+			double h = node->getHeight();
+			//double scale = (this->latestTime - this->earliestTime) / this->earliestTreeLeafHeight;
+			double scale = this->meanTipHeight_cases / this->meanTipHeight_tree;
+			//cout << "scaled node " << h << " into " << h*scale << endl;
+			double hprime = h*scale;
+
+			for (Node* child : node->getChildren()){
+				double hc = this->getSampleHeight(child);
+				if (hc > hprime) hprime = hc;
+			}
+
+			return hprime;
+		}
+
+		sampleTime = Utils::getTimeFromDate(tm);
+		node->setSampleTime(sampleTime);
+
+	}
 
 	//cout << node->getAcc() << "|" << sampleDate << "| has height " << (this->latestTime - Utils::getTimeFromDate(tm)) << endl;
-	return this->latestTime - Utils::getTimeFromDate(tm);
+	return this->latestTime - sampleTime;
 
 }
 
@@ -364,7 +412,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 		vector<string> labels;
 		Utils::getNiceTimes(this->latestDate, height, ndates, heights, labels);
 
-		// Plot them
+		// Plot the axis lines
 		for (int t = 0; t < heights.size(); t ++){
 
 
@@ -387,6 +435,24 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			tick["stroke"] = "#29465b";
 			tick["stroke_linecap"] = "round";
 			arr.push_back(tick);
+
+
+
+
+			//cout << "tick " << time << " | " << x << " | " << x_scaled << endl;
+
+		}
+
+		// Plot the axis labels on top
+		for (int t = 0; t < heights.size(); t ++){
+
+
+			// x value
+			double x = heights.at(t);
+			if (!scaling->inRangeX(x)) continue;
+
+			double x_scaled = scaling->scaleX(x);
+			string label = labels.at(t);
 
 
 			// A background rectangle under the text. Assuming Courier new font with a width height ratio of 0.56
@@ -412,8 +478,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			label_json["font_family"] = "Arial";
 			arr.push_back(label_json);
 
-
-			//cout << "tick " << time << " | " << x << " | " << x_scaled << endl;
 
 		}
 

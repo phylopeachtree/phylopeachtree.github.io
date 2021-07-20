@@ -38,6 +38,16 @@ jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double a
 
 
 
+
+/*
+ * Reset sample heights if the subtree has changed
+ */
+void EpiAPI::prepareNodeSampleHeights(Node* subtree){
+	if (EpiAPI::timeline == nullptr) return;
+	EpiAPI::timeline->prepareNodeSampleHeights(subtree);
+}
+
+
 /*
  * Prepare timeline
  */

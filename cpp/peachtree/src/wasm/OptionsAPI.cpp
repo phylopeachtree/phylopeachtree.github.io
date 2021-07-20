@@ -680,7 +680,7 @@ extern "C" {
 		// Finally, plot the EPI timeline
 		if (PhylogenyAPI::isReady() && treeScaling != nullptr) {
 			Node* subtree = AlignmentAPI::getFiltering()->getSubtreeRoot() == nullptr ? PhylogenyAPI::getTree()->getRoot() : AlignmentAPI::getFiltering()->getSubtreeRoot();
-			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal());
+			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal(), OptionsAPI::epiSymptomDate->getVal(), OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
 			objs.insert(objs.end(), timeline.begin(), timeline.end());
 		}
 

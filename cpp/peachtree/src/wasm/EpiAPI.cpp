@@ -28,12 +28,12 @@ bool EpiAPI::epiAnnotationsAreDirty = false;
 /*
  * Get timeline graphics
  */
-jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize){
+jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
 	if (EpiAPI::timeline == nullptr || !EpiAPI::timeline->isReady()) {
 		jsonObject arr = json::array();
 		return arr;
 	}
-	return EpiAPI::timeline->getTimelineGraphics(subtree, scaling, axisFontSize);
+	return EpiAPI::timeline->getTimelineGraphics(subtree, scaling, axisFontSize, symptomDateVar, infectiousDaysBefore, infectiousDaysAfter);
 }
 
 

@@ -320,6 +320,16 @@ tm Utils::addYears(tm t1, double years) {
 
 
 /*
+ * Add days to date
+ */
+tm Utils::addDays(tm t1, double days){
+	time_t epoch = mktime(&t1);
+	epoch += (60*60*24 * days);
+	return *localtime(&epoch);
+}
+
+
+/*
  * Format date as dd mon yyyy
  */
 string Utils::formatDate(tm date){

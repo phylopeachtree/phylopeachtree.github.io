@@ -35,7 +35,7 @@ public:
 	double getSampleTimeOfCase(int caseNum);
 	double getSampleHeightOfCase(int caseNum);
 	double getSampleHeight(Node* node);
-	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize);
+	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
 
 	tm getLatestDate();
 	tm getEarliestDate();

@@ -82,7 +82,7 @@ void Epidemiology::parseFile(string contents){
 			}
 
 			if (accessionIndex == -1) {
-				Error::throwError("Please ensure the header contains a variable named 'accession' which contains sample names.");
+				Error::throwError("Please ensure the header contains a variable named accession which contains sample names.");
 			}
 
 

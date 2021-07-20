@@ -77,6 +77,8 @@ bool PhylogenyAPI::isReady(){
 }
 
 
+
+
 void PhylogenyAPI::cleanup(){
 	if (PhylogenyAPI::THE_TREE != nullptr){
 		PhylogenyAPI::THE_TREE->cleanup();
@@ -117,6 +119,7 @@ jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, b
 
 	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
 				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
+
 
 }
 

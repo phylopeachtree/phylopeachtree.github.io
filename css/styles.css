@@ -326,6 +326,11 @@ body {
 }
 
 
+#svg .symptom:hover{
+	fill:"#F7941D";
+}
+
+
 /* Tabs
 	http://jsfiddle.net/csDP9/9/s 
 */

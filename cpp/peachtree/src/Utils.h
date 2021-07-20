@@ -34,6 +34,7 @@ public:
 	//static void sortDates(vector<tm>& times);
 	static bool compareDates(const tm &d1, const tm &d2);
 	static tm addYears(tm t1, double years);
+	static tm addDays(tm t1, double days);
 	static string formatDate(tm date);
 	static void getNiceTimes(tm lastDate, double timeSpan, int maxNTimes, vector<double>& heights, vector<string>& labels);
 

@@ -15,9 +15,9 @@ const int Timeline::MAX_NDATES = 24;
 
 
 Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVariable, string dateFormat) {
+
 	this->epidemiology = epidemiology;
 	this->setSampleDateVariable(sampleDateVariable, dateFormat);
-
 
 	// Calculate earliest tip height in tree
 	this->earliestTreeLeafHeight = 0;
@@ -126,8 +126,8 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 	}
 
 
-
 }
+
 
 
 /*
@@ -234,10 +234,12 @@ void Timeline::cleanup(){
 }
 
 
+
 /*
  * Get the json object encoding the timeline x-axis
  */
-jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize){
+jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize,
+										string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
 
 	jsonObject arr = json::array();
 
@@ -267,12 +269,92 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	double height = this->getSampleHeight(subtree);
 
 
-	//First and last date
+	// First and last date
 	tm firstDate = Utils::addYears(this->latestDate, -height);
 
 
-	// Get some nice dates to print
 
+	// Infectious period: check the variable name is valid
+	vector<string> annots = this->epidemiology->getAnnotations();
+	if (std::count(annots.begin(), annots.end(), symptomDateVar) > 0) {
+
+		vector<Node*> leaves;
+		subtree->getLeafSet(leaves);
+
+
+		// Calculate yshift to avoid clipping top margin
+		double yshift = 0;
+		for (int leafNr = 0; leafNr < leaves.size(); leafNr ++) {
+			int filteredNr = leaves.at(leafNr)->getFilteredNr();
+			if (filteredNr >= 0 && scaling->inRangeY(filteredNr)){
+				yshift = scaling->getCanvasMinY() - scaling->scaleY(filteredNr);
+				break;
+			}
+		}
+
+		// Plot the symptom dates
+		for (Node* node : leaves){
+
+			string val = node->getAnnotationValue(symptomDateVar);
+
+			// Attempt to parse date
+			struct tm symptomDate;
+			if (!Utils::parseDate(val, dateFormatCanonical, symptomDate)) {
+				cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
+				continue;
+			}
+
+
+			// Get x coords
+			struct tm infectiousStartDate = Utils::addDays(symptomDate, -infectiousDaysBefore);
+			struct tm infectiousEndDate = Utils::addDays(symptomDate, infectiousDaysAfter);
+			double symptomX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(symptomDate));
+			double infectiousStartX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(infectiousStartDate));
+			double infectiousEndX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(infectiousEndDate));
+
+			// Get y coord
+			double y = node->getFilteredNr() + 0.4;
+			double yscaled = scaling->scaleY(y) + yshift;
+
+			const int nodeRadius = 5;
+
+
+
+			// Plot infectious period
+			jsonObject tick;
+			tick["ele"] = "line";
+			tick["x1"] = infectiousStartX;
+			tick["x2"] = infectiousEndX;
+			tick["y1"] = yscaled;
+			tick["y2"] = yscaled;
+			tick["stroke_width"] = 4;
+			tick["stroke"] = "#F7941Daa";
+			tick["stroke_linecap"] = "round";
+			//tick["class"] = "symptom";
+			//tick["title"] = node->getAcc() + " developed symptoms on " + Utils::formatDate(symptomDate);
+			arr.push_back(tick);
+
+
+			// Plot an orange circle on symptom date
+			jsonObject node_json;
+			node_json["ele"] = "circle";
+			node_json["cx"] = symptomX;
+			node_json["cy"] = yscaled;
+			node_json["r"] = nodeRadius;
+			node_json["fill"] = "#F7941Daa";
+			node_json["class"] = "symptom";
+			node_json["title"] = node->getAcc() + " developed symptoms on " + Utils::formatDate(symptomDate);
+			arr.push_back(node_json);
+
+
+		}
+
+
+	}
+
+
+
+	// Get some nice dates to print
 	int ndates = std::floor((scaling->getCanvasMaxX() - scaling->getCanvasMinX()) / (5 * axisFontSize));
 	ndates = std::min(ndates, Timeline::MAX_NDATES);
 	if (ndates > 0){
@@ -341,6 +423,27 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	return arr;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -44,6 +44,7 @@ public:
 	static int getTaxonRowNum(Taxon* taxon);
 	static void cleanup();
 	static void makeMockAlignment(Tree* tree);
+	static bool isMock();
 
 
 

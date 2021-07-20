@@ -71,7 +71,7 @@ public:
 private:
 
 	string getNewickMetaData();
-	string getTidyMetaData();
+	string getTidyMetaData(Timeline* timeline);
 	void parseAnnotation(string annotation);
 
 	int nodeNr;

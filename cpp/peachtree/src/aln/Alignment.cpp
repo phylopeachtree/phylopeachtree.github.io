@@ -317,17 +317,14 @@ void Alignment::sortByTree(Tree* tree){
 	}
 
 
-
-
 	// Create new sequence array
-	vector<Sequence*> sequencesNew;;
+	vector<Sequence*> sequencesNew;
 
 
 	// Reorder the array
 	for (int newIndex = 0; newIndex < leaves.size(); newIndex ++) {
-		int oldIndex = newOrdering[newIndex];
+		int oldIndex = newOrdering.at(newIndex);
 		sequencesNew.push_back(this->getSequence(oldIndex));
-
 	}
 
 
@@ -379,7 +376,11 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		sequence->getY0(seqNum, scaling);
+		if (scaling->inRangeY(seqNum)){
+			yshift = sequence->getY0(seqNum, scaling);
+			break;
+		}
+
 	}
 
 	int seqNumDisplayed = 0;
@@ -417,7 +418,11 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		sequence->getY0(seqNum, scaling);
+		if (scaling->inRangeY(seqNum)){
+			yshift = sequence->getY0(seqNum, scaling);
+			break;
+		}
+
 	}
 
 

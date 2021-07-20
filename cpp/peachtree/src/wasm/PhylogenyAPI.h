@@ -32,6 +32,7 @@ public:
 			string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
 	static void cleanup();
+	static void setOrderingToDirty();
 
 	//Variables
 	static Tree* THE_TREE;

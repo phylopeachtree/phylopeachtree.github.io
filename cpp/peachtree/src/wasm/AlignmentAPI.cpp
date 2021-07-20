@@ -134,6 +134,11 @@ void AlignmentAPI::setOrderingToDirty(){
 	AlignmentAPI::orderingIsDirty = true;
 }
 
+bool AlignmentAPI::isMock(){
+	if (AlignmentAPI::THE_ALIGNMENT == nullptr) return false;
+	return AlignmentAPI::THE_ALIGNMENT->getLength() == 0;
+}
+
 void AlignmentAPI::setSelectionToDirty(){
 	AlignmentAPI::selectionIsDirty = true;
 }
@@ -206,6 +211,7 @@ extern "C" {
 
 
 		// If tree has been uploaded, check the alignment matches the tree
+		PhylogenyAPI::setOrderingToDirty();
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::THE_ALIGNMENT);
 		EpiAPI::setEpiAccessionsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);

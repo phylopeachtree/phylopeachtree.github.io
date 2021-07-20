@@ -274,6 +274,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	// Get some nice dates to print
 
 	int ndates = std::floor((scaling->getCanvasMaxX() - scaling->getCanvasMinX()) / (5 * axisFontSize));
+	ndates = std::min(ndates, Timeline::MAX_NDATES);
 	if (ndates > 0){
 
 
@@ -291,8 +292,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 
 			double x_scaled = scaling->scaleX(x);
 			string label = labels.at(t);
-
-
 
 
 			// Vertical line
@@ -319,8 +318,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			arr.push_back(bg_json);
 
 
-
-
 			// Label
 			jsonObject label_json;
 			label_json["ele"] = "text";
@@ -332,9 +329,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			label_json["font_size"] = axisFontSize;
 			label_json["font_family"] = "Arial";
 			arr.push_back(label_json);
-
-
-
 
 
 			//cout << "tick " << time << " | " << x << " | " << x_scaled << endl;

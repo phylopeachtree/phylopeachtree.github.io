@@ -29,6 +29,12 @@ Tree* PhylogenyAPI::getTree(){
 	return PhylogenyAPI::THE_TREE;
 }
 
+
+void PhylogenyAPI::setOrderingToDirty(){
+	PhylogenyAPI::orderingIsDirty = true;
+}
+
+
 /*
  * Return a list of annotations
  */
@@ -39,6 +45,7 @@ vector<string> PhylogenyAPI::getAllAnnotations(){
 }
 
 
+
 /*
  * Sort the taxa in the alignment by the tree
  */
@@ -46,7 +53,6 @@ void PhylogenyAPI::sortTaxaByTree(Tree* tree, Alignment* alignment){
 	if (alignment == nullptr) return;
 	alignment->sortByTree(tree);
 }
-
 
 
 /*
@@ -71,8 +77,6 @@ bool PhylogenyAPI::isReady(){
 }
 
 
-
-
 void PhylogenyAPI::cleanup(){
 	if (PhylogenyAPI::THE_TREE != nullptr){
 		PhylogenyAPI::THE_TREE->cleanup();
@@ -93,7 +97,6 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
 	if (THE_TREE == nullptr) return;
 	if (!orderingIsDirty) return;
 	if (alignment == nullptr) {
-		// Make a mock alignment so that taxa exist
 		AlignmentAPI::makeMockAlignment(THE_TREE);
 	}else{
 		PhylogenyAPI::sortTaxaByTree(THE_TREE, alignment);
@@ -114,7 +117,6 @@ jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, b
 
 	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
 				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
-
 
 }
 

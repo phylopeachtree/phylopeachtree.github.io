@@ -346,7 +346,7 @@ string Node::getNewickMetaData(){
 /*
  *  Meta data annotations for displaying string
  */
-string Node::getTidyMetaData(){
+string Node::getTidyMetaData(Timeline* timeline){
 
 
 	string str;
@@ -357,13 +357,20 @@ string Node::getTidyMetaData(){
 		str.append("Click node to switch child ordering.");
 	}
 	str.append("\nheight=");
-	str.append(to_string(this->getHeight())); //OptionsAPI.sf(this->getHeight()));
+	str.append(to_string(this->getHeight(timeline))); //OptionsAPI.sf(this->getHeight()));
+	if (!this->isRoot()){
+		str.append("\nlength=");
+		str.append(to_string(this->getParent()->getHeight(timeline) - this->getHeight(timeline))); //OptionsAPI.sf(this->getHeight()));
+	}
+
 	if (this->annotations.empty()) return str;
 	str.append("\n");
 	int i = 0;
 	for (const auto & pair: this->annotations) {
 		string key = pair.first;
 		string value = pair.second;
+
+
 
 		/* Rounding
 		try {
@@ -520,11 +527,10 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			branch_json["stroke_linecap"] = "round";
 			objs.push_back(branch_json);
 
-
 		}
 
-
 	}
+
 
 
 	// Draw node and annotate it
@@ -539,7 +545,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			node_json["class"] = "node";
 			node_json["i"] = this->nodeNr;
 		}
-		if (!this->annotations.empty()) node_json["title"] = this->getTidyMetaData();
+		node_json["title"] = this->getTidyMetaData(timeline);
 		objs.push_back(node_json);
 	}
 
@@ -607,7 +613,7 @@ void Node::parseFromNewick(string newick){
 
 
 	std::regex re("\\[.+");
-	std::regex re1(",.*");
+	std::regex re1(".*:");
 	std::regex re2("[(].*");
 	std::regex re3("[)].*");
 
@@ -725,11 +731,9 @@ void Node::parseFromNewick(string newick){
 
 
 	// Set node height
-	if (!this->isRoot()) {
+	if (!this->isRoot()){
 		this->setHeight(this->parent->getHeight() - length);
-		//System.out.println(label + " has tree " + newick + " and height " + this.getHeight());
 	}
-
 
 
 	// Parse children

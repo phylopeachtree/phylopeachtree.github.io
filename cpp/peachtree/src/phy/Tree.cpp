@@ -187,6 +187,7 @@ void Tree::parseFromNexus(string nexus){
 		for (Node* node : this->getNodesAsArray()) {
 			string key = node->getAcc();
 			if (translateMap.count(key) > 0) {
+				//cout << key << " has accession " << translateMap[key] << " and height " << node->getHeight() << endl;
 				node->setAcc(translateMap[key]);
 			}
 		}
@@ -335,9 +336,6 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 	}
 
 	Node* subtree = filtering->getSubtreeRoot() != nullptr ? filtering->getSubtreeRoot() : this->root;
-
-	cout << "subtree is " << subtree->getAcc() << " root is " << this->root->getAcc() << endl;
-
 	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius,
 				internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
 	return objs;

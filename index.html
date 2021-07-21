@@ -143,16 +143,13 @@
 
 		
 		
-		
-		<div id="graphics_div" style="display:none"/>
-		
-		
+
 			<div id="control_panel_div">
 			
 				
-				<div> Showing <span id="ntaxadisplayed_span"></span> of <span id="ntaxa_span"></span> samples </div>
-				<div> Showing <span id="nsitesdisplayed_span"></span> of <span id="nsites_span"></span> sites </div>
-				<div title="Number of unique sequences. Ambiguous characters do not increase the count."> <span id="nuniqueseqs_span"></span> unique sequences </div>
+				<div class="alignmentSummary"> Showing <span id="ntaxadisplayed_span"></span> of <span id="ntaxa_span"></span> samples </div>
+				<div class="alignmentSummary"> Showing <span id="nsitesdisplayed_span"></span> of <span id="nsites_span"></span> sites </div>
+				<div class="alignmentSummary" title="Number of unique sequences. Ambiguous characters do not increase the count."> <span id="nuniqueseqs_span"></span> unique sequences </div>
 				
 				<div> <b>Taxon selection: </b>
 					<span id="btn_focus" onClick="focusSelection()" class="button selectBtn" title="Focus on taxa selection (click on a label below to select)">Focus</span>
@@ -183,13 +180,18 @@
 				<span id="ctrl_loading_div"> </span>
 				
 				
-
+				<hr>
 			
 			
 			
 			
-			</div>
-			<hr>
+		</div>
+		
+		
+		
+		
+		<div id="graphics_div" style="display:none"/>
+		
 		
 			<div id="svgouter">
 				<svg id="svg">

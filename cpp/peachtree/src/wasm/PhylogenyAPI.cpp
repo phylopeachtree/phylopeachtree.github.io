@@ -72,7 +72,6 @@ double PhylogenyAPI::getHeight(){
 }
 
 bool PhylogenyAPI::isReady(){
-	cout << "phy ready " << (PhylogenyAPI::THE_TREE != nullptr) << endl;
 	return PhylogenyAPI::THE_TREE != nullptr;
 }
 

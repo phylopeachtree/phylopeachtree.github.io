@@ -446,15 +446,11 @@ extern "C" {
 	 */
 	void EMSCRIPTEN_KEEPALIVE buildTree() {
 
-
 		LinkType method = ClusterTree::getLinkType(OptionsAPI::treeMethods->getVal());
-
 		jsonObject j = PhylogenyAPI::buildTree(AlignmentAPI::getAlignment(), method);
-
 		if (Error::wasError()) {
 			return;
 		}
-
 		WasmAPI::messageFromWasmToJS(j.dump(0));
 
 	}
@@ -465,7 +461,7 @@ extern "C" {
 	 * Generate all objects. Now ready - to render onto the svg
 	 * Return canvas width and height but do not return any of the objects until getGraphics is called
 	*/
-	void EMSCRIPTEN_KEEPALIVE initGraphics () {
+	void EMSCRIPTEN_KEEPALIVE initGraphics (double maxH, double maxW) {
 
 
 		if (!OptionsAPI::isReady()) {
@@ -489,10 +485,17 @@ extern "C" {
 
 
 
-
 		jsonObject json;
 		double width = OptionsAPI::canvasWidth->getVal();
 		double height = OptionsAPI::canvasHeight->getVal();
+
+
+		// Ensure the svg fits in the page
+		width = std::min(width, maxW);
+		height = std::min(height, maxH);
+		OptionsAPI::canvasWidth->setVal(width);
+		OptionsAPI::canvasHeight->setVal(height);
+
 
 		// Initialise filterings if necessary
 		AlignmentAPI::initFiltering(OptionsAPI::variantSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), (OptionsAPI::focusOnClade->getVal() ? PhylogenyAPI::getTree() : nullptr));
@@ -583,15 +586,39 @@ extern "C" {
 		}
 
 		// x-boundary objects
-		jsonObject xboundaries;// = new JSONObject();
-		xboundaries[OptionsAPI::canvasWidth->getName()] = width;
-		xboundaries[OptionsAPI::division1->getName()] = xdivide1*width;
-		xboundaries[OptionsAPI::division2->getName()] = xdivide2*width;
+		jsonObject xboundaries = json::array();
+
+		// Width
+		jsonObject w;
+		w["id"] = OptionsAPI::canvasWidth->getName();
+		w["val"] = width;
+		xboundaries.push_back(w);
+
+		// Divide 1
+		if (PhylogenyAPI::isReady()) {
+			jsonObject o;
+			o["id"] = OptionsAPI::division1->getName();
+			o["val"] = xdivide1*width;
+			xboundaries.push_back(o);
+		}
+
+		// Divide 2
+		if (AlignmentAPI::isReady() && !AlignmentAPI::isMock()) {
+			jsonObject o;
+			o["id"] = OptionsAPI::division2->getName();
+			o["val"] = xdivide2*width;
+			xboundaries.push_back(o);
+		}
+
 		json["xboundaries"] = xboundaries;
 
 		// y-boundary objects
-		jsonObject yboundaries;// = new JSONObject();
-		yboundaries[OptionsAPI::canvasHeight->getName()] = height;
+		jsonObject yboundaries = json::array();
+		jsonObject o;
+		o["id"] = OptionsAPI::canvasHeight->getName();
+		o["val"] = height;
+		yboundaries.push_back(o);
+		//yboundaries[OptionsAPI::canvasHeight->getName()] = height;
 		json["yboundaries"] = yboundaries;
 
 
@@ -702,7 +729,7 @@ extern "C" {
 
 
 				// Horizontal scrolling?
-				if (scaling->getScrollXLength() > 0) {
+				if (scaling->getScrollXLength() > 0 && nsitesInView > 1) {
 
 					// Validate scrollX position
 					if (OptionsAPI::scrollX->getVal()*alnViewWidth + scaling->getScrollXLength() > alnViewWidth) {

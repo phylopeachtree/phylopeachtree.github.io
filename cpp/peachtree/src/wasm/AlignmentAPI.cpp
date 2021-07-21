@@ -28,7 +28,6 @@ int AlignmentAPI::mostRecentlySelectedTaxon = -1;
  * Is the alignment ready to render?
  */
 bool AlignmentAPI::isReady(){
-	cout << "aln ready " << (AlignmentAPI::THE_ALIGNMENT != nullptr) << endl;
 	return AlignmentAPI::THE_ALIGNMENT != nullptr;
 }
 
@@ -221,8 +220,6 @@ extern "C" {
 
 		auto finish = high_resolution_clock::now();
 		auto duration = duration_cast<seconds>(finish - start);
-
-
 
 
 		if (Error::wasError()) {

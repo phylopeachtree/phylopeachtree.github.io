@@ -10,10 +10,11 @@ function initGraphics(){
 
 	MOUSEWHEEL_DY = 0;
 	SCROLLING = false;
+	RESIZING = false;
 	$(document).ready(function() {
 
 
-
+		/*
 		// No main page scroll when mouse is on svg
 		$('#svg').mouseenter(function(e) {
 			//console.log('no scroll');
@@ -24,11 +25,13 @@ function initGraphics(){
 		// Enable main page scroll when mouse is out of svg
 		$('#svg').mouseleave(function(e) {
 			//console.log('yes scroll');
-			$("body").css("overflow", "auto");
+			$("body").css("overflow", "hidden");
 		});
+		*/
 
-		 $('#svg').bind('mousewheel', function(e){
+		 $('#svg').bind('wheel', function(e){
 
+		 	//console.log("when the wheels come down");
 
 
 		 	let goingUp = e.originalEvent.wheelDelta/120 > 0;
@@ -88,6 +91,51 @@ function initGraphics(){
 
 
 
+
+	// Redraw graphics on Window resize
+	$(window).resize(function() {
+
+
+		if (!$("#graphics_div").is(":visible")) return;
+
+		//console.log("window resized");
+		$("#svg").addClass("resizing");
+
+
+		// Prevent resizes in short succession from triggering the event
+		clearTimeout($.data(this, 'resizer'));
+		$.data(this, 'resizer', setTimeout(function() {
+
+			
+			if (RESIZING) return;
+
+
+			RESIZING = true;
+				//callWasmFunction("scrollABit", [mw], function(val){
+				//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
+        		renderGraphics(function() { 
+        			$("#svg").removeClass("resizing");
+        			RESIZING = false; 
+        		});
+	        		//setTimeout(function() {
+	        			//clearTimeout($.data(this, 'timer'));
+        			
+	        		//}, 100);
+	        		
+	        	//});
+
+
+		 //do something
+		}, 60));
+
+
+
+	});
+
+
+
+
+
 	
 }
 
@@ -104,38 +152,44 @@ function renderGraphics(resolve = function() {}){
 	
 	isReadyToRender(function(ready){
 		
-
 		
 		if (!ready) {
 			console.log("Not ready to render!");
+			$("body").css("overflow", "visible");
 			return;
 		}
-		
 		
 		CANCEL_GRAPHICS = true;
 		
 		
 		// Options
 		renderOptions();
-		
-		
 
+
+		
+		
 	
 		addLoader($("#upload_loading_div"));
 		$("#renderBtn").hide();
+
+
+		// Get width and height
+		var maxH = $( window ).height() - $("#mainHeader").offset().top - 250;
+		var maxW = $("#main").offset().left + $("#main").width();
+		console.log("bottomY", maxH, maxW);
 	
 
 		// Generate the graphics objects
-		callWasmFunction("initGraphics", [], function(initialVal){
+		callWasmFunction("initGraphics", [maxH, maxW], function(initialVal){
 		//cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
 			
 			
 			CANCEL_GRAPHICS = false;
-
+			$("body").css("overflow", "hidden");
 
 			
 			//var initialVal = JSON.parse(initialVal);
-			console.log("initialVal", initialVal)
+			//console.log("initialVal", initialVal)
 
 			if (initialVal.err != null){
 				alert(initialVal.err);
@@ -143,6 +197,7 @@ function renderGraphics(resolve = function() {}){
 
 
 				// Hide the upload menu
+				$("#control_panel_div").show(0);
 				$("#graphics_div").show(0);
 				$("#upload_div").hide(0);
 
@@ -161,8 +216,16 @@ function renderGraphics(resolve = function() {}){
 					const padding = 0;
 
 
-					var width = initialVal.xboundaries.width;
-					var height = initialVal.yboundaries.height;
+					var width, height;
+					for (var xboundary in initialVal.xboundaries){
+						var id = initialVal.xboundaries[xboundary]["id"]; 
+						if (id == "width") width = initialVal.xboundaries[xboundary]["val"]; 
+					}
+					for (var yboundary in initialVal.yboundaries){
+						var id = initialVal.yboundaries[yboundary]["id"]; 
+						if (id == "height") height = initialVal.yboundaries[yboundary]["val"]; 
+					}
+
 
 					svg.html("");
 					svg.height(height);
@@ -170,6 +233,7 @@ function renderGraphics(resolve = function() {}){
 
 					svg.parent().height(height + padding);
 					svg.parent().width(width + padding);
+					$("#graphics_div").width(width + padding);
 
 
 					// Create top layer
@@ -179,17 +243,23 @@ function renderGraphics(resolve = function() {}){
 					svg.append(topGroup);
 
 
+					console.log(initialVal);
+
 					// Add the boundaries
 					$(".draggableDivision").remove();
 					for (var xboundary in initialVal.xboundaries){
-						console.log("x", xboundary);
-						var contained = xboundary != "width";
-						createDraggableStick(svg, initialVal.xboundaries[xboundary], xboundary, true, contained);
+						var val = initialVal.xboundaries[xboundary]["val"];
+						var id = initialVal.xboundaries[xboundary]["id"]; 
+						var contained = id != "width";
+						//console.log("xb", id, val);
+						createDraggableStick(svg, val, id, true, contained);
 					}
 					for (var yboundary in initialVal.yboundaries){
-						console.log("y", yboundary);
-						var contained = yboundary != "height";
-						createDraggableStick(svg, initialVal.yboundaries[yboundary], yboundary, false, contained);
+						
+						var val = initialVal.yboundaries[yboundary]["val"];
+						var id = initialVal.yboundaries[yboundary]["id"]; 
+						var contained = id != "height";
+						createDraggableStick(svg, val, id, false, contained);
 					}
 					
 					
@@ -198,13 +268,11 @@ function renderGraphics(resolve = function() {}){
 						if (initialVal.scrolls.scrollY != null){
 							let pos = initialVal.scrolls.scrollY;
 							let len = initialVal.scrolls.scrollYLength;
-							console.log("scrollY", pos, len);
 							createScrollbar(svg, pos, len, "scrollY", true);
 						}
 						if (initialVal.scrolls.scrollX != null){
 							let pos = initialVal.scrolls.scrollX;
 							let len = initialVal.scrolls.scrollXLength;
-							console.log("scrollX", pos, len);
 							createScrollbar(svg, pos, len, "scrollX", false);
 						}
 					}
@@ -215,11 +283,16 @@ function renderGraphics(resolve = function() {}){
 
 
 					// Other meta info
-					$("#ntaxa_span").html(initialVal.ntaxa);
-					$("#nsites_span").html(initialVal.nsites);
-					$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
-					$("#nsitesdisplayed_span").html(initialVal.nsitesdisplayed );
-					$("#nuniqueseqs_span").html(initialVal.nuniqueseqs);
+					if (initialVal.ntaxa != null){
+						$("#ntaxa_span").html(initialVal.ntaxa);
+						$("#nsites_span").html(initialVal.nsites);
+						$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
+						$("#nsitesdisplayed_span").html(initialVal.nsitesdisplayed );
+						$("#nuniqueseqs_span").html(initialVal.nuniqueseqs);
+						$(".alignmentSummary").show(50);
+					}else{
+						$(".alignmentSummary").hide(0);
+					}
 					updateSelectionCSS();
 
 
@@ -317,7 +390,6 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
  		}
 
 
- 		console.log('new value', newValue);
 
 
  		// Set options
@@ -403,7 +475,6 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
  		
  		if (contained && xAxis) newValue = newValue / svg.width();
  		if (contained && !xAxis) newValue = newValue / svg.height();
- 		console.log('new value', newValue);
 
 
 		

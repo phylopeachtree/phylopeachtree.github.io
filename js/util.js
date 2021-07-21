@@ -4,6 +4,7 @@
 function initUtil(){
 	
 	
+	$("#control_panel_div").hide(0);
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
 	BUILDING_TREE = false;
@@ -239,6 +240,7 @@ function initUtil(){
 */
 function reupload(){
 
+	$("#control_panel_div").hide(0);
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
 	

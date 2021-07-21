@@ -21,6 +21,7 @@ Node::Node(){
 	this->parent = nullptr;
 	this->taxon = nullptr;
 	this->sampleTime = Utils::INFTY;
+	this->isCompatibleTransmissionEvent = true;
 }
 
 
@@ -32,6 +33,7 @@ Node::Node(int index){
 	this->parent = nullptr;
 	this->taxon = nullptr;
 	this->sampleTime = Utils::INFTY;
+	this->isCompatibleTransmissionEvent = true;
 }
 
 
@@ -63,7 +65,7 @@ void Node::setNr(int nr){
 	this->nodeNr = nr;
 }
 
-void Node::Node::setFilteredNr(int nr){
+void Node::setFilteredNr(int nr){
 	this->filteredNodeNr = nr;
 }
 
@@ -413,7 +415,7 @@ string Node::getAnnotationValue(string var){
  */
 double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
 		bool showTaxaOnTree, double yshift, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding,
-		bool transmissionTree, Timeline* timeline){
+		bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions){
 
 
 	double x2 = this->getHeight(timeline);
@@ -437,7 +439,8 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 		for (Node* child : this->getChildren()) {
 			double ychild = child->getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift,
-												nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
+												nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree,
+												timeline, displayIncompatibleTransmissions);
 			if (ychild != Utils::INFTY) {
 				if (y == Utils::INFTY) y = 0.0;
 				y += ychild;
@@ -537,6 +540,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 	// Draw node and annotate it
 	if (nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1)) {
+
 		jsonObject node_json;
 		node_json["ele"] = "circle";
 		node_json["cx"] = x2Scaled;
@@ -547,8 +551,62 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			node_json["class"] = "node";
 			node_json["i"] = this->nodeNr;
 		}
-		node_json["title"] = this->getTidyMetaData(timeline);
+		string title = this->getTidyMetaData(timeline);
+
+
+
+		// Compatible?
+		if (displayIncompatibleTransmissions && !this->isCompatibleTransmissionEvent && timeline != nullptr && timeline->isReady()){
+
+			double const tickLen = nodeRadius*1.618;
+
+			// Top-left to bottom-right
+			jsonObject tick1;
+			tick1["ele"] = "line";
+			tick1["x1"] = x2Scaled - tickLen;
+			tick1["x2"] = x2Scaled + tickLen;
+			tick1["y1"] = yscaled - tickLen;
+			tick1["y2"] = yscaled + tickLen;
+			tick1["stroke_width"] = branchWidth;
+			tick1["stroke"] = "red";
+			tick1["stroke_linecap"] = "round";
+			//tick1["title"] = title;
+			objs.push_back(tick1);
+
+
+			// Bottom-left to top-right
+			jsonObject tick2;
+			tick2["ele"] = "line";
+			tick2["x1"] = x2Scaled - tickLen;
+			tick2["x2"] = x2Scaled + tickLen;
+			tick2["y1"] = yscaled + tickLen;
+			tick2["y2"] = yscaled - tickLen;
+			tick2["stroke_width"] = branchWidth;
+			tick2["stroke"] = "red";
+			tick2["stroke_linecap"] = "round";
+			//tick2["title"] = title;
+			objs.push_back(tick2);
+
+			if (this->getChildCount() > 0){
+				tm transmissionDate = timeline->getSampleDateOfCase(this);
+
+				// Get leaf
+				Node* descendant = this->getChild(0);
+				cout << " child of " << this->getAcc() << " is " << descendant->getAcc() << endl;
+				while (!descendant->isLeaf()) {
+					string a = descendant->getAcc();
+					descendant = descendant->getChild(0);
+					cout << " child of " << a << " is " << descendant->getAcc() << endl;
+				}
+
+				title = title + "\n\n" + descendant->getAcc() + " could not have caused this transmission event because they were not infectious on " + Utils::formatDate(transmissionDate);
+			}
+
+		}
+
+		node_json["title"] = title;
 		objs.push_back(node_json);
+
 	}
 
 
@@ -792,10 +850,27 @@ void Node::getAllAnnotations(vector<string>& annots){
 void Node::rotateChildren(){
 
 	if (this->getChildCount() == 0) return;
+	/*
+	vector<int> filterNums;
+	for (int i = 0; i < this->getChildCount(); i++){
+		filterNums.push_back(this->getChild(i)->getFilteredNr());
+	}
+	*/
 
 	Node* lastChild = this->getChild(this->getChildCount()-1);
 	this->children.insert(this->children.begin(), lastChild);
 	this->children.erase(this->children.end()); // Remove last child
+
+
+	/*
+	int lastNr = filterNums.at(filterNums.size() - 1);
+	filterNums.insert(filterNums.begin(), lastNr);
+	filterNums.erase(filterNums.end()); // Remove last filter nr
+	for (int i = 0; i < this->getChildCount(); i++){
+		Node* child = this->children.at(i);
+		child->setFilteredNr(filterNums.at(i));
+	}
+	*/
 
 }
 
@@ -813,6 +888,21 @@ void Node::addAnnotations(Case* c){
 
 
 /*
+ * Is this compatible?
+ */
+bool Node::getIsCompatibleTransmissionEvent(){
+	return this->isCompatibleTransmissionEvent;
+}
+
+
+/*
+ * Set compatibity
+ */
+void Node::setIsCompatibleTransmissionEvent(bool val){
+	this->isCompatibleTransmissionEvent = val;
+}
+
+/*
  * Get the sample time
  */
 double Node::getSampleTime(){
@@ -826,8 +916,6 @@ double Node::getSampleTime(){
 void Node::setSampleTime(double time){
 	this->sampleTime = time;
 }
-
-
 
 
 /*

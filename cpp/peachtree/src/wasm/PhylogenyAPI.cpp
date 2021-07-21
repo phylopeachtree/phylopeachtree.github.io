@@ -115,10 +115,10 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
  */
 jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
 									string internalLabel, string leafLabel, double fontSize, int rounding,
-									bool transmissionTree, Timeline* timeline){
+									bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions){
 
 	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
-				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
+				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions);
 
 
 }
@@ -240,6 +240,7 @@ extern "C" {
 
 		if (PhylogenyAPI::THE_TREE != nullptr) {
 			PhylogenyAPI::THE_TREE->flipSubtree(index);
+			PhylogenyAPI::orderingIsDirty = true;
 		}
 		WasmAPI::messageFromWasmToJS("{}");
 

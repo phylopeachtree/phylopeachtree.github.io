@@ -76,10 +76,13 @@ DiscreteOption* OptionsAPI::colourings;
 // Epidemiology
 DiscreteOption* OptionsAPI::epiSampleDate;
 DiscreteOption* OptionsAPI::epiSymptomDate;
+DiscreteOption* OptionsAPI::epiIsolationDate;
 NumericalOption* OptionsAPI::infectiousPeriodBefore = new NumericalOption("infectiousPeriodBefore", "Epidemiology", "Number of days infectious before symptom onset", 3, 0, 28, 1);
 NumericalOption* OptionsAPI::infectiousPeriodAfter = new NumericalOption("infectiousPeriodAfter", "Epidemiology", "Number of days infectious after symptom onset", 7, 0, 28, 1);
 DiscreteOption* OptionsAPI::dateFormat;
 NumericalOption* OptionsAPI::timelineFontSize = new NumericalOption("timelineFontSize", "Epidemiology", "Font size of dates on timeline", 12, 0, 28, 1);
+BooleanOption* OptionsAPI::displayIncompatibleTranmissions = new BooleanOption("displayIncompatibleTranmissions", "Epidemiology", "Highlight incompatible transmissions", false);
+
 
 
 // Variables
@@ -138,9 +141,11 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(dateFormat);
 	options.push_back(epiSampleDate);
 	options.push_back(epiSymptomDate);
+	options.push_back(epiIsolationDate);
 	options.push_back(infectiousPeriodBefore);
 	options.push_back(infectiousPeriodAfter);
 	options.push_back(timelineFontSize);
+	options.push_back(displayIncompatibleTranmissions);
 
 
 
@@ -175,6 +180,41 @@ void OptionsAPI::prepareEpiAnnotations() {
 		OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
 	}else{
 		OptionsAPI::epiSymptomDate->setValAndDomain(vals.at(0), vals);
+	}
+
+	// Isolation date
+	if (OptionsAPI::epiIsolationDate == nullptr){
+		OptionsAPI::epiIsolationDate = new DiscreteOption("epiIsolationDate", "Epidemiology", "Isolation date", vals.at(0), vals);
+	}else{
+		OptionsAPI::epiIsolationDate->setValAndDomain(vals.at(0), vals);
+	}
+
+
+
+	// Smart matching by string match
+	for (string var : vals){
+
+		string lower = Utils::toLower(var);
+
+		// Sample date
+		if (lower.find("sample") != std::string::npos) {
+			cout << "Default: setting sample date to " << var << endl;
+			OptionsAPI::epiSampleDate->setVal(var);
+		}
+
+
+		// Symptom onset date
+		if (lower.find("symptom") != std::string::npos) {
+			cout << "Default: setting symptom date to " << var << endl;
+			OptionsAPI::epiSymptomDate->setVal(var);
+		}
+
+		// Isolation date
+		if (lower.find("isolat") != std::string::npos) {
+			cout << "Default: setting isolation date to " << var << endl;
+			OptionsAPI::epiIsolationDate->setVal(var);
+		}
+
 	}
 
 
@@ -373,6 +413,7 @@ extern "C" {
 		OptionsAPI::internalNodeLabels = nullptr;
 		OptionsAPI::leafNodeLabels = nullptr;
 		OptionsAPI::epiSymptomDate = nullptr;
+		OptionsAPI::epiIsolationDate = nullptr;
 
 		OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain(), true);
 
@@ -472,7 +513,7 @@ extern "C" {
 
 
 		// Full size of view
-		double fullHeight = ntHeight * AlignmentAPI::getNtaxaDisplayed() + OptionsAPI::TOP_MARGIN;
+		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN;
 		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+1);
 
 
@@ -573,7 +614,7 @@ extern "C" {
 
 			// Prepare epi calendar
 			EpiAPI::prepareTimeline(PhylogenyAPI::getTree(), OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
-			EpiAPI::prepareNodeSampleHeights(subtree);
+			EpiAPI::prepareNodeSampleHeights(subtree, OptionsAPI::epiSymptomDate->getVal(), OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
 
 
 			// Tree range
@@ -598,8 +639,9 @@ extern "C" {
 
 
 			// Plot tree
+			bool displayIncompat = OptionsAPI::transmissionTree->getVal() && OptionsAPI::displayIncompatibleTranmissions->getVal();
 			jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
-					internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline());
+					internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline(), displayIncompat);
 			objs.insert(objs.end(), tree.begin(), tree.end());
 
 
@@ -681,8 +723,10 @@ extern "C" {
 
 		// Finally, plot the EPI timeline
 		if (PhylogenyAPI::isReady() && treeScaling != nullptr && subtree != nullptr) {
+
 			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal(), OptionsAPI::epiSymptomDate->getVal(),
-										OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
+										OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal(),
+										OptionsAPI::epiIsolationDate->getVal());
 			objs.insert(objs.end(), timeline.begin(), timeline.end());
 		}
 
@@ -860,6 +904,12 @@ extern "C" {
 				if (option == OptionsAPI::focusOnClade || option == OptionsAPI::focusOnTaxa) {
 					OptionsAPI::resetScroll();
 					AlignmentAPI::setSelectionToDirty();
+				}
+
+
+				// If 'displayIncompatibleTranmissions' becomes true, set 'transmissionTree' to true
+				if (option == OptionsAPI::displayIncompatibleTranmissions && val == true){
+					OptionsAPI::transmissionTree->setVal(true);
 				}
 
 				cout << "setting " << option->getName() << " to " << val << "|" << value << endl;

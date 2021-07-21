@@ -31,12 +31,13 @@ public:
 	bool isReady();
 	void setSampleDateVariable(string sampleDateVariable, string dateFormat);
 	void cleanup();
-	tm getSampleDateOfCase(int caseNum);
 	double getSampleTimeOfCase(int caseNum);
 	double getSampleHeightOfCase(int caseNum);
+	tm getSampleDateOfCase(Node* node);
 	double getSampleHeight(Node* node);
-	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
-	void prepareNodeSampleHeights(Node* subtree);
+	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar,
+			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar);
+	void prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
 
 
 

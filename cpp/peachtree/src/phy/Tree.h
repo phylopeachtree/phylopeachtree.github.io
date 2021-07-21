@@ -44,7 +44,8 @@ public:
 	vector<Node*> listNodes(Node* theRoot);
 	static int getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos);
 	jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
-								double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline);
+								double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree,
+								Timeline* timeline, bool displayIncompatibleTransmissions);
 	double getHeight();
 	void applyFiltering(Filtering* filtering);
 	vector<Taxon*> getClade(vector<Taxon*> taxa);

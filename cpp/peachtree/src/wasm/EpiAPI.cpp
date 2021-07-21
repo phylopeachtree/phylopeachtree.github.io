@@ -28,12 +28,14 @@ bool EpiAPI::epiAnnotationsAreDirty = false;
 /*
  * Get timeline graphics
  */
-jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
+jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar,
+				int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar){
 	if (EpiAPI::timeline == nullptr || !EpiAPI::timeline->isReady()) {
 		jsonObject arr = json::array();
 		return arr;
 	}
-	return EpiAPI::timeline->getTimelineGraphics(subtree, scaling, axisFontSize, symptomDateVar, infectiousDaysBefore, infectiousDaysAfter);
+	return EpiAPI::timeline->getTimelineGraphics(subtree, scaling, axisFontSize, symptomDateVar, infectiousDaysBefore, infectiousDaysAfter,
+			isolationDateVar);
 }
 
 
@@ -42,9 +44,9 @@ jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double a
 /*
  * Reset sample heights if the subtree has changed
  */
-void EpiAPI::prepareNodeSampleHeights(Node* subtree){
+void EpiAPI::prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
 	if (EpiAPI::timeline == nullptr) return;
-	EpiAPI::timeline->prepareNodeSampleHeights(subtree);
+	EpiAPI::timeline->prepareNodeSampleHeights(subtree, symptomDateVar, infectiousDaysBefore, infectiousDaysAfter);
 }
 
 

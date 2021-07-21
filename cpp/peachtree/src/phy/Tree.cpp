@@ -318,7 +318,8 @@ int Tree::getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos){
  * Get a json array of graphics
  */
 jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
-						double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline){
+						double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree,
+						Timeline* timeline, bool displayIncompatibleTransmissions){
 
 
 	jsonObject objs = json::array();
@@ -337,7 +338,7 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 
 	Node* subtree = filtering->getSubtreeRoot() != nullptr ? filtering->getSubtreeRoot() : this->root;
 	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius,
-				internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline);
+				internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions);
 	return objs;
 
 

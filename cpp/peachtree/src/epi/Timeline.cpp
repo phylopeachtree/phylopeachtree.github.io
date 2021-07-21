@@ -36,15 +36,86 @@ Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVari
  * Prepare node sample heights for this subtree
  * If the tree has not changed, then do not do any new calculations
  */
-void Timeline::prepareNodeSampleHeights(Node* subtree){
+void Timeline::prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
 
-	if (this->sampleSubtree != nullptr && this->sampleSubtree == subtree) return;
-	this->sampleSubtree = subtree;
-	cout << "prepareNodeSampleHeights" << endl;
 
-	this->resetNodeSampleTimes(subtree);
+	if (this->sampleSubtree == nullptr || this->sampleSubtree != subtree) {
+
+		// Clear cache of node heights
+		this->sampleSubtree = subtree;
+		cout << "prepareNodeSampleHeights" << endl;
+		this->resetNodeSampleTimes(subtree);
+
+
+	}
+
+
+	// Determine which internal nodes (with at least 1 leaf child) are compatible based on infectious period
+	vector<string> annots = this->epidemiology->getAnnotations();
+
+	if (std::count(annots.begin(), annots.end(), symptomDateVar) > 0) {
+
+
+		vector<Node*> leaves;
+		subtree->getLeafSet(leaves);
+		for (Node* node : leaves){
+
+			string val = node->getAnnotationValue(symptomDateVar);
+			node->setIsCompatibleTransmissionEvent(true);
+
+			// Attempt to parse date
+			struct tm symptomDate;
+			if (!Utils::parseDate(val, dateFormatCanonical, symptomDate)) {
+				cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
+				continue;
+			}
+
+
+			// Get x coords
+			struct tm infectiousStartDate = Utils::addDays(symptomDate, -infectiousDaysBefore);
+			struct tm infectiousEndDate = Utils::addDays(symptomDate, infectiousDaysAfter);
+			double infectiousStartX_height = this->latestTime - Utils::getTimeFromDate(infectiousStartDate);
+			double infectiousEndX_height = this->latestTime - Utils::getTimeFromDate(infectiousEndDate);
+
+
+			// Compatible?
+			if (!node->isRoot()){
+
+				Node* child = node;
+				Node* parent = child->getParent();
+
+				while (true) {
+
+					// Check that 'child' is the infector
+					if (parent->getChild(0) == child){
+
+						// Is the parent node within the infectious period of this node?
+						double transmissionHeight = this->getSampleHeight(parent);
+						bool compatible = infectiousStartX_height > transmissionHeight && transmissionHeight > infectiousEndX_height;
+						parent->setIsCompatibleTransmissionEvent(compatible);
+
+					}else{
+						break;
+					}
+
+					if (parent->isRoot()) break;
+					child = parent;
+					parent = parent->getParent();
+
+
+
+				}
+
+			}
+
+		}
+
+	}
+
 
 }
+
+
 
 
 /*
@@ -169,17 +240,6 @@ bool Timeline::isReady(){
 }
 
 
-/*
- * The date of this case
- */
-tm Timeline::getSampleDateOfCase(int caseNum){
-	if (this->caseDates.size() == 0) {
-		tm time;
-		time.tm_mon = -1;
-	}
-	return this->caseDates.at(caseNum);
-
-}
 
 
 /*
@@ -201,6 +261,18 @@ double Timeline::getSampleHeightOfCase(int caseNum){
 		return 0;
 	}
 	return this->latestTime - Utils::getTimeFromDate(this->caseDates.at(caseNum));
+}
+
+
+
+/*
+ * The date of this case
+ */
+tm Timeline::getSampleDateOfCase(Node* node){
+
+	// Node sample height
+	double height = this->getSampleHeight(node);
+	return Utils::addYears(this->latestDate, -height);
 }
 
 
@@ -239,6 +311,7 @@ double Timeline::getSampleHeight(Node* node){
 				if (hc > hprime) hprime = hc;
 			}
 
+			//node->setSampleTime(hprime);
 			return hprime;
 		}
 
@@ -287,7 +360,8 @@ void Timeline::cleanup(){
  * Get the json object encoding the timeline x-axis
  */
 jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize,
-										string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter){
+										string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter,
+										string isolationDateVar){
 
 	jsonObject arr = json::array();
 
@@ -312,33 +386,28 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	arr.push_back(axis);
 	*/
 
-
 	// Date of the root
 	double height = this->getSampleHeight(subtree);
-
 
 	// First and last date
 	tm firstDate = Utils::addYears(this->latestDate, -height);
 
+	vector<string> annots = this->epidemiology->getAnnotations();
+	vector<Node*> leaves;
+	subtree->getLeafSet(leaves);
 
+	// Calculate yshift to avoid clipping top margin
+	double yshift = 0;
+	for (int leafNr = 0; leafNr < leaves.size(); leafNr ++) {
+		int filteredNr = leaves.at(leafNr)->getFilteredNr();
+		if (filteredNr >= 0 && scaling->inRangeY(filteredNr)){
+			yshift = scaling->getCanvasMinY() - scaling->scaleY(filteredNr);
+			break;
+		}
+	}
 
 	// Infectious period: check the variable name is valid
-	vector<string> annots = this->epidemiology->getAnnotations();
 	if (std::count(annots.begin(), annots.end(), symptomDateVar) > 0) {
-
-		vector<Node*> leaves;
-		subtree->getLeafSet(leaves);
-
-
-		// Calculate yshift to avoid clipping top margin
-		double yshift = 0;
-		for (int leafNr = 0; leafNr < leaves.size(); leafNr ++) {
-			int filteredNr = leaves.at(leafNr)->getFilteredNr();
-			if (filteredNr >= 0 && scaling->inRangeY(filteredNr)){
-				yshift = scaling->getCanvasMinY() - scaling->scaleY(filteredNr);
-				break;
-			}
-		}
 
 		// Plot the symptom dates
 		for (Node* node : leaves){
@@ -357,8 +426,10 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			struct tm infectiousStartDate = Utils::addDays(symptomDate, -infectiousDaysBefore);
 			struct tm infectiousEndDate = Utils::addDays(symptomDate, infectiousDaysAfter);
 			double symptomX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(symptomDate));
-			double infectiousStartX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(infectiousStartDate));
-			double infectiousEndX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(infectiousEndDate));
+			double infectiousStartX_height = this->latestTime - Utils::getTimeFromDate(infectiousStartDate);
+			double infectiousStartX = scaling->scaleX(infectiousStartX_height);
+			double infectiousEndX_height = this->latestTime - Utils::getTimeFromDate(infectiousEndDate);
+			double infectiousEndX = scaling->scaleX(infectiousEndX_height);
 
 			// Get y coord
 			double y = node->getFilteredNr() + 0.4;
@@ -395,15 +466,124 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			arr.push_back(node_json);
 
 
-		}
 
+			/*
+			// Compatible?
+			if (displayIncompatibleTranmissions && !node->isRoot()){
+
+				Node* parent = node->getParent();
+
+				// Check that this is the infector
+				if (parent->getChild(0) == node){
+
+
+					// Is the parent node within the infectious period of this node?
+					double transmissionHeight = this->getSampleHeight(parent);
+					bool compatible = infectiousStartX_height > transmissionHeight && transmissionHeight > infectiousEndX_height;
+
+					// Get siblings (ie. secondary cases)
+					if (!compatible){
+
+						cout << node->getAcc() << " is not compatible" << endl;
+
+						double const rectW = 5;
+						double parentX = scaling->scaleX(transmissionHeight);
+						double parentY = scaling->scaleY(parent->getFilteredNr() + 0.5) + yshift;
+						tm transmissionDate = Utils::addYears(latestDate, -transmissionHeight);
+
+						string title = node->getAcc() + " could not have cause this transmission event because they were not infectious on " + Utils::formatDate(transmissionDate);
+
+						double const tickLen = 6;
+						double const tickWid = 3;
+
+						// Top-left to bottom-right
+						jsonObject tick1;
+						tick1["ele"] = "line";
+						tick1["x1"] = parentX - tickLen;
+						tick1["x2"] = parentX + tickLen;
+						tick1["y1"] = parentY - tickLen;
+						tick1["y2"] = parentY + tickLen;
+						tick1["stroke_width"] = tickWid;
+						tick1["stroke"] = "red";
+						tick1["stroke_linecap"] = "round";
+						tick1["title"] = title;
+						arr.push_back(tick1);
+
+
+						// Bottom-left to top-right
+						jsonObject tick2;
+						tick2["ele"] = "line";
+						tick2["x1"] = parentX - tickLen;
+						tick2["x2"] = parentX + tickLen;
+						tick2["y1"] = parentY + tickLen;
+						tick2["y2"] = parentY - tickLen;
+						tick2["stroke_width"] = tickWid;
+						tick2["stroke"] = "red";
+						tick2["stroke_linecap"] = "round";
+						tick2["title"] = title;
+						arr.push_back(tick2);
+
+					}
+
+				}
+
+			}
+			*/
+
+		}
 
 	}
 
 
 
+	// Isolation date: check the variable name is valid
+	if (std::count(annots.begin(), annots.end(), isolationDateVar) > 0) {
+
+
+		// Plot the symptom dates
+		for (Node* node : leaves){
+
+			string val = node->getAnnotationValue(isolationDateVar);
+
+			// Attempt to parse date
+			struct tm isolationDate;
+			if (!Utils::parseDate(val, dateFormatCanonical, isolationDate)) {
+				cout << "Warning: could not parse isolation date '" << val << "' from " << dateFormatCanonical << endl;
+				continue;
+			}
+
+			// Get x coords
+			double isolationX = scaling->scaleX(this->latestTime - Utils::getTimeFromDate(isolationDate));
+
+
+			// Get y coord
+			double y = node->getFilteredNr() + 0.5;
+			double yscaled = scaling->scaleY(y) + yshift;
+			const int nodeRadius = 5;
+
+
+
+			// Plot a purple circle on isolation date
+			jsonObject node_json;
+			node_json["ele"] = "circle";
+			node_json["cx"] = isolationX;
+			node_json["cy"] = yscaled;
+			node_json["r"] = nodeRadius;
+			node_json["fill"] = "#662E8Faa";
+			node_json["class"] = "isolation";
+			node_json["title"] = node->getAcc() + " entered isolation on " + Utils::formatDate(isolationDate);
+			arr.push_back(node_json);
+
+
+		}
+
+	}
+
+
+
+
 	// Get some nice dates to print
-	int ndates = std::floor((scaling->getCanvasMaxX() - scaling->getCanvasMinX()) / (5 * axisFontSize));
+	int ndates = std::floor((scaling->getCanvasMaxX() - scaling->getCanvasMinX()) / (8 * axisFontSize));
 	ndates = std::min(ndates, Timeline::MAX_NDATES);
 	if (ndates > 0){
 

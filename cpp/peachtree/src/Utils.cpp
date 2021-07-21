@@ -195,15 +195,33 @@ void Utils::getNiceTimes(tm lastDate, double timeSpan, int maxNTimes, vector<dou
 	int currentYear = 0;
 
 
+	double nDaysInTimespan = timeSpan*365;
 	double nMonthsInTimespan = timeSpan*12;
 	bool countDays = nMonthsInTimespan < 6; // Less than 6 months
 	bool countMonthsNotDays = !countDays && timeSpan < maxNTimes; // Between 6 months and 2 years
 
 	// How long is a time interval?
 	double deltaTime = timeSpan / maxNTimes;
+
+	// Every 1,2,3,4,5,10 days
+	if (countDays){
+
+		vector<int> niceGaps({1,2,3,4,5,10});
+		for (int g : niceGaps){
+			if (nDaysInTimespan / g <= maxNTimes){
+				deltaTime = g/365.0;
+				//cout << "nice gaps " << g << " (" << maxNTimes << ")" << endl;
+				break;
+			}
+		}
+
+	}
+
+
+	// Every 1, 2, 3, 4, 5, or 6 months
 	if (countMonthsNotDays){
 
-		// Every 1, 2, 3, 4, 5, or 6 months
+
 		vector<int> niceGaps({1,2,3,4,5,6});
 		for (int g : niceGaps){
 			if (nMonthsInTimespan / g <= maxNTimes){

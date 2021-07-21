@@ -67,10 +67,12 @@ public:
 	// Epidemiology
 	static DiscreteOption* epiSampleDate;
 	static DiscreteOption* epiSymptomDate;
+	static DiscreteOption* epiIsolationDate;
 	static NumericalOption* infectiousPeriodBefore;
 	static NumericalOption* infectiousPeriodAfter;
 	static DiscreteOption* dateFormat;
 	static NumericalOption* timelineFontSize;
+	static BooleanOption* displayIncompatibleTranmissions;
 
 
 	// Methods

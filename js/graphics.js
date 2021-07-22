@@ -2,6 +2,7 @@
 
 
 CANCEL_GRAPHICS = false;
+DOWNLOADING = false;
 
 
 function initGraphics(){
@@ -150,6 +151,9 @@ function initGraphics(){
 */
 function renderGraphics(resolve = function() {}){
 	
+
+	if (DOWNLOADING) return;
+
 	isReadyToRender(function(ready){
 		
 		
@@ -158,8 +162,12 @@ function renderGraphics(resolve = function() {}){
 			$("body").css("overflow", "visible");
 			return;
 		}
+
+
+
 		
 		CANCEL_GRAPHICS = true;
+
 		
 		
 		// Options
@@ -180,7 +188,7 @@ function renderGraphics(resolve = function() {}){
 	
 
 		// Generate the graphics objects
-		callWasmFunction("initGraphics", [maxH, maxW], function(initialVal){
+		callWasmFunction("initGraphics", [maxH, maxW, 0], function(initialVal){
 		//cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
 			
 			
@@ -681,4 +689,121 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
 
 
+
+
+/*
+	Download the svg
+*/
+function download(){
+
+
+	isReadyToRender(function(ready){
+
+		if (!ready || DOWNLOADING) return;
+
+		addLoader($("#ctrl_loading_div"));
+
+		var divID = "downloadSVG_DIV";
+		var svgID = "downloadSVG";
+		$("body").append(`<div id="` + divID + `" style="display:none"> <svg id="` + svgID + `" style="font-family:'Courier New';dominant-baseline:middle; "></svg></div>`);
+
+
+		var resolve = function(){
+			saveSvg(document.getElementById(svgID), "peachtree.svg");
+			DOWNLOADING = false;
+			removeLoader($("#ctrl_loading_div"));
+		};
+
+
+
+
+
+		DOWNLOADING = true;
+
+		// Generate the graphics objects
+		callWasmFunction("initGraphics", [0, 0, 1], function(initialVal){
+		//cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
+			
+
+
+			if (initialVal.err != null){
+				alert(initialVal.err);
+			}else{
+
+
+
+
+				// Prepare svg width/height
+				var svg = $("#" + svgID);
+				const padding = 0;
+
+
+				var width, height;
+				for (var xboundary in initialVal.xboundaries){
+					var id = initialVal.xboundaries[xboundary]["id"]; 
+					if (id == "width") width = initialVal.xboundaries[xboundary]["val"]; 
+				}
+				for (var yboundary in initialVal.yboundaries){
+					var id = initialVal.yboundaries[yboundary]["id"]; 
+					if (id == "height") height = initialVal.yboundaries[yboundary]["val"]; 
+				}
+
+
+				svg.html("");
+				svg.height(height);
+				svg.width(width);
+
+				// Create top layer
+				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				svg.append(mainGroup);
+				svg.append(topGroup);
+
+				console.log(initialVal);
+
+
+				// Plot top level objects
+				for (var i = 0; i < initialVal.objects.length; i ++){
+					var o = initialVal.objects[i];
+					drawSVGobj(topGroup, o);
+				}
+
+
+				// Plot json objects 1 chunk at a time
+				plotNextObject(mainGroup, 0, resolve);
+
+				
+			}
+
+
+		});
+		
+
+
+	});
+
+
+}
+
+
+
+/*
+	Save the svg
+*/
+function saveSvg(svgEl, name) {
+
+	console.log("saving as", name);
+
+	svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+	var svgData = svgEl.outerHTML;
+	var preface = '<?xml version="1.0" standalone="no"?>\r\n';
+	var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
+	var svgUrl = URL.createObjectURL(svgBlob);
+	var downloadLink = document.createElement("a");
+	downloadLink.href = svgUrl;
+	downloadLink.download = name;
+	document.body.appendChild(downloadLink);
+	downloadLink.click();
+	document.body.removeChild(downloadLink);
+}
 

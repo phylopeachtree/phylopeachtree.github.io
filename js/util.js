@@ -3,7 +3,7 @@
 
 function initUtil(){
 	
-	
+
 	$("#control_panel_div").hide(0);
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
@@ -668,6 +668,9 @@ function flipSubtree(ele){
 
 }
 
+
+
+
 /*
 	Clears all taxa selection
 */
@@ -777,6 +780,10 @@ function searchForTaxon(){
 		
 	}, 1);
 }
+
+
+
+
 
 
 

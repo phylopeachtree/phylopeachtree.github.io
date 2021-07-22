@@ -40,28 +40,34 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 	if (x > 0) {
 
 		double viewWidth = (this->canvasMaxX - this->canvasMinX);
-		this->scrollX = x * fullWidth + this->canvasMinX;
+		double scrollXLen = this->getScrollXLength();
+
+		// Renormalise to account for thumb size
+		x = x / (1 - scrollXLen/viewWidth);
+		//x = std::min(x, 1.0);
+
+		this->scrollX = x * (fullWidth-viewWidth);// + this->canvasMinX;
+
+		cout << "scrolling: " << x << "/" << fullWidth << "/" << fullWidth << "/" << this->scrollX << endl;
 
 
 		// Left side
-		double scrollXLen = this->getScrollXLength();
 		if (this->scrollX <= scrollXLen) {
 			this->scrollX = 0;
 		}
 
 		// Right side
-		else if (this->scrollX >= fullWidth - viewWidth) {
-			this->scrollX = fullWidth - viewWidth;
+		else if (x >= 1) {
+
 		}
 
 		// In between
 		else {
-			this->scrollX += scrollXLen/2;
+			//this->scrollX += scrollXLen/2;
 		}
 
-
-
 	}
+
 
 
 	// Y scroll
@@ -69,25 +75,33 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 	if (y > 0) {
 
 		double viewHeight = (this->canvasMaxY - this->canvasMinY);
-		this->scrollY = y * fullHeight + this->canvasMinY;
+		double scrollYLen = this->getScrollYLength();
+
+		// Renormalise to account for thumb size
+		y = y / (1 - scrollYLen/viewHeight);
+		//y = std::min(y, 1.0);
+		this->scrollY = y * (fullHeight-viewHeight); // + this->canvasMinY;
+
+		cout << "scrolling: " << y << "/" << fullHeight << "/" << this->scrollY << endl;
 
 		// Top of window
-		double scrollYLen = this->getScrollYLength();
 		if (this->scrollY <= scrollYLen) {
 			this->scrollY = 0;
 		}
 
 		// Bottom of window
-		else if (this->scrollY >= fullHeight - viewHeight) {
-			this->scrollY = fullHeight - viewHeight;
+		else if (y >= 1){
+		//else if (this->scrollY + this->getScrollYLength() >= fullHeight) { // - viewHeight) {
+			//this->scrollY = fullHeight - this->canvasMaxY; // viewHeight;
 		}
 
 		// In between
 		else {
-			this->scrollY += scrollYLen/2;
+			//this->scrollY += scrollYLen/2;
 		}
 
 	}
+
 }
 
 

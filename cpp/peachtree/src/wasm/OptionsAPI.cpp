@@ -33,8 +33,8 @@ const double OptionsAPI::SCROLL_Y_NROWS = 10;
 
 
 // Boundaries
-NumericalOption* OptionsAPI::canvasWidth = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, 2000, 100, true);
-NumericalOption* OptionsAPI::canvasHeight = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, 2000, 100, true);
+NumericalOption* OptionsAPI::canvasWidth = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, Utils::INFTY, 100, true);
+NumericalOption* OptionsAPI::canvasHeight = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, Utils::INFTY, 100, true);
 NumericalOption* OptionsAPI::division1 = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0, 0, 1, 0.1, true);
 NumericalOption* OptionsAPI::division2 = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.2, 0, 1, 0.1, true);
 
@@ -461,8 +461,9 @@ extern "C" {
 	 * Generate all objects. Now ready - to render onto the svg
 	 * Return canvas width and height but do not return any of the objects until getGraphics is called
 	*/
-	void EMSCRIPTEN_KEEPALIVE initGraphics (double maxH, double maxW) {
+	void EMSCRIPTEN_KEEPALIVE initGraphics(double maxH, double maxW, int downloadInt) {
 
+		bool download = downloadInt == 1;
 
 		if (!OptionsAPI::isReady()) {
 			WasmAPI::messageFromWasmToJS("");
@@ -491,10 +492,12 @@ extern "C" {
 
 
 		// Ensure the svg fits in the page
-		width = std::min(width, maxW);
-		height = std::min(height, maxH);
-		OptionsAPI::canvasWidth->setVal(width);
-		OptionsAPI::canvasHeight->setVal(height);
+		if (!download){
+			width = std::min(width, maxW);
+			height = std::min(height, maxH);
+			OptionsAPI::canvasWidth->setVal(width);
+			OptionsAPI::canvasHeight->setVal(height);
+		}
 
 
 		// Initialise filterings if necessary
@@ -517,8 +520,14 @@ extern "C" {
 
 		// Full size of view
 		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN;
-		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+1);
+		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+2);
 
+
+
+		if (download){
+			width = OptionsAPI::LEFT_MARGIN + xdivide2*width + fullAlnWidth;
+			height = fullHeight;
+		}
 
 
 		// Vertical scrolling?
@@ -691,7 +700,19 @@ extern "C" {
 				// Font size
 				double labelFontSize = std::min(ntHeight, OptionsAPI::fontSizeTaxa->getVal());
 
-				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling,  labelFontSize, OptionsAPI::showTaxonNumbers->getVal());
+
+				// White bg
+				jsonObject rect;
+				rect["ele"] = "rect";
+				rect["x"] = xdivide1*width;
+				rect["y"] = OptionsAPI::TOP_MARGIN;
+				rect["width"] = xdivide2*width - xdivide1*width;
+				rect["height"] = height - OptionsAPI::TOP_MARGIN;
+				rect["fill"] = "white";
+				objs.push_back(rect);
+
+
+				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal());
 				objs.insert(objs.end(), taxa.begin(), taxa.end()); //test
 			}
 
@@ -712,6 +733,16 @@ extern "C" {
 				scaling->setRowHeight(ntHeight);
 				scaling->setScroll(OptionsAPI::scrollX->getVal(), OptionsAPI::scrollY->getVal(), fullAlnWidth, fullHeight);
 
+
+				// White bg
+				jsonObject rect;
+				rect["ele"] = "rect";
+				rect["x"] = xdivide2*width;
+				rect["y"] = OptionsAPI::TOP_MARGIN;
+				rect["width"] = width - xdivide2*width;
+				rect["height"] = height - OptionsAPI::TOP_MARGIN;
+				rect["fill"] = "white";
+				objs.push_back(rect);
 
 				// Font size
 				double ntFontSize = std::min(ntHeight, OptionsAPI::fontSizeAln->getVal());
@@ -741,6 +772,9 @@ extern "C" {
 				}
 
 
+				delete scaling;
+
+
 			}
 
 
@@ -755,6 +789,7 @@ extern "C" {
 										OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal(),
 										OptionsAPI::epiIsolationDate->getVal());
 			objs.insert(objs.end(), timeline.begin(), timeline.end());
+			delete treeScaling;
 		}
 
 
@@ -905,6 +940,8 @@ extern "C" {
 
 				double val = stod(value);
 
+
+
 				// Special case: scroll bar positions should be normalised
 				if (option == OptionsAPI::scrollX) {
 					val = val - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal();
@@ -912,8 +949,9 @@ extern "C" {
 				}
 
 				if (option == OptionsAPI::scrollY) {
-					val = val / (OptionsAPI::canvasHeight->getVal());
+					val = val / (OptionsAPI::canvasHeight->getVal() - OptionsAPI::TOP_MARGIN);
 				}
+
 
 
 				v->setVal(val);
@@ -939,7 +977,7 @@ extern "C" {
 					OptionsAPI::transmissionTree->setVal(true);
 				}
 
-				cout << "setting " << option->getName() << " to " << val << "|" << value << endl;
+				//cout << "setting " << option->getName() << " to " << val << "|" << value << endl;
 
 				v->setVal(val);
 			}

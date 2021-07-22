@@ -684,6 +684,7 @@ input:checked + .sliderboolean:before {
 	flex-wrap: wrap;
 	align-items:flex-start;
 	padding-top:5em;
+	%padding-bottom:5em;
 }
 
 

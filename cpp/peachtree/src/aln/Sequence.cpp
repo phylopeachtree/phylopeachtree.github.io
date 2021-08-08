@@ -215,7 +215,8 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 
 	// Add some xshift to the first nucleotide so it doesn't get clipped by left boundary
 	double xshift = Utils::INFTY; // -1 = null
-
+	//double x0 = Utils::INFTY;
+	//int siteNum = 0;
 
 	// Plot sites
 	json nt_bg;
@@ -234,12 +235,27 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 
 
 
+
+
 		double xc = scaling->scaleX(x);
 		if (xshift == Utils::INFTY) {
 			xshift = scaling->getCanvasMinX() - xc;
 		}
 		xc += xshift;
 
+
+		/*
+		double xc;
+		if (x0 == Utils::INFTY) {
+			double xc = scaling->scaleX(x);
+			xshift = scaling->getCanvasMinX() - xc;
+			xc += xshift;
+			x0 = xc;
+		}else{
+			siteNum++;
+			xc = x0 + ntWidth*siteNum;
+		}
+	*/
 
 
 
@@ -266,6 +282,7 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 		// Text
 		if (textSize > 0) {
 			xc = scaling->scaleX(x + 0.5) + xshift;
+			//xc = xc + ntWidth/2.0;
 			nt_font["ele"] = "text";
 			nt_font["x"] = xc;
 			nt_font["y"] = yc_text_scaled;

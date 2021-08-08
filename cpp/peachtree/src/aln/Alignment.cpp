@@ -365,7 +365,7 @@ json Alignment::toJSON(){
  * Get graphics of the sequences in the alignment
  * @return
  */
-json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering){
+json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering, int siteNumberingEvery){
 
 	json objs = json::array();
 	if (!scaling->inView() || this->sequences.size() == 0) return objs;
@@ -382,6 +382,93 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 		}
 
 	}
+
+
+	// Site numbering at the top
+	int siteLabelIndex = 0;
+	int x = 0;
+	double xshift = Utils::INFTY;
+
+	// First pos
+	for (int site : filtering->getSites()) {
+		if (!scaling->inRangeX(x, minNtWidth)) {
+			x++;
+			continue;
+		}else{
+			xshift = scaling->getCanvasMinX() - scaling->scaleX(x);
+			break;
+		}
+	}
+	x=0;
+
+	const double tickWidth = 2;
+	const double tickHeight = textSize;
+	for (int site : filtering->getSites()) {
+
+
+
+		// Do not plot beyond edge
+		if (!scaling->inRangeX(x, minNtWidth)) {
+			x ++;
+			continue;
+		}
+
+
+
+
+		int effSiteNum = filtering->getVariantSitesOnly() ? siteLabelIndex : site+1;
+
+		// Plot the site number
+		if (effSiteNum % siteNumberingEvery == 0){
+
+
+			// Is there enough space?
+			int len = to_string(site+1).size();
+			if (!scaling->inRangeX(x+len, minNtWidth)) continue;
+
+
+			double xc = scaling->scaleX(x) + xshift;
+
+
+			// Draw a tick
+			if (x > 0){
+				json tick_json;
+				tick_json["ele"] = "line";
+				tick_json["x1"] = xc;
+				tick_json["x2"] = xc;
+				tick_json["y1"] = scaling->getCanvasMinY();
+				tick_json["y2"] = scaling->getCanvasMinY()-tickHeight;
+				tick_json["stroke_width"] = tickWidth;
+				tick_json["stroke"] = "black";
+				tick_json["stroke_linecap"] = "round";
+				objs.push_back(tick_json);
+			}
+
+			// Plot the number
+			json label_json;
+			label_json["ele"] = "text";
+			label_json["x"] = xc + tickWidth + 0.5;
+			label_json["y"] = scaling->getCanvasMinY() - textSize/2.0;
+			label_json["text_anchor"] = "start";
+			//label_json["dominant_baseline"] = "hanging";
+			label_json["value"] = site+1;
+			label_json["font_size"] = textSize;
+			objs.push_back(label_json);
+
+
+
+		}
+
+
+
+		siteLabelIndex++;
+		x++;
+		if (siteLabelIndex >= siteNumberingEvery) siteLabelIndex = 0;
+
+
+	}
+
+
 
 	int seqNumDisplayed = 0;
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {

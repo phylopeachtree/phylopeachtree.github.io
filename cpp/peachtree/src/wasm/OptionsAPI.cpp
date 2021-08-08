@@ -22,13 +22,15 @@
 
 
 const long OptionsAPI::CHUNK_SIZE = 40000;
-const double OptionsAPI::LEFT_MARGIN = 16; // Left hand margin
-const double OptionsAPI::TOP_MARGIN = 16; // Top margin
+const double OptionsAPI::LEFT_MARGIN = 0; // Left hand margin
+double OptionsAPI::TOP_MARGIN = 16; // Top margin
+const double OptionsAPI::MARGIN_SIZE = 16;
 const double OptionsAPI::INIT_WIDTH = 1200;
 const double OptionsAPI::INIT_HEIGHT = INIT_WIDTH*0.618;
 const double OptionsAPI::INIT_DIV1 = 0.3;
 const double OptionsAPI::INIT_DIV2 = 0.5;
 const double OptionsAPI::SCROLL_Y_NROWS = 10;
+const int OptionsAPI::SITE_NUMBERING_EVERY = 10;
 
 
 
@@ -516,23 +518,26 @@ extern "C" {
 		// Height of taxa
 		double ntHeight = OptionsAPI::siteHeight->getVal();
 		cout << "ntHeight " << ntHeight << endl;
+		OptionsAPI::TOP_MARGIN = ntHeight;
+
+
 
 
 		// Full size of view
-		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN;
+		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN + OptionsAPI::MARGIN_SIZE;
 		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+2);
 
 
 
 		if (download){
-			width = OptionsAPI::LEFT_MARGIN + xdivide2*width + fullAlnWidth;
+			width = xdivide2*width + fullAlnWidth;
 			height = fullHeight;
 		}
 
 
 		// Vertical scrolling?
 		if (height < fullHeight) {
-			Scaling* scaling = new Scaling(0, 0, OptionsAPI::TOP_MARGIN, height);
+			Scaling* scaling = new Scaling(0, 0, OptionsAPI::TOP_MARGIN + OptionsAPI::MARGIN_SIZE, height);
 			scaling->setRowHeight(ntHeight);
 			scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
@@ -547,11 +552,11 @@ extern "C" {
 
 				// Scroll Y value
 				scaling->setScroll(0, 0, 0, fullHeight);
-				double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - height / 2;
-				OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN));
+				double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE - height / 2;
+				OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE));
 				scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
-				cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
+				cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
 
 			}
 
@@ -587,11 +592,11 @@ extern "C" {
 
 
 		// Ensure divs are within margins
-		if (xdivide1*width < OptionsAPI::LEFT_MARGIN) {
-			xdivide1 = OptionsAPI::LEFT_MARGIN / width;
+		if (xdivide1*width < OptionsAPI::LEFT_MARGIN + OptionsAPI::MARGIN_SIZE) {
+			xdivide1 = (OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE) / width;
 		}
-		if (xdivide2*width < OptionsAPI::LEFT_MARGIN) {
-			xdivide2 = OptionsAPI::LEFT_MARGIN / width;
+		if (xdivide2*width < OptionsAPI::LEFT_MARGIN + OptionsAPI::MARGIN_SIZE) {
+			xdivide2 = (OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE) / width;
 		}
 
 		// x-boundary objects
@@ -663,7 +668,8 @@ extern "C" {
 
 
 			// Scaling
-			treeScaling = new Scaling(OptionsAPI::LEFT_MARGIN + spacing,  xdivide1*width - spacing, OptionsAPI::TOP_MARGIN, height, treeHeight, treeMin);
+			treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing,  xdivide1*width - spacing,
+										OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
 			treeScaling->setRowHeight(ntHeight);
 			treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
@@ -687,33 +693,32 @@ extern "C" {
 		// Width of taxa
 		if (AlignmentAPI::isReady()) {
 
-
 			// Taxa
 			if (xdivide2 > xdivide1) {
 				double x0 = xdivide1*width + OptionsAPI::taxaSpacing->getVal();
 
 				// Scaling
-				Scaling* scaling = new Scaling(x0, xdivide2*width, OptionsAPI::TOP_MARGIN, height);
+				Scaling* scaling = new Scaling(x0, xdivide2*width, OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height);
 				scaling->setRowHeight(ntHeight);
 				scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
 				// Font size
 				double labelFontSize = std::min(ntHeight, OptionsAPI::fontSizeTaxa->getVal());
 
-
 				// White bg
 				jsonObject rect;
 				rect["ele"] = "rect";
 				rect["x"] = xdivide1*width;
-				rect["y"] = OptionsAPI::TOP_MARGIN;
+				rect["y"] = OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE;
 				rect["width"] = xdivide2*width - xdivide1*width;
-				rect["height"] = height - OptionsAPI::TOP_MARGIN;
+				rect["height"] = height - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE;
 				rect["fill"] = "white";
 				objs.push_back(rect);
 
 
 				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal());
-				objs.insert(objs.end(), taxa.begin(), taxa.end()); //test
+				objs.insert(objs.end(), taxa.begin(), taxa.end());
+
 			}
 
 
@@ -724,12 +729,13 @@ extern "C" {
 
 				double minWidth = OptionsAPI::ntWidth->getVal();
 				int nsitesInView = std::ceil(alnViewWidth /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
+				nsitesInView = std::min(nsitesInView, AlignmentAPI::getNsitesDisplayed());
 				Colouring* cols = OptionsAPI::getSelectedColouring();
 				cols->setSiteColourFilter(OptionsAPI::siteColourType->getVal(), AlignmentAPI::getFiltering());
 				cout << "Using the " << cols->getName() << " scheme" << endl;
 
 				// Scaling
-				Scaling* scaling = new Scaling(xdivide2*width, width, OptionsAPI::TOP_MARGIN, height, 0, nsitesInView-1);
+				Scaling* scaling = new Scaling(xdivide2*width, xdivide2*width + minWidth*nsitesInView, OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, nsitesInView-1);
 				scaling->setRowHeight(ntHeight);
 				scaling->setScroll(OptionsAPI::scrollX->getVal(), OptionsAPI::scrollY->getVal(), fullAlnWidth, fullHeight);
 
@@ -738,16 +744,16 @@ extern "C" {
 				jsonObject rect;
 				rect["ele"] = "rect";
 				rect["x"] = xdivide2*width;
-				rect["y"] = OptionsAPI::TOP_MARGIN;
+				rect["y"] = OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE;
 				rect["width"] = width - xdivide2*width;
-				rect["height"] = height - OptionsAPI::TOP_MARGIN;
+				rect["height"] = height - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE;
 				rect["fill"] = "white";
 				objs.push_back(rect);
 
 				// Font size
 				double ntFontSize = std::min(ntHeight, OptionsAPI::fontSizeAln->getVal());
 
-				jsonObject alignment = AlignmentAPI::getAlignmentGraphics(scaling, minWidth, ntFontSize, cols);
+				jsonObject alignment = AlignmentAPI::getAlignmentGraphics(scaling, minWidth, ntFontSize, cols, OptionsAPI::SITE_NUMBERING_EVERY);
 
 				//objs.putAll(alignment);
 				objs.insert(objs.end(), alignment.begin(), alignment.end());
@@ -771,9 +777,7 @@ extern "C" {
 					scrolls["scrollXLength"] = scaling->getScrollXLength();
 				}
 
-
 				delete scaling;
-
 
 			}
 
@@ -800,14 +804,14 @@ extern "C" {
 		top["x"] = 0;
 		top["y"] = 0;
 		top["width"] = width;
-		top["height"] = OptionsAPI::TOP_MARGIN;
+		top["height"] = OptionsAPI::MARGIN_SIZE;
 		top["fill"] = "#FFDAB9";
 
 		jsonObject left;
 		left["ele"] = "rect";
 		left["x"] = 0;
 		left["y"] = 0;
-		left["width"] = OptionsAPI::LEFT_MARGIN;
+		left["width"] = OptionsAPI::MARGIN_SIZE;
 		left["height"] = height;
 		left["fill"] = "#FFDAB9";
 
@@ -828,9 +832,8 @@ extern "C" {
 		// Return
 		WasmAPI::messageFromWasmToJS(json.dump(0));
 
-
-
 	}
+
 
 
 	/*
@@ -949,7 +952,7 @@ extern "C" {
 				}
 
 				if (option == OptionsAPI::scrollY) {
-					val = val / (OptionsAPI::canvasHeight->getVal() - OptionsAPI::TOP_MARGIN);
+					val = val / (OptionsAPI::canvasHeight->getVal() - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE);
 				}
 
 

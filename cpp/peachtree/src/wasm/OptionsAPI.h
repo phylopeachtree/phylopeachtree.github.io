@@ -95,12 +95,14 @@ public:
 	// Constants
 	static const long CHUNK_SIZE;
 	static const double LEFT_MARGIN; // Left hand margin
-	static const double TOP_MARGIN; // Top margin
+	static double TOP_MARGIN; // Top margin
+	static const double MARGIN_SIZE; // Left/top margin with background
 	static const double INIT_WIDTH;
 	static const double INIT_HEIGHT;
 	static const double INIT_DIV1;
 	static const double INIT_DIV2;
 	static const double SCROLL_Y_NROWS;
+	static const int SITE_NUMBERING_EVERY;
 
 
 	// Variables

@@ -243,6 +243,8 @@ function reupload(){
 	$("#control_panel_div").hide(0);
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
+	$("#options_tabs").html("");
+	$("#slideIns").html("");
 	
 }
 

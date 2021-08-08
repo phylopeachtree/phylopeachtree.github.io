@@ -45,7 +45,6 @@ int AlignmentAPI::getTaxonRowNum(Taxon* taxon){
  */
 void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 
-
 	if (AlignmentAPI::THE_ALIGNMENT == nullptr) return;
 
 	bool initRequired = false;
@@ -64,8 +63,8 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 		orderingIsDirty = false;
 	}
 
-
 }
+
 
 
 /*
@@ -87,8 +86,8 @@ jsonObject AlignmentAPI::getTaxaGraphics(Scaling* scaling, double textSize, bool
 /*
  * Get alignment graphics
  */
-jsonObject AlignmentAPI::getAlignmentGraphics(Scaling* scaling, double minNtWidth, double textSize, Colouring* colouring) {
-	return THE_ALIGNMENT->getAlignmentGraphics(scaling, colouring, minNtWidth, textSize, filtering);
+jsonObject AlignmentAPI::getAlignmentGraphics(Scaling* scaling, double minNtWidth, double textSize, Colouring* colouring, int siteNumberingEvery) {
+	return THE_ALIGNMENT->getAlignmentGraphics(scaling, colouring, minNtWidth, textSize, filtering, siteNumberingEvery);
 }
 
 

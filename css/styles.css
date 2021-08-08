@@ -39,12 +39,10 @@ body {
 #mainHeader{
 	background-color:#b0fb5aaa;
 	color:#333;
-	width:60%;
+	width:55%;
 	margin:auto;
 	font-weight: bold;
 	border-radius:0em 0em 10em 10em;
-	%font-size:120%;
-	%margin: 0.1em;
 	border-width:0.05em;
 	border-color:black;
 	border-style:solid;
@@ -56,17 +54,17 @@ body {
 
 
 #mainHeader h1{
-	font-size:3em;
+	font-size:2.5em;
 	margin:0em;
 	margin-bottom:-0.2em;
 }
 
 #mainHeader h4{
 	font-size:1.2em;
-	margin-top:0em;
+	margin-top:0.5em;
 	margin-left:2em;
 	margin-right:2em;
-	margin-bottom:1em;
+	margin-bottom:0.5em;
 	%color:black;
 }
 
@@ -96,23 +94,19 @@ body {
 #upload_div table{
 	text-align:center; 
 	margin:auto; 
-	width:60%
+	width:50%
 }
 
 
 .uploader {
-	height:20em;
+	height:15em;
 	border-style:dashed;
 	border-width: 0.1em;
 	color:#333;
-	%padding:0;
 	border-color:black;
 	text-align:center;
 	vertical-align:middle;
 	margin: 0.1em;
-	%overflow-y:auto;
-	%overflow-x:auto;
-	%max-width:800px;
 }
 
 
@@ -164,10 +158,10 @@ body {
 
 
 .uploader > div {
-	text-size-adjust:200%;
-	font-size:180%;
-	margin-top: 3em;
-	%padding: 1em;
+	text-size-adjust:150%;
+	font-size:140%;
+	margin-top: 2.5em;
+	padding: 1em;
 }
 
 .uploader.loading{

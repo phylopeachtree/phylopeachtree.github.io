@@ -55,7 +55,7 @@ public:
 
 	void sortByTree(Tree* tree);
 	json toJSON();
-	json getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering);
+	json getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering, int siteNumberingEvery);
 	json getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers);
 
 	vector<string> getNames();

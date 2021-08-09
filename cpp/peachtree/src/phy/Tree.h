@@ -43,9 +43,10 @@ public:
 	string toString();
 	vector<Node*> listNodes(Node* theRoot);
 	static int getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos);
+	jsonObject getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, string maxCol);
 	jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
-								double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree,
-								Timeline* timeline, bool displayIncompatibleTransmissions);
+								double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree,
+								Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol);
 	double getHeight();
 	void applyFiltering(Filtering* filtering);
 	vector<Taxon*> getClade(vector<Taxon*> taxa);

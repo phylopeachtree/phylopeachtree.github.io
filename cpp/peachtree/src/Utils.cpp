@@ -9,6 +9,7 @@
 
 
 #include <iostream>
+#include <sstream>
 #include <cstring>
 #include <cmath>
 #include <cstdlib>
@@ -363,9 +364,115 @@ string Utils::formatDate(tm date){
 
 
 
+/**
+ * Get red (0-255) from hex code
+ */
+int Utils::getRed(string hexCol){
+
+	string substr = hexCol.substr(1,2);
+	unsigned int x;
+	std::stringstream ss;
+	ss << std::hex << substr;
+	ss >> x;
+	return x;
+
+}
+
+/**
+ * Get green (0-255) from hex code
+ */
+int Utils::getGreen(string hexCol){
+
+	string substr = hexCol.substr(3,2);
+	unsigned int x;
+	std::stringstream ss;
+	ss << std::hex << substr;
+	ss >> x;
+	return x;
+
+}
 
 
+/**
+ * Get blue (0-255) from hex code
+ */
+int Utils::getBlue(string hexCol){
 
+	string substr = hexCol.substr(5,2);
+	unsigned int x;
+	std::stringstream ss;
+	ss << std::hex << substr;
+	ss >> x;
+	return x;
+
+}
+
+
+/*
+ * Get a hex code
+ */
+string Utils::getHexCode(int red, int green, int blue){
+
+	// Red
+	std::stringstream red_stream;
+	red_stream << std::hex << red;
+	std::string red_str( red_stream.str() );
+	if (red_str.size() == 1) red_str = "0" + red_str;
+
+	// Green
+	std::stringstream green_stream;
+	green_stream << std::hex << green;
+	std::string green_str( green_stream.str() );
+	if (green_str.size() == 1) green_str = "0" + green_str;
+
+	// Blue
+	std::stringstream blue_stream;
+	blue_stream << std::hex << blue;
+	std::string blue_str( blue_stream.str() );
+	if (blue_str.size() == 1) blue_str = "0" + blue_str;
+
+
+	return "#" + red_str + green_str + blue_str;
+
+
+}
+
+
+/*
+ * Round to sf
+ * https://www.geeksforgeeks.org/round-off-number-given-number-significant-digits/
+ */
+double Utils::roundToSF(double N, int n){
+
+
+	int h;
+	double l, a, b, c, d, e, i, j, m, f, g;
+	b = N;
+	c = floor(N);
+
+	// Counting the no. of digits to the left of decimal point
+	// in the given no.
+	for (i = 0; b >= 1; ++i)
+		b = b / 10;
+
+	d = n - i;
+	b = N;
+	b = b * pow(10, d);
+	e = b + 0.5;
+	if ((float)e == (float)ceil(b)) {
+		f = (ceil(b));
+		h = f - 2;
+		if (h % 2 != 0) {
+			e = e - 1;
+		}
+	}
+	j = floor(e);
+	m = pow(10, d);
+	j = j / m;
+
+	return j;
+
+}
 
 
 

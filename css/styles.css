@@ -187,6 +187,30 @@ body {
 
 
 
+.colourPicker{
+	text-align:center;
+	background-color:white;
+	border-style:solid;
+	border-color:black;
+	border-width:0.1em;
+}
+
+.colourPicker span{
+	width:1em;
+	height:1em;
+	margin:0.2em;
+	cursor:pointer;
+}
+
+.colourPicker span.selected{
+
+	border-style:solid;
+	border-color:white;
+	border-width:0.15em;
+	width:0.7em;
+	height:0.7em;
+}
+
 
 
 .dz-preview, .dz-file-preview {

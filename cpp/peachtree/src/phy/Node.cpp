@@ -375,23 +375,14 @@ string Node::getTidyMetaData(Timeline* timeline){
 		string value = pair.second;
 
 
-
-		/* Rounding
+		// Rounding
 		try {
-    		vector<string> bits = Utils::split(value, ",");
-    		string roundedValue = "";
-    		for (int j = 0; j < bits.size(); j ++) {
-    			double val = Double.parseDouble(bits[j]);
-    			val = OptionsAPI.sf(val);
-    			roundedValue += Double.toString(val);
-    			if (j < bits.length-1) roundedValue += ", ";
-    		}
-    		value = roundedValue;
-
-		}catch (Exception e) {
+			double val = stof(value);
+			value = to_string(Utils::roundToSF(val, 4));
+		}catch (...) {
 
 		}
-		*/
+
 		str.append(key).append("=").append(value);
 		if (i < this->annotations.size()-1) str.append("\n");
 		i++;
@@ -410,12 +401,74 @@ string Node::getAnnotationValue(string var){
 }
 
 
+/**
+ * Get hex code for this value
+ */
+string Node::getAnnotationColour(double val, double min, double max, string colourMax){
+
+
+
+	// Get RGB
+	int red = Utils::getRed(colourMax);
+	int green = Utils::getGreen(colourMax);
+	int blue = Utils::getBlue(colourMax);
+
+
+
+	// Invert the colour
+	int red_ = 255 - red;
+	int green_ = 255 - green;
+	int blue_ = 255 - blue;
+
+
+
+	// Scale rgb
+	double scale = (val - min) / (max - min);
+	if (scale < 0) scale = 0;
+	if (scale > 1) scale = 1;
+	int redVal = (red - red_)*scale + red_;
+	int greenVal = (green - green_)*scale + green_;
+	int blueVal = (blue - blue_)*scale + blue_;
+
+
+	//cout << scale << ":" << red << "|" << green << "|" << blue << " | " << redVal << "|" << greenVal << "|" << blueVal << endl;
+
+
+	// Convert to hex
+	string colourHex = Utils::getHexCode(redVal, greenVal, blueVal);
+
+	//cout << "colourHex: " << colourHex << endl;
+
+
+	return colourHex;
+
+}
+
+
+/**
+ * Get hex code for this annotation
+ */
+string Node::getAnnotationColour(string var, double min, double max, string colourMax){
+
+	string val = this->getAnnotationValue(var);
+	//cout << var << "=" << val << "|" << min << "," << max << endl;
+	if (val == "") return "#000000";
+	double val_d = 0;
+	try{
+		val_d = stof(val);
+	}catch(...){}
+
+	return this->getAnnotationColour(val_d, min, max, colourMax);
+}
+
+
 /*
  * Get the svg graphics of this subtree
  */
 double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
-		bool showTaxaOnTree, double yshift, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding,
-		bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions){
+		bool showTaxaOnTree, double yshift, double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding,
+		bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol,
+		vector<double>& minMaxNode, vector<double>& minMaxBranch){
 
 
 	double x2 = this->getHeight(timeline);
@@ -439,8 +492,8 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 		for (Node* child : this->getChildren()) {
 			double ychild = child->getGraphics(false, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift,
-												nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree,
-												timeline, displayIncompatibleTransmissions);
+												nodeRadius, branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree,
+												timeline, displayIncompatibleTransmissions, branchCol, nodeCol, minMaxNode, minMaxBranch);
 			if (ychild != Utils::INFTY) {
 				if (y == Utils::INFTY) y = 0.0;
 				y += ychild;
@@ -463,6 +516,13 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	double yscaled = scaling->scaleY(y);
 	yscaled += yshift;
 	bool inrangeY = scaling->inRangeY(y);
+
+
+	// Colours
+	string bcol = branchCol;
+	string ncol = nodeCol;
+	if (branchColourBy != "") bcol = getAnnotationColour(branchColourBy, minMaxBranch.at(0), minMaxBranch.at(1), branchCol);
+	if (nodeColourBy != "") ncol = getAnnotationColour(nodeColourBy, minMaxNode.at(0), minMaxNode.at(1), nodeCol);
 
 	// Dashed line to taxa
 	if (this->isLeaf() && showTaxaOnTree && this->getHeight(timeline) > 0) {
@@ -502,7 +562,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			shoulder_json["y1"] = scaling->scaleY(minY) + yshift;
 			shoulder_json["y2"] = scaling->scaleY(maxY) + yshift;
 			shoulder_json["stroke_width"] = branchWidth;
-			shoulder_json["stroke"] = "black";
+			shoulder_json["stroke"] = bcol;
 			shoulder_json["stroke_linecap"] = "round";
 			objs.push_back(shoulder_json);
 
@@ -528,7 +588,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			branch_json["y1"] = yscaled;
 			branch_json["y2"] = yscaled;
 			branch_json["stroke_width"] = branchWidth;
-			branch_json["stroke"] = "black";
+			branch_json["stroke"] = bcol;
 			branch_json["stroke_linecap"] = "round";
 			objs.push_back(branch_json);
 
@@ -546,7 +606,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		node_json["cx"] = x2Scaled;
 		node_json["cy"] = yscaled;
 		node_json["r"] = nodeRadius;
-		node_json["fill"] = "black";
+		node_json["fill"] = ncol;
 		if (!this->isLeaf()) {
 			node_json["class"] = "node";
 			node_json["i"] = this->nodeNr;
@@ -611,48 +671,6 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 
-	// Internal/leaf node annotations?
-	if (inrangeY && fontSize > 0) {
-
-		string label = this->isLeaf() ? leafLabel : internalLabel;
-		if (this->annotations.count(label) > 0) {
-
-
-			string val = this->annotations[label];
-
-
-			/*
-			 * // Is it a double? If so then round it
-			if (Utils::is_number(val)){
-				double d = stod(val);
-
-			}
-
-			try {
-			    double d = Double.parseDouble(val);
-			    BigDecimal bd = new BigDecimal(d);
-			    bd = bd.round(new MathContext(rounding));
-			    val = "" + bd.doubleValue();
-			}
-			catch (Exception e) {};
-			*/
-
-
-			// Plot annotation
-			jsonObject label_json;
-			label_json["ele"] = "text";
-			label_json["x"] = x2Scaled + nodeRadius;
-			label_json["y"] = yscaled;
-			label_json["text_anchor"] = "start";
-			label_json["alignment_baseline"] = "middle";
-			label_json["value"] = val;
-			label_json["font_size"] = fontSize;
-			objs.push_back(label_json);
-
-		}
-
-
-	}
 
 
 	return y;
@@ -931,6 +949,38 @@ void Node::clearSampleTime(){
 bool Node::hasSampleTime(){
 	return this->sampleTime != Utils::INFTY;
 }
+
+
+/*
+ * Get min and max value
+ */
+void Node::getMinMax(string var, vector<double>& minMax){
+
+
+	if (var == "") return;
+	string val = this->getAnnotationValue(var);
+	if (val != "") {
+	double val_d = 0;
+		try{
+			val_d = stof(val);
+		}catch(...){
+
+		}
+
+		if (val_d < minMax.at(0)) minMax.at(0) = val_d;
+		if (val_d > minMax.at(1)) minMax.at(1) = val_d;
+
+	}
+	for (Node* child : this->getChildren()){
+		child->getMinMax(var, minMax);
+	}
+
+}
+
+
+
+
+
 
 
 

@@ -405,15 +405,11 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 	const double tickHeight = textSize;
 	for (int site : filtering->getSites()) {
 
-
-
 		// Do not plot beyond edge
 		if (!scaling->inRangeX(x, minNtWidth)) {
 			x ++;
 			continue;
 		}
-
-
 
 
 		int effSiteNum = filtering->getVariantSitesOnly() ? siteLabelIndex : site+1;
@@ -422,9 +418,16 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 		if (effSiteNum % siteNumberingEvery == 0){
 
 
+			string label = to_string(site+1);
+
 			// Is there enough space?
-			int len = to_string(site+1).size();
+			int len = label.size();
+			if (filtering->getVariantSitesOnly()) {
+				label += "&#10203";
+				len++;
+			}
 			if (!scaling->inRangeX(x+len, minNtWidth)) continue;
+
 
 
 			double xc = scaling->scaleX(x) + xshift;
@@ -444,6 +447,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 				objs.push_back(tick_json);
 			}
 
+
 			// Plot the number
 			json label_json;
 			label_json["ele"] = "text";
@@ -451,7 +455,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 			label_json["y"] = scaling->getCanvasMinY() - textSize/2.0;
 			label_json["text_anchor"] = "start";
 			//label_json["dominant_baseline"] = "hanging";
-			label_json["value"] = site+1;
+			label_json["value"] = label;
 			label_json["font_size"] = textSize;
 			objs.push_back(label_json);
 

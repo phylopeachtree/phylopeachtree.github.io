@@ -25,8 +25,19 @@ void test(string& str){
 
 
 int main() {
-	cout << "hello there" << endl; // prints !!!Hello World!!!
 
+	cout << "hello there" << endl;
+
+	string col = "#baff00";
+	int red = Utils::getRed(col);
+	int green = Utils::getGreen(col);
+	int blue = Utils::getBlue(col);
+
+	cout << "rgb " << red << "/" << green << "/" << blue << endl;
+
+
+	string rgb = Utils::getHexCode(red, green, blue);
+	cout << "rgb " << rgb << endl;
 
 	/*
 	tm t1;

@@ -108,16 +108,17 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
 	orderingIsDirty = false;
 }
 
-
 /*
  * Generate graphics for the tree
  */
 jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
-									string internalLabel, string leafLabel, double fontSize, int rounding,
-									bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions){
+									string branchColourBy, string nodeColourBy, double fontSize, int rounding,
+									bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
+									string branchCol, string nodeCol){
 
 	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
-				nodeRadius, internalLabel, leafLabel, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions);
+				nodeRadius, branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions,
+				branchCol, nodeCol);
 
 
 }

@@ -54,8 +54,9 @@ public:
 	string tostring();
    	string toSortedNewick(int&, bool printMetaData);
 	double getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
-			bool showTaxaOnTree, double yshift, double nodeRadius, string internalLabel, string leafLabel, double fontSize, int rounding,
-			bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions);
+			bool showTaxaOnTree, double yshift, double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding,
+			bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol,
+			vector<double>& minMaxNode, vector<double>& minMaxBranch);
 	void parseFromNewick(string newick);
 
 	void getAllAnnotations(vector<string>& annots);
@@ -71,6 +72,9 @@ public:
 
 	bool getIsCompatibleTransmissionEvent();
 	void setIsCompatibleTransmissionEvent(bool val);
+	void getMinMax(string var, vector<double>& minMax);
+	string getAnnotationColour(string var, double min, double max, string colourMax);
+	string getAnnotationColour(double val, double min, double max, string colourMax);
 
 
 private:

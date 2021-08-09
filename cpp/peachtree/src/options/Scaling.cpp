@@ -48,7 +48,7 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 
 		this->scrollX = x * (fullWidth-viewWidth);// + this->canvasMinX;
 
-		cout << "scrolling: " << x << "/" << fullWidth << "/" << fullWidth << "/" << this->scrollX << endl;
+		//cout << "scrolling: " << x << "/" << fullWidth << "/" << fullWidth << "/" << this->scrollX << endl;
 
 
 		// Left side
@@ -82,7 +82,7 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 		//y = std::min(y, 1.0);
 		this->scrollY = y * (fullHeight-viewHeight); // + this->canvasMinY;
 
-		cout << "scrolling: " << y << "/" << fullHeight << "/" << this->scrollY << endl;
+		//cout << "scrolling: " << y << "/" << fullHeight << "/" << this->scrollY << endl;
 
 		// Top of window
 		if (this->scrollY <= scrollYLen) {

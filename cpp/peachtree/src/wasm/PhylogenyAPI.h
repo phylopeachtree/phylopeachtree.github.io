@@ -29,7 +29,8 @@ public:
 	static void applyFiltering(Filtering* filtering);
 	static double getHeight();
 	static jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
-			string internalLabel, string leafLabel, double fontSize, int rounding, bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions);
+			string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
+			string branchCol, string nodeCol);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
 	static void cleanup();
 	static void setOrderingToDirty();

@@ -14,6 +14,8 @@
 #include "../options/NumericalOption.h"
 #include "../options/BooleanOption.h"
 #include "../options/DiscreteOption.h"
+#include "../options/ColourOption.h"
+
 
 using jsonObject = nlohmann::json;
 using namespace std;
@@ -43,10 +45,14 @@ public:
 	static NumericalOption* treeSpacing;
 	static BooleanOption* showTaxaOnTree;
 	static BooleanOption* transmissionTree;
-	static DiscreteOption* internalNodeLabels;
-	static DiscreteOption* leafNodeLabels;
+	//static DiscreteOption* internalNodeLabels;
+	//static DiscreteOption* leafNodeLabels;
 	static NumericalOption* annotationFontSize;
 	static NumericalOption* annotationRounding;
+	static ColourOption* branchColouring;
+	static DiscreteOption* colourBranchesBy;
+	static ColourOption* nodeColouring;
+	static DiscreteOption* colourNodesBy;
 
 	// Taxa
 	static NumericalOption* siteHeight;

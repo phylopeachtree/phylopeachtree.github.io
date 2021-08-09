@@ -184,7 +184,7 @@ function renderGraphics(resolve = function() {}){
 		// Get width and height
 		var maxH = $( window ).height() - $("#mainHeader").offset().top - 250;
 		var maxW = $("#main").offset().left + $("#main").width();
-		console.log("bottomY", maxH, maxW);
+		//console.log("bottomY", maxH, maxW);
 	
 
 		// Generate the graphics objects
@@ -251,7 +251,7 @@ function renderGraphics(resolve = function() {}){
 					svg.append(topGroup);
 
 
-					console.log(initialVal);
+					//console.log(initialVal);
 
 					// Add the boundaries
 					$(".draggableDivision").remove();

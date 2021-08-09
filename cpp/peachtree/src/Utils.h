@@ -37,6 +37,11 @@ public:
 	static tm addDays(tm t1, double days);
 	static string formatDate(tm date);
 	static void getNiceTimes(tm lastDate, double timeSpan, int maxNTimes, vector<double>& heights, vector<string>& labels);
+	static int getRed(string hexCol);
+	static int getGreen(string hexCol);
+	static int getBlue(string hexCol);
+	static string getHexCode(int red, int green, int blue);
+	static double roundToSF(double N, int n);
 
 	static const vector<string> month_names;
 

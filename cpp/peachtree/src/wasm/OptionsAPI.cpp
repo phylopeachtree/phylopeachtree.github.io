@@ -54,10 +54,18 @@ NumericalOption* OptionsAPI::nodeRadius = new NumericalOption("nodeRadius", "Phy
 NumericalOption* OptionsAPI::treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 BooleanOption* OptionsAPI::showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
 BooleanOption* OptionsAPI::transmissionTree = new BooleanOption("transmissionTree", "Phylogeny", "Display as a transmission tree", false);
-DiscreteOption* OptionsAPI::internalNodeLabels;
-DiscreteOption* OptionsAPI::leafNodeLabels;
+//DiscreteOption* OptionsAPI::internalNodeLabels;
+//DiscreteOption* OptionsAPI::leafNodeLabels;
 NumericalOption* OptionsAPI::annotationFontSize = new NumericalOption("annotationFontSize", "Phylogeny", "Tree annotation font size", 8, 0, 14, 1, true);
 NumericalOption* OptionsAPI::annotationRounding = new NumericalOption("annotationRounding", "Phylogeny", "Tree annotation sf", 3, 1, 8, 1, true);
+ColourOption* OptionsAPI::branchColouring = new ColourOption("branchColouring", "Phylogeny", "Tree branch colour");
+DiscreteOption* OptionsAPI::colourBranchesBy;
+ColourOption* OptionsAPI::nodeColouring = new ColourOption("nodeColouring", "Phylogeny", "Node colour");
+DiscreteOption* OptionsAPI::colourNodesBy;
+
+
+
+
 
 // Samples
 NumericalOption* OptionsAPI::siteHeight = new NumericalOption("siteHeight", "Samples", "Row heights", 20, 1, 100, 5);
@@ -119,10 +127,15 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(treeSpacing);
 	options.push_back(showTaxaOnTree);
 	options.push_back(transmissionTree);
-	options.push_back(internalNodeLabels);
-	options.push_back(leafNodeLabels);
+	//options.push_back(internalNodeLabels);
+	//options.push_back(leafNodeLabels);
 	options.push_back(annotationFontSize);
 	options.push_back(annotationRounding);
+	options.push_back(colourBranchesBy);
+	options.push_back(branchColouring);
+	options.push_back(colourNodesBy);
+	options.push_back(nodeColouring);
+
 
 	// Taxa
 	options.push_back(siteHeight);
@@ -365,6 +378,7 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 
 
 	// Internal node labels
+	/*
 	if (internalNodeLabels == nullptr){
 		internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.at(0), annotations);
 	}else{
@@ -372,11 +386,31 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	}
 
 	// Leaves
+
 	if (leafNodeLabels == nullptr){
 		leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.at(0), annotations);
 	}else{
 		leafNodeLabels->setValAndDomain(annotations.at(0), annotations);
 	}
+	*/
+
+
+	// Node colourings
+	if (colourNodesBy == nullptr){
+		colourNodesBy = new DiscreteOption("colourNodesBy", "Phylogeny", "Colour nodes by", annotations.at(0), annotations);
+	}else{
+		colourNodesBy->setValAndDomain(annotations.at(0), annotations);
+	}
+
+
+	// Branch colourings
+	if (colourBranchesBy == nullptr){
+		colourBranchesBy = new DiscreteOption("colourBranchesBy", "Phylogeny", "Colour branches by", annotations.at(0), annotations);
+	}else{
+		colourBranchesBy->setValAndDomain(annotations.at(0), annotations);
+	}
+
+
 
 	cout << "There are " << annotations.size() << " annotations" << endl;
 
@@ -385,13 +419,17 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	if (annotations.size() == 1) {
 		annotationFontSize->hide();
 		annotationRounding->hide();
-		internalNodeLabels->hide();
-		leafNodeLabels->hide();
+		//internalNodeLabels->hide();
+		//leafNodeLabels->hide();
+		colourBranchesBy->hide();
+		colourNodesBy->hide();
 	}else{
 		annotationFontSize->show();
 		annotationRounding->show();
-		internalNodeLabels->show();
-		leafNodeLabels->show();
+		//internalNodeLabels->show();
+		//leafNodeLabels->show();
+		colourBranchesBy->show();
+		colourNodesBy->show();
 	}
 
 
@@ -412,8 +450,13 @@ extern "C" {
 		OptionsAPI::graphicalObjects.clear();
 		OptionsAPI::focalTaxon = nullptr;
 
-		OptionsAPI::internalNodeLabels = nullptr;
-		OptionsAPI::leafNodeLabels = nullptr;
+		//OptionsAPI::internalNodeLabels = nullptr;
+		//OptionsAPI::leafNodeLabels = nullptr;
+
+		OptionsAPI::colourBranchesBy = nullptr;
+		OptionsAPI::colourNodesBy = nullptr;
+
+
 		OptionsAPI::epiSymptomDate = nullptr;
 		OptionsAPI::epiIsolationDate = nullptr;
 
@@ -517,7 +560,6 @@ extern "C" {
 
 		// Height of taxa
 		double ntHeight = OptionsAPI::siteHeight->getVal();
-		cout << "ntHeight " << ntHeight << endl;
 		OptionsAPI::TOP_MARGIN = ntHeight;
 
 
@@ -674,8 +716,10 @@ extern "C" {
 			treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
 			// Annotations
-			string internalLabel = OptionsAPI::internalNodeLabels == nullptr ? nullptr : OptionsAPI::internalNodeLabels->getVal();
-			string leafLabels = OptionsAPI::leafNodeLabels == nullptr ? nullptr : OptionsAPI::leafNodeLabels->getVal();
+			string branchColourBy = OptionsAPI::colourBranchesBy == nullptr ? "" : OptionsAPI::colourBranchesBy->getVal();
+			string nodeColourBy = OptionsAPI::colourNodesBy == nullptr ? "" : OptionsAPI::colourNodesBy->getVal();
+			if (branchColourBy == "None") branchColourBy = "";
+			if (nodeColourBy == "None") nodeColourBy = "";
 			double fontSize = std::min(ntHeight, OptionsAPI::annotationFontSize->getVal());
 			int rounding = (int)OptionsAPI::annotationRounding->getVal();
 
@@ -683,7 +727,8 @@ extern "C" {
 			// Plot tree
 			bool displayIncompat = OptionsAPI::transmissionTree->getVal() && OptionsAPI::displayIncompatibleTranmissions->getVal();
 			jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
-					internalLabel, leafLabels, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline(), displayIncompat);
+					branchColourBy, nodeColourBy, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline(), displayIncompat,
+					OptionsAPI::branchColouring->getVal(), OptionsAPI::nodeColouring->getVal());
 			objs.insert(objs.end(), tree.begin(), tree.end());
 
 
@@ -989,6 +1034,11 @@ extern "C" {
 				v->setVal(value);
 			}
 
+			else if (ColourOption* v = dynamic_cast<ColourOption*>(option)) {
+				v->setVal(value);
+			}
+
+
 		}
 
 
@@ -1065,7 +1115,6 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE isReady() {
 		jsonObject json;
 		json["ready"] = OptionsAPI::isReady();
-		cout << "checking for readiness: " << json["ready"] << endl;
 		WasmAPI::messageFromWasmToJS(json.dump(0));
 	}
 

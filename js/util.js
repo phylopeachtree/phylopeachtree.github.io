@@ -306,7 +306,7 @@ function renderOptions(){
 						
 			
 		//var options = JSON.parse(cjStringJavaToJs(options));
-		console.log("options", options);
+		//console.log("options", options);
 
 
 		var optionsDiv = $("#options_div");
@@ -331,7 +331,7 @@ function renderOptions(){
 			if (!sections.includes(s)) sections.push(s);
 
 		}
-		console.log("sections", sections);
+		//console.log("sections", sections);
 
 		// Create one tab per section
 		for (let i = 0; i < sections.length; i++){
@@ -433,6 +433,32 @@ function renderOptions(){
 						
 						
 					}
+
+
+					else if (opt.type == "ColourOption"){
+						
+						
+						
+						
+						// Dropdown html
+						let pickerHTML = $(`<div class="optionsBox colourPicker"></div>`);
+						
+						
+						for (let j = 0; j < opt.colours.length; j ++){
+							let colHTML = $(`<span var="` + opt.name + `" value="` + opt.colours[j] + `" style="background-color:` + opt.colours[j] + 
+												`" onclick="setOptionFromEle(this)" title="Select colour"></span>`);
+							if (opt.colours[j] == opt.value) colHTML.addClass("selected");
+							pickerHTML.append(colHTML);
+						}
+						pickerHTML.append("<br>" + opt.title);
+
+						
+
+						div.children("div").children("div").append(pickerHTML);
+						
+						
+						
+					}
 		
 					
 				}
@@ -464,10 +490,14 @@ function setOptionFromEle(ele){
 	let val = 0;
 	if ($(ele).prop('nodeName') == "INPUT" && $(ele).prop("type") == "checkbox"){
 		val = $(ele).prop("checked");
+	}else if($(ele).prop('nodeName') == "SPAN"){
+		val = $(ele).attr("value");
 	}else{
 		val = $(ele).val();
 	}
 	
+
+	//console.log(id, val);
 
 	setOptionToVal(id, val);
 	
@@ -590,7 +620,6 @@ function isReadyToRender(callback = function(response) { }){
 	callWasmFunction("isReady", [], function(val){
 	//cjCall("peachtree.options.OptionsAPI", "isReady").then(function(val){
 		
-		console.log("ready?", val);
 		//val = JSON.parse(val);
 		var ready = val.ready;
 		//var val = cjStringJavaToJs(val);

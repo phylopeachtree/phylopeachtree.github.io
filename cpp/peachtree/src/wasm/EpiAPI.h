@@ -29,7 +29,7 @@ public:
 	static void cleanup();
 	static void prepareTimeline(Tree* tree, string sampleDateVariable, string dateFormat);
 	static jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar,
-			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar);
+			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar, double branchWidth);
 	static Timeline* getTimeline();
 	static void prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
 

@@ -361,10 +361,10 @@ void Timeline::cleanup(){
  */
 jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize,
 										string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter,
-										string isolationDateVar){
+										string isolationDateVar, double branchWidth){
 
 	jsonObject arr = json::array();
-
+	const int nodeRadius = 2.5 * branchWidth;
 
 	if (axisFontSize <= 0) return arr;
 
@@ -432,10 +432,10 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			double infectiousEndX = scaling->scaleX(infectiousEndX_height);
 
 			// Get y coord
-			double y = node->getFilteredNr() + 0.4;
+			double y = node->getFilteredNr() + 0.5;
 			double yscaled = scaling->scaleY(y) + yshift;
 
-			const int nodeRadius = 5;
+
 
 
 
@@ -446,9 +446,10 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			tick["x2"] = infectiousEndX;
 			tick["y1"] = yscaled;
 			tick["y2"] = yscaled;
-			tick["stroke_width"] = 4;
+			tick["stroke_width"] = branchWidth*2.5;
 			tick["stroke"] = "#F7941Daa";
 			tick["stroke_linecap"] = "round";
+			tick["layer"] = 0;
 			//tick["class"] = "symptom";
 			//tick["title"] = node->getAcc() + " developed symptoms on " + Utils::formatDate(symptomDate);
 			arr.push_back(tick);
@@ -463,6 +464,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			node_json["fill"] = "#F7941Daa";
 			node_json["class"] = "symptom";
 			node_json["title"] = node->getAcc() + " developed symptoms on " + Utils::formatDate(symptomDate);
+			node_json["layer"] = 0;
 			arr.push_back(node_json);
 
 
@@ -559,7 +561,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			// Get y coord
 			double y = node->getFilteredNr() + 0.5;
 			double yscaled = scaling->scaleY(y) + yshift;
-			const int nodeRadius = 5;
+
 
 
 
@@ -571,6 +573,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			node_json["r"] = nodeRadius;
 			node_json["fill"] = "#662E8Faa";
 			node_json["class"] = "isolation";
+			node_json["layer"] = 0;
 			node_json["title"] = node->getAcc() + " entered isolation on " + Utils::formatDate(isolationDate);
 			arr.push_back(node_json);
 

@@ -472,47 +472,49 @@ extern "C" {
 
 
 		// Date formats
-		OptionsAPI::dateFormat  = new DiscreteOption("dateFormat", "Epidemiology", "Date format", Timeline::getDefaultDateFormat(), Timeline::dateFormats);
+		OptionsAPI::dateFormat = new DiscreteOption("dateFormat", "Epidemiology", "Date format", Timeline::getDefaultDateFormat(), Timeline::dateFormats);
 
-		// Full option descriptions
+
+
+		// Full option descriptions. Including too many of these seems to upset the compiler and give slow rendering times
 
 		// Taxa
 		OptionsAPI::siteHeight->setLongTitle("The height of each row (tree branches, sample labels, and aligned sequences).");
-		OptionsAPI::fontSizeTaxa->setLongTitle("Font size of sample labels.");
-		OptionsAPI::showTaxonNumbers->setLongTitle("Enable this setting to display a numeric index before each sample label.");
+		//OptionsAPI::fontSizeTaxa->setLongTitle("Font size of sample labels.");
+		//OptionsAPI::showTaxonNumbers->setLongTitle("Enable this setting to display a numeric index before each sample label.");
 
 		// Alignment
-		OptionsAPI::ntWidth->setLongTitle("The width of each site in the alignment.");
-		OptionsAPI::fontSizeAln->setLongTitle("The font size of each site in the alignment.");
+		//OptionsAPI::ntWidth->setLongTitle("The width of each site in the alignment.");
+		//OptionsAPI::fontSizeAln->setLongTitle("The font size of each site in the alignment.");
 		OptionsAPI::variantSitesOnly->setLongTitle("Enable this setting to only display segregating sites in the alignment i.e., sites which have more than one unique character (excluding ambiguous sites).");
 		OptionsAPI::siteColourType->setLongTitle("Select whether to colour major allelles only, or minor alleles only, or all sites.");
-		OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment.");
+		//OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment.");
+
+
 
 		// Phylogeny
-		OptionsAPI::branchwidth->setLongTitle("Branch line thickness in the phylogenetic tree.");
-		OptionsAPI::nodeRadius->setLongTitle("Node radius in the phylogenetic tree.");
-		OptionsAPI::treeSpacing->setLongTitle("Horizontal spacing on either side of the phylogenetic tree.");
-		OptionsAPI::showTaxaOnTree->setLongTitle("Enable this setting to display dotted lines connecting tree leaves to their sample names.");
+		//OptionsAPI::branchwidth->setLongTitle("Branch line thickness in the phylogenetic tree.");
+		//OptionsAPI::nodeRadius->setLongTitle("Node radius in the phylogenetic tree.");
+		//OptionsAPI::treeSpacing->setLongTitle("Horizontal spacing on either side of the phylogenetic tree.");
+		//OptionsAPI::showTaxaOnTree->setLongTitle("Enable this setting to display dotted lines connecting tree leaves to their sample names.");
 		OptionsAPI::transmissionTree->setLongTitle("Enable this setting to display the phylogenetic tree as a transmission tree, where the top child is assumed to have infected the bottom child. You can click on an internal node to switch the ordering.");
-		//OptionsAPI::internalNodeLabels->setLongTitle("XXX");
-		//OptionsAPI::leafNodeLabels->setLongTitle("XXX");
-		//OptionsAPI::annotationFontSize->setLongTitle("XXX");
-		//OptionsAPI::annotationRounding->setLongTitle("XXX");
-		OptionsAPI::colourBranchesBy->setLongTitle("Phylogenetic tree annotation to colour branches by, using a colour ladder ranging from 'Tree branch colour' to its complementary colour.");
-		OptionsAPI::branchColouring->setLongTitle("The colour of branches in the phylogenetic tree.");
-		OptionsAPI::colourNodesBy->setLongTitle("Phylogenetic tree annotation to colour nodes by, using a colour ladder ranging from 'Node colour' to its complementary colour.");
-		OptionsAPI::nodeColouring->setLongTitle("The colour of nodes in the phylogenetic tree.");
+		OptionsAPI::colourBranchesBy->setLongTitle("Phylogenetic tree annotation to colour branches by, using a colour ladder ranging from Tree branch colour to its complementary colour.");
+		//OptionsAPI::branchColouring->setLongTitle("The colour of branches in the phylogenetic tree.");
+		OptionsAPI::colourNodesBy->setLongTitle("Phylogenetic tree annotation to colour nodes by, using a colour ladder ranging from Node colour to its complementary colour.");
+		//OptionsAPI::nodeColouring->setLongTitle("The colour of nodes in the phylogenetic tree.");
 
 
 		// Epidemiology
 		OptionsAPI::dateFormat->setLongTitle("The format of dates entered in the uploaded annotation file.");
 		OptionsAPI::epiSampleDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to sample date. This will determine the leaf dates. Please ensure that at least 2 unique dates are entered in order for a timeline to be calibrated.");
 		OptionsAPI::epiSymptomDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to symptom onset date. These dates will be indicated on the phylogenetic tree in orange.");
-		OptionsAPI::epiIsolationDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to case isolation date. These dates will be indicated on the phylogenetic tree in puroke.");
+		OptionsAPI::epiIsolationDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to case isolation date. These dates will be indicated on the phylogenetic tree in purple.");
 		OptionsAPI::infectiousPeriodBefore->setLongTitle("The number of days prior to symptom onset that a person is assumed to be infectious.");
 		OptionsAPI::infectiousPeriodAfter->setLongTitle("The number of days after symptom onset that a person is assumed to be infectious.");
-		OptionsAPI::timelineFontSize->setLongTitle("Font size of dates on the timeline.");
-		OptionsAPI::displayIncompatibleTranmissions->setLongTitle("Enable this setting to display the phylogenetuc tree as a transmission tree, and print a red cross on any internal nodes which are outside the infecious period of the infector. You can click on an internal node to switch the child ordering.");
+		//OptionsAPI::timelineFontSize->setLongTitle("Font size of dates on the timeline.");
+		OptionsAPI::displayIncompatibleTranmissions->setLongTitle("Enable this setting to display the phylogenetic tree as a transmission tree, and print a red cross on any internal nodes which are outside the infecious period of the infector. You can click on an internal node to switch the child ordering.");
+
+
 
 
 		// Get all colour classes
@@ -881,7 +883,7 @@ extern "C" {
 
 			jsonObject timeline = EpiAPI::getTimelineGraphics(subtree, treeScaling, OptionsAPI::timelineFontSize->getVal(), OptionsAPI::epiSymptomDate->getVal(),
 										OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal(),
-										OptionsAPI::epiIsolationDate->getVal());
+										OptionsAPI::epiIsolationDate->getVal(),  OptionsAPI::branchwidth->getVal());
 			objs.insert(objs.end(), timeline.begin(), timeline.end());
 			delete treeScaling;
 		}

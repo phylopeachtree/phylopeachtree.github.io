@@ -244,10 +244,13 @@ function renderGraphics(resolve = function() {}){
 					$("#graphics_div").width(width + padding);
 
 
-					// Create top layer
-					var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+					var group1 = document.createElementNS('http://www.w3.org/2000/svg', "g");
+					var group2 = document.createElementNS('http://www.w3.org/2000/svg', "g");
+					var group3 = document.createElementNS('http://www.w3.org/2000/svg', "g");
 					var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
-					svg.append(mainGroup);
+					svg.append(group1);
+					svg.append(group2);
+					svg.append(group3);
 					svg.append(topGroup);
 
 
@@ -307,12 +310,12 @@ function renderGraphics(resolve = function() {}){
 					// Plot top level objects
 					for (var i = 0; i < initialVal.objects.length; i ++){
 						var o = initialVal.objects[i];
-						drawSVGobj(topGroup, o);
+						drawSVGobj(group1, group2, group3, o);
 					}
 
 
 					// Plot json objects 1 chunk at a time
-					plotNextObject(mainGroup, 0, resolve);
+					plotNextObject(group1, group2, group3, 0, resolve);
 
 
 					
@@ -525,7 +528,7 @@ function makeDraggable(evt) {
 */
 
 
-function plotNextObject(svg, iteration = 0, resolve = function() { } ){
+function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = function() { } ){
 
 	if (CANCEL_GRAPHICS){
 		CANCEL_GRAPHICS = false;
@@ -548,7 +551,7 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 				removeLoader($("#ctrl_loading_div"));
 				
 				// Taxon selection
-				$(svg).find(".taxon").click(function(){
+				$(svgBtm).parent().find(".taxon").click(function(){
 
 					if (SHIFT_KEY_IS_DOWN){
 						selectUpToTaxon($(this));
@@ -561,7 +564,7 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 
 
 				// Node selection
-				$(svg).find(".node").click(function(){
+				$(svgBtm).parent().find(".node").click(function(){
 					flipSubtree($(this));
 				});
 				
@@ -577,12 +580,12 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 			}else{
 
 				// Repeat
-				plotNextObject(svg, iteration + 1, resolve)
+				plotNextObject(svgBtm, svgMid, svgTop, iteration + 1, resolve)
 
 				// And render thes objects asynchronously...
 				for (var i = 0; i < objects.length; i ++){
 					var o = objects[i];
-					drawSVGobj(svg, o);
+					drawSVGobj(svgBtm, svgMid, svgTop, o);
 				}
 
 			}
@@ -598,13 +601,16 @@ function plotNextObject(svg, iteration = 0, resolve = function() { } ){
 
 
 
-function drawSVGobj(svg, object){
+function drawSVGobj(svgBtm, svgMid, svgTop, object){
 
 
 	//console.log("drawing", object);
 
 	var type = object.ele;
 	if (type == null) return;
+
+
+	var svg = object.layer == null || object.layer == 1 ? svgMid : object.layer == 0 ? svgBtm : svgTop;
 
 	//console.log("attr", attr);
 	var newObj = document.createElementNS('http://www.w3.org/2000/svg', type);
@@ -613,6 +619,7 @@ function drawSVGobj(svg, object){
 	// Set attributes
 	for (var a in object){
 		if (a == "ele") continue;
+		if (a == "layer") continue;
 		else if (a == "value") newObj.innerHTML += object[a];
 		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
 		//else if (a == "col") newObj.setAttribute("color", object[a]);
@@ -754,9 +761,13 @@ function download(){
 				svg.width(width);
 
 				// Create top layer
-				var mainGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var group1 = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var group2 = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var group3 = document.createElementNS('http://www.w3.org/2000/svg', "g");
 				var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				svg.append(mainGroup);
+				svg.append(group1);
+				svg.append(group2);
+				svg.append(group3);
 				svg.append(topGroup);
 
 				console.log(initialVal);
@@ -765,12 +776,12 @@ function download(){
 				// Plot top level objects
 				for (var i = 0; i < initialVal.objects.length; i ++){
 					var o = initialVal.objects[i];
-					drawSVGobj(topGroup, o);
+					drawSVGobj(group1, group2, group3, o);
 				}
 
 
 				// Plot json objects 1 chunk at a time
-				plotNextObject(mainGroup, 0, resolve);
+				plotNextObject(group1, group2, group3, 0, resolve);
 
 				
 			}

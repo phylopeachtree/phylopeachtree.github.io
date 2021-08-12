@@ -376,11 +376,9 @@ string Node::getTidyMetaData(Timeline* timeline){
 
 
 		// Rounding
-		try {
+		if (Utils::is_number(value)) {
 			double val = stof(value);
 			value = to_string(Utils::roundToSF(val, 4));
-		}catch (runtime_error &err) {
-
 		}
 
 
@@ -452,9 +450,7 @@ string Node::getAnnotationColour(string var, double min, double max, string colo
 	//cout << var << "=" << val << "|" << min << "," << max << endl;
 	if (val == "") return "#000000";
 	double val_d = 0;
-	try{
-		val_d = stof(val);
-	}catch(runtime_error &err){}
+	if (Utils::is_number(val)) val_d = stof(val);
 
 	return this->getAnnotationColour(val_d, min, max, colourMax);
 }
@@ -608,6 +604,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		node_json["cy"] = yscaled;
 		node_json["r"] = nodeRadius;
 		node_json["fill"] = ncol;
+		node_json["layer"] = 2;
 		if (!this->isLeaf()) {
 			node_json["class"] = "node";
 			node_json["i"] = this->nodeNr;
@@ -631,6 +628,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			tick1["stroke_width"] = branchWidth;
 			tick1["stroke"] = "red";
 			tick1["stroke_linecap"] = "round";
+			tick1["layer"] = 2;
 			//tick1["title"] = title;
 			objs.push_back(tick1);
 
@@ -645,6 +643,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			tick2["stroke_width"] = branchWidth;
 			tick2["stroke"] = "red";
 			tick2["stroke_linecap"] = "round";
+			tick2["layer"] = 2;
 			//tick2["title"] = title;
 			objs.push_back(tick2);
 
@@ -959,14 +958,10 @@ void Node::getMinMax(string var, vector<double>& minMax){
 	string val = this->getAnnotationValue(var);
 	if (val != "") {
 	double val_d = 0;
-		try{
-			val_d = stof(val);
-		}catch(runtime_error &err){
+	if (Utils::is_number(val)) val_d = stof(val);
 
-		}
-
-		if (val_d < minMax.at(0)) minMax.at(0) = val_d;
-		if (val_d > minMax.at(1)) minMax.at(1) = val_d;
+	if (val_d < minMax.at(0)) minMax.at(0) = val_d;
+	if (val_d > minMax.at(1)) minMax.at(1) = val_d;
 
 	}
 	for (Node* child : this->getChildren()){

@@ -22,11 +22,13 @@ class Utils {
 
 public:
 
+	static const double INFTY;
+
+
 	static vector<string> split(string str, string delimiter);
 	static vector<string> split(string str, string delimiter, int limit);
 	static string toUpper(string str);
 	static string toLower(string str);
-	static const double INFTY;
 	static void trim(string& s);
 	static bool is_number(const std::string& s);
 	static bool parseDate(string date, string format, tm& time);

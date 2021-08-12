@@ -11,6 +11,7 @@ BooleanOption::BooleanOption(string name, string section, string title, bool val
 	this->name = name;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->value = value;
 	this->hidden = false;
 }
@@ -20,6 +21,7 @@ BooleanOption::BooleanOption(string name, string section, string title, bool val
 	this->name = name;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->value = value;
 	this->hidden = hidden;
 }

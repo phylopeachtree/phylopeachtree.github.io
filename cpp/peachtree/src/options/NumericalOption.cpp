@@ -15,6 +15,7 @@ NumericalOption::NumericalOption(string name, string section, string title, doub
 	this->value = val;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->stepSize = stepSize;
 	this->hidden = false;
 }
@@ -27,6 +28,7 @@ NumericalOption::NumericalOption(string name, string section, string title, doub
 	this->value = val;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->stepSize = stepSize;
 	this->hidden = hidden;
 }

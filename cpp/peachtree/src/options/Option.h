@@ -22,6 +22,8 @@ public:
 	string getName() ;
 	string getSection();
 	string getTitle();
+	string getLongTitle();
+	void setLongTitle(string desc);
 	void hide();
 	void show();
 	jsonObject modifyJSON(jsonObject json);
@@ -30,6 +32,7 @@ protected:
 	string name; // Name of variable
 	string section; // Category it belongs to
 	string title; // Description
+	string longTitle; // Long description
 	bool hidden; // Hide it?
 
 };

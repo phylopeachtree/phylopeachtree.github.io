@@ -14,6 +14,7 @@ DiscreteOption::DiscreteOption(string name, string section, string title, string
 	this->domain = domain;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->hidden = false;
 	this->setVal(value);
 }
@@ -24,6 +25,7 @@ DiscreteOption::DiscreteOption(string name, string section, string title, string
 	this->domain = domain;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->hidden = hide;
 	this->setVal(value);
 }

@@ -13,6 +13,7 @@ ColourOption::ColourOption(string name, string section, string title){
 	this->name = name;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->hidden = false;
 
 	initCols();
@@ -24,6 +25,7 @@ ColourOption::ColourOption(string name, string section, string title, string val
 	this->name = name;
 	this->section = section;
 	this->title = title;
+	this->longTitle = title;
 	this->hidden = false;
 
 	initCols();

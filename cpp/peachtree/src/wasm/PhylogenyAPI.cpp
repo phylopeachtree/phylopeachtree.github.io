@@ -188,6 +188,8 @@ extern "C" {
 
 		auto start = high_resolution_clock::now();
 
+
+
 		PhylogenyAPI::THE_TREE = new Tree();
 		PhylogenyAPI::THE_TREE->parseFromNexus(contents);
 		PhylogenyAPI::orderingIsDirty = true;

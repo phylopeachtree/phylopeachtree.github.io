@@ -379,9 +379,10 @@ string Node::getTidyMetaData(Timeline* timeline){
 		try {
 			double val = stof(value);
 			value = to_string(Utils::roundToSF(val, 4));
-		}catch (...) {
+		}catch (runtime_error &err) {
 
 		}
+
 
 		str.append(key).append("=").append(value);
 		if (i < this->annotations.size()-1) str.append("\n");
@@ -407,19 +408,16 @@ string Node::getAnnotationValue(string var){
 string Node::getAnnotationColour(double val, double min, double max, string colourMax){
 
 
-
 	// Get RGB
 	int red = Utils::getRed(colourMax);
 	int green = Utils::getGreen(colourMax);
 	int blue = Utils::getBlue(colourMax);
 
 
-
 	// Invert the colour
 	int red_ = 255 - red;
 	int green_ = 255 - green;
 	int blue_ = 255 - blue;
-
 
 
 	// Scale rgb
@@ -456,7 +454,7 @@ string Node::getAnnotationColour(string var, double min, double max, string colo
 	double val_d = 0;
 	try{
 		val_d = stof(val);
-	}catch(...){}
+	}catch(runtime_error &err){}
 
 	return this->getAnnotationColour(val_d, min, max, colourMax);
 }
@@ -599,7 +597,10 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 	// Draw node and annotate it
-	if (nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1)) {
+	bool drawNode = nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1);
+	if (nodeColourBy != "" && this->getAnnotationValue(nodeColourBy) == "") drawNode = false;
+
+	if (drawNode) {
 
 		jsonObject node_json;
 		node_json["ele"] = "circle";
@@ -668,9 +669,6 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		objs.push_back(node_json);
 
 	}
-
-
-
 
 
 	return y;
@@ -963,7 +961,7 @@ void Node::getMinMax(string var, vector<double>& minMax){
 	double val_d = 0;
 		try{
 			val_d = stof(val);
-		}catch(...){
+		}catch(runtime_error &err){
 
 		}
 

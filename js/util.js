@@ -373,7 +373,7 @@ function renderOptions(){
 						// Range slider html
 						
 						let optionsHTML = `
-						<div class="optionsBox">
+						<div class="optionsBox" title="` + opt.longTitle + `">
 							
 							<div class="slidecontainer">
 								 <input onChange="setOptionFromEle(this)" type="range" min="` + opt.min + `" max="` + opt.max + `" value="` + opt.value + `" step="` + opt.step + `" class="slider" var="` + opt.name + `">
@@ -390,7 +390,7 @@ function renderOptions(){
 						
 						// Switch html
 						let optionsHTML = `
-						<div class="optionsBox">
+						<div class="optionsBox"  title="` + opt.longTitle + `">
 							<div>
 								<label class="switch">
 									<input onChange="setOptionFromEle(this)" var="` + opt.name + `" type="checkbox">
@@ -412,7 +412,7 @@ function renderOptions(){
 						
 						// Dropdown html
 						let optionsHTML = `
-						<div class="optionsBox">
+						<div class="optionsBox"  title="` + opt.longTitle + `">
 							
 							<div class="dropdown">
 								  <select onChange="setOptionFromEle(this)" var="` + opt.name + `">
@@ -441,7 +441,7 @@ function renderOptions(){
 						
 						
 						// Dropdown html
-						let pickerHTML = $(`<div class="optionsBox colourPicker"></div>`);
+						let pickerHTML = $(`<div class="optionsBox colourPicker" title="` + opt.longTitle + `"></div>`);
 						
 						
 						for (let j = 0; j < opt.colours.length; j ++){

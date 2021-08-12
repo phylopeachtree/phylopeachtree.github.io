@@ -45,10 +45,18 @@ string Option::getTitle(){
 	return title;
 }
 
+string Option::getLongTitle(){
+	return longTitle;
+}
+void Option::setLongTitle(string desc){
+	this->longTitle = desc;
+}
+
 jsonObject Option::modifyJSON(jsonObject json){
 	json["name"] = name;
 	json["section"] = section;
 	json["title"] = title;
+	json["longTitle"] = longTitle;
 	json["hide"] = hidden;
 	return json;
 }

@@ -142,6 +142,20 @@ void EpiAPI::cleanup(){
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
+
+
+	/*
+	 * Remove the epi data
+	 */
+	void EMSCRIPTEN_KEEPALIVE removeEpiUpload(){
+		EpiAPI::cleanup();
+		OptionsAPI::resetScroll();
+		OptionsAPI::resetWindowSize();
+		OptionsAPI::prepareEpiAnnotations();
+		WasmAPI::messageFromWasmToJS("");
+	}
+
+
 	void EMSCRIPTEN_KEEPALIVE uploadEpi() {
 
 		cout << "Uploading epidemiological information" << endl;

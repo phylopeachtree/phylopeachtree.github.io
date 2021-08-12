@@ -265,15 +265,51 @@ function plotUploadErrorMsg(err, uploadSelector){
 	Clear error message on success
 */
 function plotUploadSuccessMsg(filename, time, uploadSelector){
+
+	var html = "";
 	if (time == "0" || time == 0) {
-		$(uploadSelector + " .usermsg").html(filename + " successfully parsed in <1s!");
+		html = filename + " successfully parsed in <1s!";
 	}else{
-		$(uploadSelector + " .usermsg").html(filename + " successfully parsed in " + Math.round(time*10)/10 + "s!");
+		html = filename + " successfully parsed in " + Math.round(time*10)/10 + "s!";
 	}
+
+	html += "<span selector='" + uploadSelector + "'' onclick='removeUpload(this)' class='removeUploadBtn' title='Remove uploaded file'> &#10005; </span>"
+
+	$(uploadSelector + " .usermsg").html(html);
+
 	
 	updateRenderBtn();
 	removeLoader($(uploadSelector + "_title"));
 	return true;
+}
+
+
+
+/*
+	Remove an uploaded file
+*/
+function removeUpload(ele){
+
+
+	var resolve = function(x){
+		$(id + " .usermsg").html("");
+		updateRenderBtn();
+	}
+
+	var id = $(ele).attr("selector");
+	console.log(id);
+
+	if (id == "#aln_upload"){
+		callWasmFunction("removeAlignmentUpload", [], resolve);
+	}else if (id == "#phy_upload"){
+		callWasmFunction("removeTreeUpload", [], resolve);
+	}else if (id == "#epi_upload"){
+		callWasmFunction("removeEpiUpload", [], resolve);
+	}
+
+
+
+
 }
 
 

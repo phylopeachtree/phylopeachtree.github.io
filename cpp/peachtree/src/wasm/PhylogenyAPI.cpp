@@ -174,6 +174,26 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
+
+	/*
+	 * Remove the tree
+	 */
+	void EMSCRIPTEN_KEEPALIVE removeTreeUpload(){
+		PhylogenyAPI::cleanup();
+		PhylogenyAPI::orderingIsDirty = true;
+		EpiAPI::setEpiAnnotationsToDirty();
+
+
+		//AlignmentAPI::initFiltering(OptionsAPI::getVariantSitesOnly(), false, nullptr);
+		//OptionsAPI::prepareColourings();
+
+		OptionsAPI::resetScroll();
+		OptionsAPI::resetWindowSize();
+		OptionsAPI::prepareTreeAnnotationOptions();
+		WasmAPI::messageFromWasmToJS("");
+	}
+
+
 	void EMSCRIPTEN_KEEPALIVE uploadTree() {
 
 		char* str = WasmAPI::getFromHeap();
@@ -207,7 +227,7 @@ extern "C" {
 		OptionsAPI::prepareTreeAnnotationOptions();
 		OptionsAPI::resetScroll();
 
-		// Epidemiological annotations TODO
+		// Epidemiological annotations
 		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 

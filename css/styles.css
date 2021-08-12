@@ -186,6 +186,13 @@ body {
 }
 
 
+.removeUploadBtn{
+	cursor: pointer;
+	font-size: 18px;
+	color:red;
+}
+
+
 
 .colourPicker{
 	text-align:center;

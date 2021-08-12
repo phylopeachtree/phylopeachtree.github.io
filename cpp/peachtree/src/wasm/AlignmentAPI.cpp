@@ -188,6 +188,33 @@ void AlignmentAPI::makeMockAlignment(Tree* tree){
 // Interface between javascript and cpp for webassembly
 extern "C" {
 
+
+
+	/*
+	 * Remove the alignment
+	 */
+	void EMSCRIPTEN_KEEPALIVE removeAlignmentUpload(){
+
+		AlignmentAPI::cleanup();
+
+		// Tree
+		PhylogenyAPI::orderingIsDirty = true;
+		PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
+		PhylogenyAPI::orderingIsDirty = true;
+
+		// Epi
+		EpiAPI::setEpiAccessionsToDirty();
+		EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
+		EpiAPI::setEpiAccessionsToDirty();
+
+		OptionsAPI::resetScroll();
+		OptionsAPI::resetWindowSize();
+
+		WasmAPI::messageFromWasmToJS("");
+
+	}
+
+
 	void EMSCRIPTEN_KEEPALIVE uploadAlignment(){
 
 

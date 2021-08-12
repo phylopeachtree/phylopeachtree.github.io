@@ -195,7 +195,7 @@ void Epidemiology::addAnnotationsToTree(Tree* tree){
 	tree->getRoot()->getAllAnnotations(treeAnnotations);
 	for (string var : treeAnnotations) {
 		if (std::count(this->annotations.begin(), this->annotations.end(), var)) {
-			Error::throwError("Duplicate annotation '" + var + "' found in the tree and the epidemiological data. "
+			Error::throwError("Duplicate annotation " + var + " found in the tree and the epidemiological data. "
 					+ "Please ensure annotation names are unique.");
 			return;
 		}

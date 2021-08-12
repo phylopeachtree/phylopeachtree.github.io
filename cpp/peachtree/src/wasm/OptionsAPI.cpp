@@ -370,7 +370,12 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	if (INIT_DIV1 > division2->getVal()) {
 		division2->setVal(INIT_DIV2);
 	}
-	division1->setVal(INIT_DIV1);
+	if (PhylogenyAPI::isReady()){
+		division1->setVal(INIT_DIV1);
+	}else{
+		division1->setVal(0);
+	}
+
 
 	vector<string> annotations;
 	annotations.push_back("None");
@@ -479,7 +484,7 @@ extern "C" {
 		// Full option descriptions. Including too many of these seems to upset the compiler and give slow rendering times
 
 		// Taxa
-		OptionsAPI::siteHeight->setLongTitle("The height of each row (tree branches, sample labels, and aligned sequences).");
+		//OptionsAPI::siteHeight->setLongTitle("The height of each row (tree branches, sample labels, and aligned sequences).");
 		//OptionsAPI::fontSizeTaxa->setLongTitle("Font size of sample labels.");
 		//OptionsAPI::showTaxonNumbers->setLongTitle("Enable this setting to display a numeric index before each sample label.");
 
@@ -487,7 +492,7 @@ extern "C" {
 		//OptionsAPI::ntWidth->setLongTitle("The width of each site in the alignment.");
 		//OptionsAPI::fontSizeAln->setLongTitle("The font size of each site in the alignment.");
 		OptionsAPI::variantSitesOnly->setLongTitle("Enable this setting to only display segregating sites in the alignment i.e., sites which have more than one unique character (excluding ambiguous sites).");
-		OptionsAPI::siteColourType->setLongTitle("Select whether to colour major allelles only, or minor alleles only, or all sites.");
+		//OptionsAPI::siteColourType->setLongTitle("Select whether to colour major allelles only, or minor alleles only, or all sites.");
 		//OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment.");
 
 
@@ -505,12 +510,12 @@ extern "C" {
 
 
 		// Epidemiology
-		OptionsAPI::dateFormat->setLongTitle("The format of dates entered in the uploaded annotation file.");
+		//OptionsAPI::dateFormat->setLongTitle("The format of dates entered in the uploaded annotation file.");
 		OptionsAPI::epiSampleDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to sample date. This will determine the leaf dates. Please ensure that at least 2 unique dates are entered in order for a timeline to be calibrated.");
 		OptionsAPI::epiSymptomDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to symptom onset date. These dates will be indicated on the phylogenetic tree in orange.");
 		OptionsAPI::epiIsolationDate->setLongTitle("The name of the (variable in the uploaded annotations file) which corresponds to case isolation date. These dates will be indicated on the phylogenetic tree in purple.");
-		OptionsAPI::infectiousPeriodBefore->setLongTitle("The number of days prior to symptom onset that a person is assumed to be infectious.");
-		OptionsAPI::infectiousPeriodAfter->setLongTitle("The number of days after symptom onset that a person is assumed to be infectious.");
+		//OptionsAPI::infectiousPeriodBefore->setLongTitle("The number of days prior to symptom onset that a person is assumed to be infectious.");
+		//OptionsAPI::infectiousPeriodAfter->setLongTitle("The number of days after symptom onset that a person is assumed to be infectious.");
 		//OptionsAPI::timelineFontSize->setLongTitle("Font size of dates on the timeline.");
 		OptionsAPI::displayIncompatibleTranmissions->setLongTitle("Enable this setting to display the phylogenetic tree as a transmission tree, and print a red cross on any internal nodes which are outside the infecious period of the infector. You can click on an internal node to switch the child ordering.");
 

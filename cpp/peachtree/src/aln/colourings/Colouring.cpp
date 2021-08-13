@@ -10,7 +10,7 @@
 
 
 void Colouring::init(){
-	this->colFilter = SiteColourFilter::all;
+	this->colFilter = SiteColourFilter::minor;
 }
 
 
@@ -54,7 +54,7 @@ vector<string> Colouring::getSiteColourFilters(){
 	return domain;
 }
 string Colouring::getDefaultSiteColourFilter(){
-	return "all";
+	return "minor";
 }
 
 string Colouring::getColour(string symbol, int siteNum){

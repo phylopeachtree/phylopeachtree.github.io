@@ -615,7 +615,7 @@ extern "C" {
 
 		// Full size of view
 		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN + OptionsAPI::MARGIN_SIZE;
-		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+2);
+		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+0);
 
 
 
@@ -623,6 +623,7 @@ extern "C" {
 			width = xdivide2*width + fullAlnWidth;
 			height = fullHeight;
 		}
+
 
 
 		// Vertical scrolling?
@@ -639,23 +640,24 @@ extern "C" {
 
 				// What row number?
 				int rowNum = AlignmentAPI::getTaxonRowNum(OptionsAPI::focalTaxon);
+				if (rowNum >= 0){
 
-				// Scroll Y value
-				scaling->setScroll(0, 0, 0, fullHeight);
-				double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE - height / 2;
-				OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE));
-				scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+					// Scroll Y value
+					scaling->setScroll(0, 0, 0, fullHeight);
+					double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE - height / 2;
+					OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE));
+					scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
-				cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
-
+					cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
+				}
 			}
 
 
 			// Validate scrollY position
-			if (OptionsAPI::scrollY->getVal()*height + scaling->getScrollYLength() > height) {
-				OptionsAPI::scrollY->setVal((height - scaling->getScrollYLength()) / height);
-			}
-			scrolls["scrollY"] = OptionsAPI::scrollY->getVal()*height;
+			//if (OptionsAPI::scrollY->getVal()*height + scaling->getScrollYLength() > height) {
+				//OptionsAPI::scrollY->setVal((height - scaling->getScrollYLength()) / height);
+			//}
+			scrolls["scrollY"] = OptionsAPI::scrollY->getVal()*(height - scaling->getScrollYLength());
 			scrolls["scrollYLength"] = scaling->getScrollYLength();
 
 			scaling->cleanup();
@@ -758,6 +760,9 @@ extern "C" {
 			}
 
 
+
+
+
 			// Scaling
 			treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing,  xdivide1*width - spacing,
 										OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
@@ -825,16 +830,26 @@ extern "C" {
 
 
 				double minWidth = OptionsAPI::ntWidth->getVal();
-				int nsitesInView = std::ceil(alnViewWidth /  minWidth); // *AlignmentAPI.getNsitesDisplayed();
-				nsitesInView = std::min(nsitesInView, AlignmentAPI::getNsitesDisplayed());
+				double nsitesInView = alnViewWidth /  minWidth;
+				if (nsitesInView > AlignmentAPI::getNsitesDisplayed()) nsitesInView = AlignmentAPI::getNsitesDisplayed();
+				double remainder = minWidth * (nsitesInView - std::floor(nsitesInView));
+				alnViewWidth = alnViewWidth - remainder;
+				int nsitesInViewInt = std::floor(nsitesInView);
 				Colouring* cols = OptionsAPI::getSelectedColouring();
 				cols->setSiteColourFilter(OptionsAPI::siteColourType->getVal(), AlignmentAPI::getFiltering());
-				cout << "Using the " << cols->getName() << " scheme" << endl;
+				//cout << "Using the " << cols->getName() << " scheme" << endl;
+
+
+
 
 				// Scaling
-				Scaling* scaling = new Scaling(xdivide2*width, xdivide2*width + minWidth*nsitesInView, OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, nsitesInView-1);
+				Scaling* scaling = new Scaling(xdivide2*width, width - remainder /*xdivide2*width + minWidth*nsitesInView*/,
+												OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, nsitesInViewInt);
 				scaling->setRowHeight(ntHeight);
 				scaling->setScroll(OptionsAPI::scrollX->getVal(), OptionsAPI::scrollY->getVal(), fullAlnWidth, fullHeight);
+
+
+				//cout << "nsitesInViewInt " << nsitesInViewInt << " nsitesInView " << nsitesInView << " remainder " << remainder << endl;
 
 
 				// White bg
@@ -866,11 +881,11 @@ extern "C" {
 				if (scaling->getScrollXLength() > 0 && nsitesInView > 1) {
 
 					// Validate scrollX position
-					if (OptionsAPI::scrollX->getVal()*alnViewWidth + scaling->getScrollXLength() > alnViewWidth) {
-						OptionsAPI::scrollX->setVal((alnViewWidth - scaling->getScrollXLength()) / alnViewWidth);
-					}
+					//if (OptionsAPI::scrollX->getVal()*alnViewWidth + scaling->getScrollXLength() > alnViewWidth) {
+						//OptionsAPI::scrollX->setVal((alnViewWidth - scaling->getScrollXLength()) / alnViewWidth);
+					//}
 
-					scrolls["scrollX"] = OptionsAPI::scrollX->getVal() * (width - xdivide2*width) + xdivide2*width;
+					scrolls["scrollX"] = OptionsAPI::scrollX->getVal() * (width - xdivide2*width - scaling->getScrollXLength()) + xdivide2*width;
 					scrolls["scrollXLength"] = scaling->getScrollXLength();
 				}
 
@@ -1044,12 +1059,13 @@ extern "C" {
 
 				// Special case: scroll bar positions should be normalised
 				if (option == OptionsAPI::scrollX) {
-					val = val - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal();
-					val = val / (OptionsAPI::canvasWidth->getVal() - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal());
+					//val = val - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal();
+					//val = val / (OptionsAPI::canvasWidth->getVal() - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal());
 				}
 
 				if (option == OptionsAPI::scrollY) {
-					val = val / (OptionsAPI::canvasHeight->getVal() - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE);
+					cout << "scrolly " << val << endl;
+					//val = val / OptionsAPI::canvasHeight->getVal(); // - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE);
 				}
 
 

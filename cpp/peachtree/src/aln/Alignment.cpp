@@ -228,9 +228,8 @@ void Alignment::initPatterns(){
 
 	cout << "There are " << this->patterns.size() << " patterns" << endl;
 
-
-
 }
+
 
 
 
@@ -283,6 +282,8 @@ void Alignment::parseSequence(string acc, string seq, int seqID){
 
 }
 
+
+
 /**
  * Sort the taxa by the tree and ensure the taxon objects are mapped
  */
@@ -334,6 +335,20 @@ void Alignment::sortByTree(Tree* tree){
 	// Reinitialise
 	this->patterns.clear();
 
+
+}
+
+
+/*
+ * Get index of taxon
+ */
+int Alignment::getTaxonIndex(Taxon* taxon){
+
+	for (int i = 0; i < this->sequences.size(); i++){
+		Sequence* seq = this->sequences.at(i);
+		if (seq->getTaxon() == taxon) return i;
+	}
+	return -1;
 
 }
 

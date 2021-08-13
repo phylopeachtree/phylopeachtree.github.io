@@ -70,6 +70,7 @@ public:
 
 	Taxon* getTaxon(string label);
 	Taxon* getTaxon(int i);
+	int getTaxonIndex(Taxon* taxon);
 
 
 private:

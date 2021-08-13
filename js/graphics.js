@@ -394,10 +394,31 @@ function createScrollbar(svg, pos, scrollLength, id, vertical=true){
  		var newValue;
  		if (!vertical) {
  			newValue = $(this).offset().left - svg.offset().left;
+
+
+ 			var div2 = $("#division2").offset().left - svg.offset().left;
+ 			var tx = $(this).offset().left - svg.offset().left;
+ 			tx = tx - div2;
+ 			if (tx < 0) tx = 0;
+ 			var vw = svg.width() - div2;
+ 			var tw = $(this).width();
+
+ 			newValue = tx / (vw-tw);
+
+
 			//newValue = newValue / svg.width();
  		}else{
- 			newValue = $(this).offset().top - svg.offset().top;
-			//newValue = newValue / svg.height();
+
+			//console.log("scrolly", $(this).offset().top, $(this).height(), svg.offset().top, svg.height());
+
+ 			//newValue = $(this).offset().top - svg.offset().top;
+
+ 			var ty = $(this).offset().top - svg.offset().top;
+ 			var vh = svg.height();
+ 			var th = $(this).height();
+ 			
+			newValue = ty / (vh-th);
+
  		}
 
 

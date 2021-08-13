@@ -36,7 +36,7 @@ bool AlignmentAPI::isReady(){
  * Find the row number of this taxon in the filtering
  */
 int AlignmentAPI::getTaxonRowNum(Taxon* taxon){
-	return filtering->getIndex(taxon);
+	return THE_ALIGNMENT->getTaxonIndex(taxon);
 }
 
 

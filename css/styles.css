@@ -470,7 +470,7 @@ ul.tabs li.active:hover::after {
 	transform: translateY(-50px);
 	
 	border: solid #333;
-	border-radius: 1em;
+	border-radius: 0.1em;
 	border-width:0.05em;
   
 	

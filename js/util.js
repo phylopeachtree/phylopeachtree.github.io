@@ -40,7 +40,7 @@ function initUtil(){
 		reader.onload = (function(theFile) {
 			
 			addLoader($("#aln_upload_title"));
-
+			$("#aln_upload .usermsg").html("");
 			
 			return function(e) {
 				
@@ -112,6 +112,7 @@ function initUtil(){
 		reader.onload = (function(theFile) {
 			
 			addLoader($("#phy_upload_title"));
+			$("#phy_upload .usermsg").html("");
 			
 			return function(e) {
 				
@@ -175,6 +176,7 @@ function initUtil(){
 		reader.onload = (function(theFile) {
 			
 			addLoader($("#epi_upload_title"));
+			$("#epi_upload .usermsg").html("");
 
 			
 			return function(e) {

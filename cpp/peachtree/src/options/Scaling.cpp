@@ -39,32 +39,15 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 	this->scrollX = 0;
 	if (x > 0) {
 
+
+		if (x > 1) x = 1;
+
 		double viewWidth = (this->canvasMaxX - this->canvasMinX);
 		double scrollXLen = this->getScrollXLength();
+		this->scrollX = x * (fullWidth-viewWidth);
 
-		// Renormalise to account for thumb size
-		x = x / (1 - scrollXLen/viewWidth);
-		//x = std::min(x, 1.0);
+		//cout << "x scrolling: " << x << "/" << fullWidth << "/" << viewWidth << "/" << this->scrollX << endl;
 
-		this->scrollX = x * (fullWidth-viewWidth);// + this->canvasMinX;
-
-		//cout << "scrolling: " << x << "/" << fullWidth << "/" << fullWidth << "/" << this->scrollX << endl;
-
-
-		// Left side
-		if (this->scrollX <= scrollXLen) {
-			this->scrollX = 0;
-		}
-
-		// Right side
-		else if (x >= 1) {
-
-		}
-
-		// In between
-		else {
-			//this->scrollX += scrollXLen/2;
-		}
 
 	}
 
@@ -74,31 +57,14 @@ void Scaling::setScroll(double x, double y, double fullWidth, double fullHeight)
 	this->scrollY = 0;
 	if (y > 0) {
 
+		if (y > 1) y = 1;
+
 		double viewHeight = (this->canvasMaxY - this->canvasMinY);
 		double scrollYLen = this->getScrollYLength();
-
-		// Renormalise to account for thumb size
-		y = y / (1 - scrollYLen/viewHeight);
-		//y = std::min(y, 1.0);
 		this->scrollY = y * (fullHeight-viewHeight); // + this->canvasMinY;
 
-		//cout << "scrolling: " << y << "/" << fullHeight << "/" << this->scrollY << endl;
+		//cout << "y scrolling: " << y << "/" << fullHeight << "/" << viewHeight << "/" << this->scrollY << endl;
 
-		// Top of window
-		if (this->scrollY <= scrollYLen) {
-			this->scrollY = 0;
-		}
-
-		// Bottom of window
-		else if (y >= 1){
-		//else if (this->scrollY + this->getScrollYLength() >= fullHeight) { // - viewHeight) {
-			//this->scrollY = fullHeight - this->canvasMaxY; // viewHeight;
-		}
-
-		// In between
-		else {
-			//this->scrollY += scrollYLen/2;
-		}
 
 	}
 
@@ -195,8 +161,8 @@ bool Scaling::inRangeX(double x){
 */
 bool Scaling::inRangeX(double x, double margin){
 	double h = (x - xmin) / (xmax - xmin) * (canvasMaxX - canvasMinX) + canvasMinX - this->scrollX;
-	if (h + margin < this->canvasMinX) return false;
-	if (h - margin > this->canvasMaxX) return false;
+	if (h < this->canvasMinX) return false;
+	if (h > this->canvasMaxX) return false;
 	return true;
 }
 
@@ -218,7 +184,7 @@ bool Scaling::isAboveRangeX(double x){
  */
 bool Scaling::isAboveRangeX(double x, double margin){
 	double h = this->scaleX(x);
-	if (h - margin > this->canvasMaxX) return true;
+	if (h > this->canvasMaxX) return true;
 	return false;
 }
 

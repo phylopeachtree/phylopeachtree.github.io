@@ -45,6 +45,7 @@ public:
 	static void cleanup();
 	static void makeMockAlignment(Tree* tree);
 	static bool isMock();
+	static void resetHighlighting();
 
 
 

@@ -399,6 +399,9 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 	}
 
 
+	cout << " yshift " << yshift << " / " << scaling->getCanvasMinY() << endl;
+
+
 	// Site numbering at the top
 	int siteLabelIndex = 0;
 	int x = 0;
@@ -597,6 +600,7 @@ double Alignment::getPatternWeight(int i){
  */
 bool Alignment::selectTaxon(int taxonNum){
 	this->sequences.at(taxonNum)->getTaxon()->toggleSelection();
+	this->sequences.at(taxonNum)->getTaxon()->toggleHighlighting();
 	return this->sequences.at(taxonNum)->getTaxon()->getIsSelected();
 }
 
@@ -614,6 +618,7 @@ bool Alignment::taxonIsSelected(int taxonNum){
  */
 void Alignment::selectTaxon(int taxonNum, bool setTo){
 	this->sequences.at(taxonNum)->getTaxon()->setIsSelected(setTo);
+	if (setTo) this->sequences.at(taxonNum)->getTaxon()->setIsHighlighted(setTo);
 }
 
 
@@ -623,6 +628,17 @@ void Alignment::selectTaxon(int taxonNum, bool setTo){
 void Alignment::clearSelection(){
 	for (Sequence* seq : this->sequences) {
 		seq->getTaxon()->setIsSelected(false);
+		seq->getTaxon()->setIsHighlighted(false);
+	}
+}
+
+
+/*
+ * Deselct all taxa
+ */
+void Alignment::clearHighlighting(){
+	for (Sequence* seq : this->sequences) {
+		seq->getTaxon()->setIsHighlighted(false);
 	}
 }
 

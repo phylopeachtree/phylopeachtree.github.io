@@ -97,6 +97,12 @@ int AlignmentAPI::getNumUniqueSequences(){
 }
 
 
+void AlignmentAPI::resetHighlighting() {
+	AlignmentAPI::THE_ALIGNMENT->clearHighlighting();
+}
+
+
+
 int AlignmentAPI::getNsites(){
 	if (AlignmentAPI::THE_ALIGNMENT == nullptr) return 0;
 	return AlignmentAPI::THE_ALIGNMENT->getLength();
@@ -374,5 +380,15 @@ extern "C" {
 
 
 
+
 }
+
+
+
+
+
+
+
+
+
 

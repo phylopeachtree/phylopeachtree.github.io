@@ -1078,13 +1078,19 @@ extern "C" {
 				bool val = value == "true" || value == "1";
 
 				// Special case: if focusOnClade is enabled, then enable focusOnTaxa too
-				if (option == OptionsAPI::focusOnClade && val == true) OptionsAPI::focusOnTaxa->setVal(true);
+				if (option == OptionsAPI::focusOnClade && val == true) {
+					OptionsAPI::setFocusingOnTaxa(true);
+				}
 
 				// If focusOnTaxa is enabled, then set focusOnClade to false
-				if (option == OptionsAPI::focusOnTaxa && val == true) OptionsAPI::focusOnClade->setVal(false);
+				if (option == OptionsAPI::focusOnTaxa && val == true) {
+					OptionsAPI::setFocusOnClade(false);
+				}
+
 				if (option == OptionsAPI::focusOnClade || option == OptionsAPI::focusOnTaxa) {
 					OptionsAPI::resetScroll();
 					AlignmentAPI::setSelectionToDirty();
+					AlignmentAPI::resetHighlighting();
 				}
 
 

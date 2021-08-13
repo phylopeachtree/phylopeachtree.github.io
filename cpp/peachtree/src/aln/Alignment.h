@@ -67,6 +67,7 @@ public:
 	bool taxonIsSelected(int taxonNum);
 	void selectTaxon(int taxonNum, bool setTo);
 	void clearSelection();
+	void clearHighlighting();
 
 	Taxon* getTaxon(string label);
 	Taxon* getTaxon(int i);

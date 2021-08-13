@@ -167,7 +167,7 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 	acc_json["font_size"] = textSize;
 	acc_json["white_space"] = "pre";
 	string str1 = "taxon";
-	str1.append(this->getTaxon()->getIsSelected() ? " selected" : "");
+	str1.append(this->getTaxon()->getIsHighlighted() ? " selected" : "");
 	acc_json["class"] = str1;
 	acc_json["i"] = seqNum;
 

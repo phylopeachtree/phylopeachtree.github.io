@@ -40,3 +40,15 @@ vector<string> Case::getVariables(){
 	}
 	return keys;
 }
+
+
+
+
+void Case::setActive(bool val){
+	this->active = val;
+}
+
+
+bool Case::getActive(){
+	return this->active;
+}

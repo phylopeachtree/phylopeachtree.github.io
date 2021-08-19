@@ -132,7 +132,6 @@ void Epidemiology::parseFile(string contents){
 
 
 
-
 /*
  * List of column headers / annotations / variable names
  */
@@ -161,7 +160,26 @@ void Epidemiology::cleanup(){
  * Validate the accessions in the alignment
  */
 void Epidemiology::validateAccessions(Alignment* alignment){
+	
+	//if (true) return;
 
+
+	for (Case* c : this->cases) {
+		string acc2 = c->getAccession();
+		
+		bool match = false;
+		for (string acc1 : alignment->getNames()) {
+			if (acc1 == acc2) {
+				match = true;
+				break;
+			}
+		}
+		
+		// No match? Mark the case as inactive
+		c->setActive(match);
+		
+		
+	}
 
 	// Ensure that every sequence is matched by at least one accession
 	// Bipartite is not required
@@ -177,7 +195,8 @@ void Epidemiology::validateAccessions(Alignment* alignment){
 
 
 		if (!match) {
-			Error::throwError("Cannot find epidemiological annotations for " + acc1);
+			
+			//Error::throwError("Cannot find epidemiological annotations for " + acc1);
 		}
 	}
 

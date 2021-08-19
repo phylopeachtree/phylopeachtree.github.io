@@ -299,7 +299,7 @@ void Utils::getNiceTimes(tm lastDate, double timeSpan, int maxNTimes, vector<dou
 
 		// 3. Print years only
 		else{
-			str = year;
+			str = to_string(year);
 		}
 
 

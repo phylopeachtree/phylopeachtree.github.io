@@ -176,7 +176,13 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 	vector<tm> caseDatesNew;
 
 	for (Case* c : epidemiology->getCases()){
+		
+		if (!c->getActive()) continue;
+		
 		string val = c->getValue(sampleDateVariable);
+		
+		
+		
 
 		// Attempt to parse date
 		struct tm tm;
@@ -188,6 +194,7 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 		}
 
 		caseDatesNew.push_back(tm);
+		
 
 		// Unique dates only
 		if (std::count(uniqueDates.begin(), uniqueDates.end(), val) == 0) {
@@ -207,11 +214,18 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 		this->meanTipHeight_cases = 0;
 
 		// Get latest and earliest date
-		this->latestDate = this->caseDates.at(0);
-		this->earliestDate = this->caseDates.at(0);
+		tm early, late;
+		Utils::parseDate("9999-12-31", "%Y-%m-%d", early);
+		Utils::parseDate("0001-01-01", "%Y-%m-%d", late);
+		this->latestDate = late;
+		this->earliestDate = early;
 		for (tm d : this->caseDates){
+			if (d.tm_mon < 0) continue; 
 			if (!Utils::compareDates(d, this->latestDate)) this->latestDate = d;
 			if (Utils::compareDates(d, this->earliestDate)) this->earliestDate = d;
+			
+			
+			
 		}
 
 		this->latestTime = Utils::getTimeFromDate(this->latestDate);
@@ -219,9 +233,15 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 
 
 		// Mean tip height
+		int nValidDates = 0;
 		for (tm d : this->caseDates){
-			this->meanTipHeight_cases += (this->latestTime - Utils::getTimeFromDate(d)) / this->caseDates.size();
+			if (d.tm_mon < 0) continue;
+			nValidDates++;
+			cout << "tip height " << Utils::getTimeFromDate(d) << "/" << (this->latestTime - Utils::getTimeFromDate(d)) << endl;
+			this->meanTipHeight_cases += (this->latestTime - Utils::getTimeFromDate(d));
 		}
+		this->meanTipHeight_cases = this->meanTipHeight_cases / nValidDates;
+		cout << "this->meanTipHeight_cases " << this->meanTipHeight_cases << "/" << nValidDates << endl;
 
 		cout << "There are " << uniqueDates.size() << " unique dates. The earliest is " << Utils::getTimeFromDate(earliestDate) << " and the latest is " << Utils::getTimeFromDate(latestDate) << endl;
 
@@ -243,26 +263,26 @@ bool Timeline::isReady(){
 
 
 /*
- * The forward time of this case, where the year 0BC is at time 0
- */
 double Timeline::getSampleTimeOfCase(int caseNum){
 	if (this->caseDates.size() == 0) {
 		return 0;
 	}
-	return Utils::getTimeFromDate(this->caseDates.at(caseNum));
+	tm d = this->caseDates.at(caseNum);
+	if (d.tm_mon == -1) return this->latestTime;
+	return Utils::getTimeFromDate(d);
 }
 
 
-/*
- * The backwards time of this case (where latest case is at time 0)
- */
+
 double Timeline::getSampleHeightOfCase(int caseNum){
 	if (this->caseDates.size() == 0) {
 		return 0;
 	}
-	return this->latestTime - Utils::getTimeFromDate(this->caseDates.at(caseNum));
+	tm d = this->caseDates.at(caseNum);
+	if (d.tm_mon == -1) return 0;
+	return this->latestTime - Utils::getTimeFromDate(d);
 }
-
+*/
 
 
 /*
@@ -310,12 +330,18 @@ double Timeline::getSampleHeight(Node* node){
 				double hc = this->getSampleHeight(child);
 				if (hc > hprime) hprime = hc;
 			}
+			
+			if (node->getChildren().size() == 0) hprime = 0;
+			
+			
+			//cout << "Setting node height to " << hprime << ": " << this->meanTipHeight_cases << "/" << this->meanTipHeight_tree << endl;
 
 			//node->setSampleTime(hprime);
 			return hprime;
 		}
 
 		sampleTime = Utils::getTimeFromDate(tm);
+		cout << "Case height to " << sampleTime << endl;
 		node->setSampleTime(sampleTime);
 
 	}
@@ -405,6 +431,9 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			break;
 		}
 	}
+
+
+
 
 	// Infectious period: check the variable name is valid
 	if (std::count(annots.begin(), annots.end(), symptomDateVar) > 0) {
@@ -537,6 +566,8 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	}
 
 
+	
+
 
 	// Isolation date: check the variable name is valid
 	if (std::count(annots.begin(), annots.end(), isolationDateVar) > 0) {
@@ -585,6 +616,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 
 
 
+
 	// Get some nice dates to print
 	int ndates = std::floor((scaling->getCanvasMaxX() - scaling->getCanvasMinX()) / (8 * axisFontSize));
 	ndates = std::min(ndates, Timeline::MAX_NDATES);
@@ -599,12 +631,18 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 		for (int t = 0; t < heights.size(); t ++){
 
 
+
+			
+
 			// x value
 			double x = heights.at(t);
 			if (!scaling->inRangeX(x)) continue;
 
 			double x_scaled = scaling->scaleX(x);
 			string label = labels.at(t);
+
+
+			cout << height << "/" << x << "/" << x_scaled << endl;
 
 
 			// Vertical line
@@ -646,6 +684,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			bg_json["width"] = axisFontSize*0.56*label.size();
 			bg_json["height"] = axisFontSize;
 			bg_json["fill"] = "#ffffffdd";
+			bg_json["layer"] = 2;
 			arr.push_back(bg_json);
 
 
@@ -659,13 +698,20 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			label_json["value"] = label;
 			label_json["font_size"] = axisFontSize;
 			label_json["font_family"] = "Arial";
+			label_json["layer"] = 2;
 			arr.push_back(label_json);
+			
+			
+			
+			
 
 
 		}
 
 
 	}
+	
+
 
 	return arr;
 

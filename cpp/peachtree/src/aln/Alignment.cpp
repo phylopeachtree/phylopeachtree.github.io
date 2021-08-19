@@ -132,6 +132,7 @@ Alignment::Alignment(Tree* tree){
 	int i = 0;
 	for (Node* leaf : tree->getLeavesAsArray()){
 		Sequence* seq = new Sequence(i, leaf->getAcc(), "", true);
+		leaf->setTaxon(seq->getTaxon());
 		this->sequences.push_back(seq);
 		i++;
 	}

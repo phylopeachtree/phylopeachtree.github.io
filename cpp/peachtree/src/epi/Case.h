@@ -23,11 +23,13 @@ public:
 	string getValue(string var);
 	string getAccession();
 	vector<string> getVariables();
-
+	void setActive(bool val);
+	bool getActive();
 
 private:
 	string accession;
 	map<string, string> annotations;
+	bool active;
 };
 
 #endif /* EPI_CASE_H_ */

@@ -497,14 +497,15 @@ void Tree::applyFiltering(Filtering* filtering){
  */
 vector<Taxon*> Tree::getClade(vector<Taxon*> taxa){
 
+
 	// Find the mrca
 	Node* mrca = getMRCA(taxa);
-
+	
 
 	// Get all leaves in this subtree
 	vector<Node*> leaves;
 	mrca->getLeafSet(leaves);
-
+	
 
 	// Return their taxa
 	vector<Taxon*> clade;
@@ -524,7 +525,10 @@ Node* Tree::getMRCA(vector<Taxon*> taxa){
 		Node* node1 = this->getNode(taxa.at(i));
 		for (int j = i+1; j < taxa.size(); j ++) {
 			Node* node2 = this->getNode(taxa.at(j));
+			
+
 			Node* ancestor = Tree::getMRCA(node1, node2);
+			
 
 			// The mrca of the set of taxa is the pairwise mrca with the greatest height
 			if (mrca == nullptr || ancestor->getHeight() > mrca->getHeight()){

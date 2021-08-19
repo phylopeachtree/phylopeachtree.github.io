@@ -39,6 +39,14 @@ Sequence::Sequence(int id, string acc, string seq, bool couldBeNucleotide){
 }
 
 
+
+
+
+
+
+
+
+
 /*
  * Clear memory
  */

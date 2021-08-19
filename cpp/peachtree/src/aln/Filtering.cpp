@@ -40,17 +40,20 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 			Taxon* taxon = seq->getTaxon();
 			if (taxon->getIsSelected()) selected.push_back(taxon);
 		}
+		
 
+		
 
 		// Find their mrca and take the full clade
 		selected = tree->getClade(selected);
 		this->subtree = tree->getMRCA(selected);
-
+		
 
 		// Select the ones to include
 		for (Taxon* taxon : selected) {
 			taxon->setIsSelected(true);
 		}
+		
 
 	}
 
@@ -77,7 +80,6 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 	}
 
 	this->majors.clear();
-
 
 
 
@@ -127,7 +129,6 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 
 
 
-
 	if (numSites == 0) this->variantSitesOnly = false;
 
 	if (!this->variantSitesOnly) {
@@ -136,9 +137,13 @@ Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 			this->sitesToIncludeList.push_back(i);
 		}
 	}
-
+	
+	
 	// Prepare major/minor alleles
 	this->prepareMajorAlleles(this->alignment);
+
+
+
 }
 
 

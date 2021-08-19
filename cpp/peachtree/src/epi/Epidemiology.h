@@ -33,6 +33,7 @@ public:
 private:
 	vector<Case*> cases;
 	vector<string> annotations;
+	
 };
 
 #endif /* EPI_EPIDEMIOLOGY_H_ */

@@ -27,17 +27,22 @@ void test(string& str){
 int main() {
 
 	cout << "hello there" << endl;
+	
+	
+	tm t1;
+	std::fill((char*)&t1, (char*)&t1 + sizeof(t1), 0);
+	t1.tm_year = 2021;
+	t1.tm_mon = 8;
+	t1.tm_mday = 18;
+	
 
-	string col = "#baff00";
-	int red = Utils::getRed(col);
-	int green = Utils::getGreen(col);
-	int blue = Utils::getBlue(col);
+	vector<double> heights;
+	vector<string> labels;
+	Utils::getNiceTimes(t1, -15, 10, heights, labels);
+	for (int i = 0; i < heights.size(); i ++){
+		cout << heights.at(i) << " / " << labels.at(i) << endl;
+	}
 
-	cout << "rgb " << red << "/" << green << "/" << blue << endl;
-
-
-	string rgb = Utils::getHexCode(red, green, blue);
-	cout << "rgb " << rgb << endl;
 
 	/*
 	tm t1;

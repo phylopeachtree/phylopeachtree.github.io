@@ -215,22 +215,32 @@ void OptionsAPI::prepareEpiAnnotations() {
 		string lower = Utils::toLower(var);
 
 		// Sample date
-		if (lower.find("sample") != std::string::npos) {
-			cout << "Default: setting sample date to " << var << endl;
-			OptionsAPI::epiSampleDate->setVal(var);
+		if (OptionsAPI::epiSampleDate->getVal() == "none") {
+			if (lower.find("report") != std::string::npos) {
+				cout << "Default: setting sample date to " << var << endl;
+				OptionsAPI::epiSampleDate->setVal(var);
+			}
+			else if (lower.find("sample") != std::string::npos) {
+				cout << "Default: setting sample date to " << var << endl;
+				OptionsAPI::epiSampleDate->setVal(var);
+			}
 		}
 
 
 		// Symptom onset date
-		if (lower.find("symptom") != std::string::npos) {
-			cout << "Default: setting symptom date to " << var << endl;
-			OptionsAPI::epiSymptomDate->setVal(var);
+		if (OptionsAPI::epiSymptomDate->getVal() == "none") {
+			if (lower.find("symptom") != std::string::npos) {
+				cout << "Default: setting symptom date to " << var << endl;
+				OptionsAPI::epiSymptomDate->setVal(var);
+			}
 		}
 
 		// Isolation date
-		if (lower.find("isolat") != std::string::npos) {
-			cout << "Default: setting isolation date to " << var << endl;
-			OptionsAPI::epiIsolationDate->setVal(var);
+		if (OptionsAPI::epiIsolationDate->getVal() == "none") {
+			if (lower.find("isolat") != std::string::npos) {
+				cout << "Default: setting isolation date to " << var << endl;
+				OptionsAPI::epiIsolationDate->setVal(var);
+			}
 		}
 
 	}
@@ -750,7 +760,6 @@ extern "C" {
 			EpiAPI::prepareTimeline(PhylogenyAPI::getTree(), OptionsAPI::epiSampleDate->getVal(), OptionsAPI::dateFormat->getVal());
 			EpiAPI::prepareNodeSampleHeights(subtree, OptionsAPI::epiSymptomDate->getVal(), OptionsAPI::infectiousPeriodBefore->getVal(),  OptionsAPI::infectiousPeriodAfter->getVal());
 
-
 			// Tree range
 			double treeHeight = PhylogenyAPI::getTree()->getRoot()->getHeight(EpiAPI::getTimeline());
 			double treeMin = 0;
@@ -758,7 +767,6 @@ extern "C" {
 				treeHeight = AlignmentAPI::getFiltering()->getSubtreeRoot()->getHeight(EpiAPI::getTimeline());
 				treeMin = AlignmentAPI::getFiltering()->getSubtreeRoot()->getYoungestChildHeight(EpiAPI::getTimeline());
 			}
-
 
 
 
@@ -910,6 +918,9 @@ extern "C" {
 
 
 
+		
+
+
 		// Top and left margin backgrounds
 		jsonObject top;
 		top["ele"] = "rect";
@@ -939,6 +950,9 @@ extern "C" {
 
 
 		json["scrolls"] = scrolls;
+
+
+
 
 
 		// Return
@@ -1167,6 +1181,7 @@ extern "C" {
 
 		// Select it
 		taxon->setIsSelected(true);
+		taxon->setIsHighlighted(true);
 
 
 		// Set it as the focal taxon

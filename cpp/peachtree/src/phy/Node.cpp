@@ -716,7 +716,7 @@ void Node::parseFromNewick(string newick){
 	}
 
 
-
+	//cout << newick << endl;
 
 
 	// Find the first closing bracket on the same level
@@ -737,8 +737,13 @@ void Node::parseFromNewick(string newick){
 		if (annotationLevel == 1 && char2 == ',') {
 
 			// Parse annotation
-			this->parseAnnotation(newick.substr(annotationPos, pos-annotationPos));
+			if (!hasChildren || level == -1) {
+				this->parseAnnotation(newick.substr(annotationPos, pos-annotationPos));
+				//break;
+			}
 			annotationPos = pos+1;
+			
+			
 
 		}
 
@@ -769,7 +774,7 @@ void Node::parseFromNewick(string newick){
 			if (level == 0) {
 				childSubtrees.push_back(newick.substr(childPos, pos+1-childPos));
 				childPos = pos+1;
-				break;
+				//break;
 			}
 			level--;
 		}
@@ -780,8 +785,12 @@ void Node::parseFromNewick(string newick){
 			annotationPos = pos+1;
 		}
 		else if (char2 == ']') {
-			if (annotationLevel == 1) this->parseAnnotation(newick.substr(annotationPos, pos-annotationPos));
+			if ((!hasChildren || level == -1) && annotationLevel == 1) {
+				this->parseAnnotation(newick.substr(annotationPos, pos-annotationPos));
+				break;
+			}
 			annotationLevel--;
+			
 		}
 
 		// Array annotation
@@ -800,7 +809,7 @@ void Node::parseFromNewick(string newick){
 
 	// Validate
 	if (hasChildren && childSubtrees.empty()) {
-		Error::throwError("Could not parse newick. Perhaps there is a missing ')'.");
+		Error::throwError("Could not parse newick. Perhaps there is a missing ).");
 		return;
 	}
 
@@ -829,6 +838,10 @@ void Node::parseFromNewick(string newick){
  * Parse the annotation
  */
 void Node::parseAnnotation(string annotation){
+	
+	
+	
+	//cout << "parsing " << annotation << endl;
 
 	int pos = annotation.find("=");
 	string key = annotation.substr(0, pos);
@@ -897,6 +910,7 @@ void Node::addAnnotations(Case* c){
 	for (string var : c->getVariables()) {
 		string val = c->getValue(var);
 		annotations[var] = val;
+		cout << "setting node " << var << " = " << val << endl;
 	}
 }
 

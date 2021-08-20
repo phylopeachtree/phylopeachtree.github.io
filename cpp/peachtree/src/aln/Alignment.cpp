@@ -516,7 +516,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
  * Get taxa graphics
  * @return
  */
-json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers){
+json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage){
 
 
 	json objs = json::array();
@@ -541,7 +541,7 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 		if (scaling->isAboveRangeY(seqNumDisplayed)) break;
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift);
+		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift, displayMissingPercentage);
 		objs.insert(objs.end(), j.begin(), j.end()); // Add all
 		seqNumDisplayed ++;
 	}
@@ -770,6 +770,20 @@ bool Alignment::isAmbiguousOrGap(string symbol, bool isNT){
 		if (index > ambiguousAlphaIndex) return true;
 	}
 
+	return false;
+}
+
+
+/*
+ * Is the symbol int  a gap?
+ */
+bool Alignment::isGap(int index, bool isNT){
+
+	if (isNT) {
+		if (index == Alignment::gapNtIndex) return true;
+	}else {
+		if (index == Alignment::gapAlphaIndex) return true;
+	}
 	return false;
 }
 

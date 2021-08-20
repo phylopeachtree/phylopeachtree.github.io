@@ -40,13 +40,14 @@ public:
 	int getLength();
 	bool getIsNucleotide();
 	void setIsNucleotide(bool b);
-	json getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift);
+	json getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage);
 	json getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth, Colouring* colouring, Filtering* filtering, double textSize, double yshift);
 	int getSymbolInt(int site);
 	string getSymbol(int site);
 	void editSiteInt(int siteNum, int newSymbol);
 	double getY0(int seqNum, Scaling* scaling);
 	void cleanup();
+	double getMissingDataProportion();
 
 
 private:
@@ -56,6 +57,8 @@ private:
 	vector<int> sequenceArr;
 	int seqLen;
 	bool isNucleotide;
+	vector<int> ungappedPos;
+	double missingDataProportion;
 
 };
 

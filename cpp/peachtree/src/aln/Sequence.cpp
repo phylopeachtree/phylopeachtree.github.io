@@ -18,24 +18,8 @@ Sequence::Sequence(int id, string acc, string seq, bool couldBeNucleotide){
 	// Is it nucleotide or amino acid?
 	this->isNucleotide = true;
 	seqLen = seq.length();
-	if (seqLen > 0){
-		if (couldBeNucleotide) {
-			this->sequenceArr.resize(this->seqLen);
-			string c;
-			for (int i = 0; i < seq.length(); i ++) {
-
-				c = seq.at(i);
-				int val = Alignment::getNucleotideInt(c);
-				if (val == -1) {
-					this->isNucleotide = false;
-					return;
-				}
-
-				this->sequenceArr.at(i) = val;
-			}
-		}
-	}
-
+	if (couldBeNucleotide) this->prepareArray();
+	
 }
 
 
@@ -73,6 +57,13 @@ void Sequence::prepareArray(){
 
 
 	if (this->seqLen == 0) return;
+	
+	this->ungappedPos.clear();
+	this->ungappedPos.resize(this->seqLen);
+	int numNonGaps = 0;
+	int numAmbiguousSites = 0;
+	this->missingDataProportion = 0;
+	
 
 	//System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
 	//System.out.println("'" + this.sequence + "'");
@@ -80,11 +71,14 @@ void Sequence::prepareArray(){
 	for (int i = 0; i < this->seqLen; i ++) {
 		string site = this->sequence.substr(i, 1);
 		int val;
+		
 		if (this->isNucleotide) {
 			val = Alignment::getNucleotideInt(site);
 		}else {
 			val = Alignment::getAlphaInt(site);
 		}
+		bool isGap = Alignment::isGap(val, this->isNucleotide);
+		
 		//System.out.println("putting " + val + " at site " + i + " for symbol " + site);
 		if (val == -1) {
 			string str1 = "Unknown character ";
@@ -93,9 +87,31 @@ void Sequence::prepareArray(){
 			return;
 		}
 		this->sequenceArr.at(i) = val;
+		
+		
+		// Count ungapped position
+		if (isGap){
+			this->ungappedPos.at(i) = -1;
+		}else{
+			numNonGaps ++;
+			this->ungappedPos.at(i) = numNonGaps;
+		}
+		
+		
+		// Count missing
+		if (Alignment::isAmbiguous(val, this->isNucleotide)) numAmbiguousSites ++;
+		
 	}
+	
+	
+	this->missingDataProportion = 1.0 * numAmbiguousSites / numNonGaps;
+	
 }
 
+
+double Sequence::getMissingDataProportion(){
+	return this->missingDataProportion;
+}
 
 string Sequence::getSeq(){
 	return this->sequence;
@@ -140,7 +156,7 @@ void Sequence::setIsNucleotide(bool b){
 }
 
 
-json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift){
+json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage){
 
 
 	json arr; // = json::array();
@@ -164,14 +180,27 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 	//numberPadding.replaceAll(" ", "&#160;"); // White space
 
 
+	string missingStr = "";
+	string missingStrTitle = "";
+	if (this->getLength() > 0) {
+		string percentage;
+		if (this->missingDataProportion == 0) percentage = "0";
+		else{
+			percentage = to_string(Utils::roundToSF(100*this->missingDataProportion, 2));
+			percentage.erase(percentage.find_last_not_of('0') + 1, std::string::npos);
+		}
+		if (displayMissingPercentage) missingStr = " (" + percentage + "%)";
+		missingStrTitle = "\n" + percentage + "% missing data";
+	}
+
 	// Plot accession
 	json acc_json;
 	acc_json["ele"] = "text";
 	acc_json["x"] = scaling->scaleX(scaling->getXmin());
 	acc_json["y"] = yc_scaled;
 	acc_json["text_anchor"] = "start";
-	acc_json["value"] = label;
-	acc_json["title"] = this->getAcc();
+	acc_json["value"] = label + missingStr;
+	acc_json["title"] = this->getAcc() + missingStrTitle;
 	acc_json["font_size"] = textSize;
 	acc_json["white_space"] = "pre";
 	string str1 = "taxon";
@@ -298,6 +327,11 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 			nt_font["text_anchor"] = "middle"; // Right alignment
 			string str1 = "Site ";
 			str1.append(to_string(site+1));
+			///cout << site << endl;
+			if (this->ungappedPos.at(site) != -1){
+				str1 += "\nUngapped position: " + to_string(this->ungappedPos.at(site));
+			}
+			
 			nt_font["title"] = str1;
 			nt_font["font_size"] = textSize;
 			arr.push_back(nt_font);

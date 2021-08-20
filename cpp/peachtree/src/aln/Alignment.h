@@ -42,7 +42,7 @@ public:
 	static bool isAmbiguousOrGap(int index, bool isNT);
 	static bool isAmbiguousOrGap(string symbol, bool isNT);
 	static void prepareAlignmentChars();
-
+	static bool isGap(int index, bool isNT);
 
 
 	Sequence* getSequence(int i);
@@ -56,7 +56,7 @@ public:
 	void sortByTree(Tree* tree);
 	json toJSON();
 	json getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering, int siteNumberingEvery);
-	json getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers);
+	json getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage);
 
 	vector<string> getNames();
 	int getPatternCount();
@@ -72,6 +72,7 @@ public:
 	Taxon* getTaxon(string label);
 	Taxon* getTaxon(int i);
 	int getTaxonIndex(Taxon* taxon);
+	
 
 
 private:

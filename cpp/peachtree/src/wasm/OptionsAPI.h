@@ -66,8 +66,11 @@ public:
 	static NumericalOption* ntWidth;
 	static NumericalOption* fontSizeAln;
 	static BooleanOption* variantSitesOnly;
+	static BooleanOption* displayMissingPercentage;
 	static DiscreteOption* siteColourType;
 	static DiscreteOption* colourings;
+	
+	
 
 
 	// Epidemiology

@@ -209,6 +209,8 @@ void Epidemiology::validateAccessions(Alignment* alignment){
 void Epidemiology::addAnnotationsToTree(Tree* tree){
 
 
+	cout << "annotating tree with epi" << endl;
+
 	// Check for duplicate annotations
 	vector<string> treeAnnotations;
 	tree->getRoot()->getAllAnnotations(treeAnnotations);

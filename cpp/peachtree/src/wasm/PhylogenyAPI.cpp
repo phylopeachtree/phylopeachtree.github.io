@@ -129,40 +129,44 @@ jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, b
  */
 jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 
-
-	//String str = new String(contents);
-	//cout << "Creating tree " << method << endl;
-
-	PhylogenyAPI::cleanup();
-
-
 	auto start = high_resolution_clock::now();
+	jsonObject j;
+	if (!AlignmentAPI::isMock()){
+		//String str = new String(contents);
+		//cout << "Creating tree " << method << endl;
+
+		PhylogenyAPI::cleanup();
 
 
-	// Build tree
-	THE_TREE = new ClusterTree(alignment, method);
+		
 
 
-	// Sort taxa by tree
-	sortTaxaByTree(THE_TREE, alignment);
-	AlignmentAPI::setOrderingToDirty();
-	EpiAPI::setEpiAnnotationsToDirty();
-	EpiAPI::addAnnotationsToTree(THE_TREE);
-	PhylogenyAPI::orderingIsDirty = false;
+		// Build tree
+		THE_TREE = new ClusterTree(alignment, method);
 
 
-	// Prepare tree annotation options
-	OptionsAPI::prepareTreeAnnotationOptions();
-	OptionsAPI::resetScroll();
+		// Sort taxa by tree
+		sortTaxaByTree(THE_TREE, alignment);
+		AlignmentAPI::setOrderingToDirty();
+		EpiAPI::setEpiAnnotationsToDirty();
+		EpiAPI::addAnnotationsToTree(THE_TREE);
+		PhylogenyAPI::orderingIsDirty = false;
+
+
+		// Prepare tree annotation options
+		OptionsAPI::prepareTreeAnnotationOptions();
+		OptionsAPI::resetScroll();
+
+	
+
+		j["newick"] = THE_TREE->toNewick();
+
+	}
 
 	auto finish = high_resolution_clock::now();
 	auto duration = duration_cast<milliseconds>(finish - start);
-
-
-
-	jsonObject j;
 	j["time"] = duration.count();
-	j["newick"] = THE_TREE->toNewick();
+	
 	return j;
 
 

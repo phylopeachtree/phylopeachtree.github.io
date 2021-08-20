@@ -79,6 +79,7 @@ BooleanOption* OptionsAPI::focusOnClade = new BooleanOption("focusOnClade", "Sam
 NumericalOption* OptionsAPI::ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
 NumericalOption* OptionsAPI::fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 0, 50, 1);
 BooleanOption* OptionsAPI::variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show segregating sites only", true);
+BooleanOption* OptionsAPI::displayMissingPercentage = new BooleanOption("displayMissingPercentage", "Alignment", "Show percentage of missing data beside sample names", false);
 DiscreteOption* OptionsAPI::siteColourType;
 DiscreteOption* OptionsAPI::colourings;
 
@@ -133,6 +134,7 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(ntWidth);
 	options.push_back(fontSizeAln);
 	options.push_back(variantSitesOnly);
+	options.push_back(displayMissingPercentage);
 	options.push_back(siteColourType);
 	options.push_back(colourings);
 
@@ -395,6 +397,11 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	//annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
 
 
+	for (string a : annotations){
+		cout << "annotation " << a << endl;
+	}
+
+
 	// Internal node labels
 	/*
 	if (internalNodeLabels == nullptr){
@@ -630,8 +637,8 @@ extern "C" {
 
 
 		if (download){
-			width = xdivide2*width + fullAlnWidth;
-			height = fullHeight;
+			//width = xdivide2*width + fullAlnWidth;
+			//height = fullHeight;
 		}
 
 
@@ -825,7 +832,7 @@ extern "C" {
 				objs.push_back(rect);
 
 
-				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal());
+				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal());
 				objs.insert(objs.end(), taxa.begin(), taxa.end());
 
 			}
@@ -1199,13 +1206,35 @@ extern "C" {
 
 	/**
 	 * Is the system ready to render?
-	 * @return
 	 */
 	void EMSCRIPTEN_KEEPALIVE isReady() {
 		jsonObject json;
 		json["ready"] = OptionsAPI::isReady();
 		WasmAPI::messageFromWasmToJS(json.dump(0));
 	}
+	
+	
+	/**
+	* Is the tree ready?
+	*/
+	void EMSCRIPTEN_KEEPALIVE treeIsReady() {
+		jsonObject json;
+		json["ready"] = PhylogenyAPI::isReady();
+		WasmAPI::messageFromWasmToJS(json.dump(0));
+	}
+	
+	
+	/**
+	* Is the alignment ready?
+	*/
+	void EMSCRIPTEN_KEEPALIVE alignmentIsMock() {
+		jsonObject json;
+		json["mock"] = AlignmentAPI::isMock();
+		WasmAPI::messageFromWasmToJS(json.dump(0));
+	}
+	
+	
+	
 
 
 

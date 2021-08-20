@@ -24,7 +24,7 @@ class AlignmentAPI {
 
 public:
 
-	static jsonObject getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers);
+	static jsonObject getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage);
 	static jsonObject getAlignmentGraphics(Scaling* scaling, double minNtWidth, double textSize, Colouring* colouring, int siteNumberingEvery);
 
 

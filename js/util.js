@@ -513,6 +513,23 @@ function renderOptions(){
 		
 		//.html(JSON.stringify(options));
 		//addLoader($("#buildTreeBtn").parent());
+		
+		
+		callWasmFunction("treeIsReady", [], function(result){
+			
+			if (result.ready) $("#btn_clade").show(100);
+			else $("#btn_clade").hide(0);
+			
+		});
+		
+		
+		callWasmFunction("alignmentIsMock", [], function(result){
+			
+			if (!result.mock) $("#buildTreeBtn").show(100);
+			else $("#buildTreeBtn").hide(0);
+			
+		});
+		
 				
 	});
 	

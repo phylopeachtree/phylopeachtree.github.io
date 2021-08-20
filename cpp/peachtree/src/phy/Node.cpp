@@ -910,7 +910,7 @@ void Node::addAnnotations(Case* c){
 	for (string var : c->getVariables()) {
 		string val = c->getValue(var);
 		annotations[var] = val;
-		cout << "setting node " << var << " = " << val << endl;
+		//cout << "setting node " << var << " = " << val << endl;
 	}
 }
 

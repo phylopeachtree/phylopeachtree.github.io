@@ -389,18 +389,20 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 
 	// Add some yshift to the first row so it doesn't get clipped by top margin
 	double yshift = 0;
+	int filteredNr = 0;
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		if (scaling->inRangeY(seqNum)){
-			yshift = sequence->getY0(seqNum, scaling);
+		if (scaling->inRangeY(filteredNr)){
+			yshift = sequence->getY0(filteredNr, scaling);
 			break;
 		}
+		filteredNr++;
 
 	}
 
 
-	cout << " yshift " << yshift << " / " << scaling->getCanvasMinY() << endl;
+	//cout << " yshift " << yshift << " / " << scaling->getCanvasMinY() << endl;
 
 
 	// Site numbering at the top
@@ -525,15 +527,18 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 
 	// Add some yshift to the first row so it doesn't get clipped by top margin
 	double yshift = 0;
+	int filteredNr = 0;
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		if (scaling->inRangeY(seqNum)){
-			yshift = sequence->getY0(seqNum, scaling);
+		if (scaling->inRangeY(filteredNr)){
+			yshift = sequence->getY0(filteredNr, scaling);
 			break;
 		}
+		filteredNr++;
 
 	}
+	
 
 
 	int seqNumDisplayed = 0;

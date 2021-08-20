@@ -227,13 +227,15 @@ extern "C" {
 		// If alignment has been uploaded, check it matches the tree
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 
-		// Prepare tree annotation options
-		OptionsAPI::prepareTreeAnnotationOptions();
-		OptionsAPI::resetScroll();
 
 		// Epidemiological annotations
 		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
+		
+		
+		// Prepare tree annotation options
+		OptionsAPI::prepareTreeAnnotationOptions();
+		OptionsAPI::resetScroll();
 
 
 		auto finish = high_resolution_clock::now();

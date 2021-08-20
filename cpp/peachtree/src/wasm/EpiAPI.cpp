@@ -177,6 +177,7 @@ extern "C" {
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::getTree());
 
 		OptionsAPI::prepareEpiAnnotations();
+		OptionsAPI::prepareTreeAnnotationOptions();
 
 		auto finish = high_resolution_clock::now();
 		auto duration = duration_cast<seconds>(finish - start);

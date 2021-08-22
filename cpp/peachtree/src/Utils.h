@@ -44,6 +44,8 @@ public:
 	static int getBlue(string hexCol);
 	static string getHexCode(int red, int green, int blue);
 	static double roundToSF(double N, int n);
+	static double log10(double val);
+	
 
 	static const vector<string> month_names;
 

@@ -47,6 +47,10 @@ jsonObject NumericalOption::toJSON() {
 }
 
 
+double NumericalOption::getStepSize(){
+	return this->stepSize;
+}
+
 
 double NumericalOption::getVal() {
 	return this->value;

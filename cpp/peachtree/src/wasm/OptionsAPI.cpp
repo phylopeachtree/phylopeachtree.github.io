@@ -21,7 +21,7 @@
 #include "../epi/Timeline.h"
 
 
-const long OptionsAPI::CHUNK_SIZE = 40000;
+const long OptionsAPI::CHUNK_SIZE = 30000;
 const double OptionsAPI::LEFT_MARGIN = 0; // Left hand margin
 double OptionsAPI::TOP_MARGIN = 16; // Top margin
 const double OptionsAPI::MARGIN_SIZE = 16;
@@ -29,9 +29,13 @@ const double OptionsAPI::INIT_WIDTH = 1200;
 const double OptionsAPI::INIT_HEIGHT = INIT_WIDTH*0.618;
 const double OptionsAPI::INIT_DIV1 = 0.3;
 const double OptionsAPI::INIT_DIV2 = 0.5;
-const double OptionsAPI::SCROLL_Y_NROWS = 10;
+const double OptionsAPI::SCROLL_Y_NROWS = 7;
 const int OptionsAPI::SITE_NUMBERING_EVERY = 10;
 
+const double OptionsAPI::NT_HEIGHT = 15;
+const double OptionsAPI::NT_WIDTH = 15;
+const double OptionsAPI::FONT_SIZE_ALN = 14;
+const double OptionsAPI::FONT_SIZE_TAXA = 12;
 
 
 // Boundaries
@@ -68,16 +72,16 @@ DiscreteOption* OptionsAPI::colourNodesBy;
 
 
 // Samples
-NumericalOption* OptionsAPI::siteHeight = new NumericalOption("siteHeight", "Samples", "Row heights", 20, 1, 100, 5);
-NumericalOption* OptionsAPI::fontSizeTaxa = new NumericalOption("fontSizeTaxa", "Samples", "Font size of samples", 13, 0, 50, 1);
+NumericalOption* OptionsAPI::zoomScale = new NumericalOption("zoomScale", "Samples", "Zoom scale (log space)", 0, -1, 1, 0.1, true);
 NumericalOption* OptionsAPI::taxaSpacing = new NumericalOption("taxaSpacing", "Samples", "Padding before sample names", 5, 0, 50, 1, true);
-BooleanOption* OptionsAPI::showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false);
+BooleanOption* OptionsAPI::showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false, true);
 BooleanOption* OptionsAPI::focusOnTaxa = new BooleanOption("focusOnTaxa", "Samples", "Show only selected samples", false, true);
 BooleanOption* OptionsAPI::focusOnClade = new BooleanOption("focusOnClade", "Samples", "Show only clade of selected samples", false, true);
+DiscreteOption* OptionsAPI::sampleNameAnnotation;
+
+
 
 // Alignment
-NumericalOption* OptionsAPI::ntWidth = new NumericalOption("ntWidth", "Alignment", "Width of alignment sites", 15, 1, 100, 5);
-NumericalOption* OptionsAPI::fontSizeAln = new NumericalOption("fontSizeAln", "Alignment", "Font size of alignment", 16, 0, 50, 1);
 BooleanOption* OptionsAPI::variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show segregating sites only", true);
 BooleanOption* OptionsAPI::displayMissingPercentage = new BooleanOption("displayMissingPercentage", "Alignment", "Show percentage of missing data beside sample names", false);
 DiscreteOption* OptionsAPI::siteColourType;
@@ -123,16 +127,15 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 
 
 	// Taxa
-	options.push_back(siteHeight);
-	options.push_back(fontSizeTaxa);
+	options.push_back(zoomScale);
 	options.push_back(taxaSpacing);
 	options.push_back(showTaxonNumbers);
 	options.push_back(focusOnTaxa);
 	options.push_back(focusOnClade);
+	options.push_back(sampleNameAnnotation);
+	
 
 	// Alignment
-	options.push_back(ntWidth);
-	options.push_back(fontSizeAln);
 	options.push_back(variantSitesOnly);
 	options.push_back(displayMissingPercentage);
 	options.push_back(siteColourType);
@@ -420,6 +423,15 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	*/
 
 
+	// Sample names
+	if (sampleNameAnnotation == nullptr){
+		sampleNameAnnotation = new DiscreteOption("sampleNameAnnotation", "Samples", "Sample labels", annotations.at(0), annotations);
+	}else{
+		sampleNameAnnotation->setValAndDomain(annotations.at(0), annotations);
+	}
+	
+
+
 	// Node colourings
 	if (colourNodesBy == nullptr){
 		colourNodesBy = new DiscreteOption("colourNodesBy", "Phylogeny", "Colour nodes by", annotations.at(0), annotations);
@@ -501,13 +513,10 @@ extern "C" {
 		// Full option descriptions. Including too many of these seems to upset the compiler and give slow rendering times
 
 		// Taxa
-		//OptionsAPI::siteHeight->setLongTitle("The height of each row (tree branches, sample labels, and aligned sequences).");
 		//OptionsAPI::fontSizeTaxa->setLongTitle("Font size of sample labels.");
 		//OptionsAPI::showTaxonNumbers->setLongTitle("Enable this setting to display a numeric index before each sample label.");
 
 		// Alignment
-		//OptionsAPI::ntWidth->setLongTitle("The width of each site in the alignment.");
-		//OptionsAPI::fontSizeAln->setLongTitle("The font size of each site in the alignment.");
 		OptionsAPI::variantSitesOnly->setLongTitle("Enable this setting to only display segregating sites in the alignment i.e., sites which have more than one unique character (excluding ambiguous sites).");
 		//OptionsAPI::siteColourType->setLongTitle("Select whether to colour major allelles only, or minor alleles only, or all sites.");
 		//OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment.");
@@ -580,6 +589,9 @@ extern "C" {
 			return;
 		}
 
+		double zoomScaleLog = std::pow(10, OptionsAPI::zoomScale->getVal());
+
+
 		// Clear it so it stops rendering
 		OptionsAPI::graphicalObjects = nullptr;
 
@@ -624,7 +636,7 @@ extern "C" {
 
 
 		// Height of taxa
-		double ntHeight = OptionsAPI::siteHeight->getVal();
+		double ntHeight = zoomScaleLog * OptionsAPI::NT_HEIGHT;
 		OptionsAPI::TOP_MARGIN = ntHeight;
 
 
@@ -632,7 +644,7 @@ extern "C" {
 
 		// Full size of view
 		double fullHeight = ntHeight * (1+AlignmentAPI::getNtaxaDisplayed()) + OptionsAPI::TOP_MARGIN + OptionsAPI::MARGIN_SIZE;
-		double fullAlnWidth = OptionsAPI::ntWidth->getVal() * (AlignmentAPI::getNsitesDisplayed()+0);
+		double fullAlnWidth = zoomScaleLog * OptionsAPI::NT_WIDTH * (AlignmentAPI::getNsitesDisplayed()+0);
 
 
 
@@ -819,7 +831,7 @@ extern "C" {
 				scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
 				// Font size
-				double labelFontSize = std::min(ntHeight, OptionsAPI::fontSizeTaxa->getVal());
+				double labelFontSize = std::min(ntHeight, zoomScaleLog * OptionsAPI::FONT_SIZE_TAXA);
 
 				// White bg
 				jsonObject rect;
@@ -844,7 +856,7 @@ extern "C" {
 			if (alnViewWidth > 0) {
 
 
-				double minWidth = OptionsAPI::ntWidth->getVal();
+				double minWidth = zoomScaleLog * OptionsAPI::NT_WIDTH;
 				double nsitesInView = alnViewWidth /  minWidth;
 				if (nsitesInView > AlignmentAPI::getNsitesDisplayed()) nsitesInView = AlignmentAPI::getNsitesDisplayed();
 				double remainder = minWidth * (nsitesInView - std::floor(nsitesInView));
@@ -878,7 +890,7 @@ extern "C" {
 				objs.push_back(rect);
 
 				// Font size
-				double ntFontSize = std::min(ntHeight, OptionsAPI::fontSizeAln->getVal());
+				double ntFontSize = zoomScaleLog*OptionsAPI::FONT_SIZE_ALN;
 
 				jsonObject alignment = AlignmentAPI::getAlignmentGraphics(scaling, minWidth, ntFontSize, cols, OptionsAPI::SITE_NUMBERING_EVERY);
 
@@ -1031,7 +1043,6 @@ extern "C" {
 
 	/**
 	 * Scroll up/down slightly
-	 * @param goingUp
 	*/
 	void EMSCRIPTEN_KEEPALIVE scrollABit(int dir) {
 		double y1 = OptionsAPI::scrollY->getVal();
@@ -1041,6 +1052,19 @@ extern "C" {
 		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
 		WasmAPI::messageFromWasmToJS("");
 	}
+	
+	
+		/**
+	 * Zoom in/out slightly
+	*/
+	void EMSCRIPTEN_KEEPALIVE zoomABit(int dir) {
+		double y1 = OptionsAPI::zoomScale->getVal();
+		double y2 = y1 + dir*OptionsAPI::zoomScale->getStepSize();
+		OptionsAPI::zoomScale->setVal(y2);
+		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
+		WasmAPI::messageFromWasmToJS("");
+	}
+
 
 
 

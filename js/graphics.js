@@ -33,55 +33,91 @@ function initGraphics(){
 		 $('#svg').bind('wheel', function(e){
 
 		 	//console.log("when the wheels come down");
-
+			
+			
 
 		 	let goingUp = e.originalEvent.wheelDelta/120 > 0;
 		 	let goingUpInt = goingUp ? -1 : 1;
 
-		 	MOUSEWHEEL_DY += goingUpInt;
-
-			clearTimeout($.data(this, 'timer'));
-			$.data(this, 'timer', setTimeout(function() {
-				//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
+			// Control mousewheel is zoom
+			if (e.ctrlKey) {
+				e.preventDefault();
 				
-				if (SCROLLING) return;
+				
+				clearTimeout($.data(this, 'timer'));
+				$.data(this, 'timer', setTimeout(function() {
+					//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
+					
+					CANCEL_GRAPHICS = true;
+					if (SCROLLING) return;
 
-				let mw = MOUSEWHEEL_DY;
-				MOUSEWHEEL_DY = 0;
-				if (mw != 0){
 
-					SCROLLING = true;
-					callWasmFunction("scrollABit", [mw], function(val){
-					//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
-		        		renderGraphics(function() { SCROLLING = false; });
-		        		//setTimeout(function() {
-		        			//clearTimeout($.data(this, 'timer'));
-	        			
-		        		//}, 100);
-		        		
-		        	});
+					let mw = -goingUpInt;
+
+					if (mw != 0){
+
+						SCROLLING = true;
+						callWasmFunction("zoomABit", [mw], function(val){
+							renderGraphics(function() {  });
+						});
+					}
+
+
+				 //do something
+				}, 40));
+				
+			}
+			
+			
+			// Scroll
+			else{
+
+
+				MOUSEWHEEL_DY += goingUpInt;
+
+				clearTimeout($.data(this, 'timer'));
+				$.data(this, 'timer', setTimeout(function() {
+					//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
+					
+					CANCEL_GRAPHICS = true;
+					if (SCROLLING) return;
+
+					let mw = MOUSEWHEEL_DY;
+					MOUSEWHEEL_DY = 0;
+					if (mw != 0){
+
+						SCROLLING = true;
+						callWasmFunction("scrollABit", [mw], function(val){
+						//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
+							renderGraphics(function() {  });
+							//setTimeout(function() {
+								//clearTimeout($.data(this, 'timer'));
+							
+							//}, 100);
+							
+						});
+					}
+
+
+				 //do something
+				}, 40));
+
+
+
+
+				
+
+				/*
+				if(goingUp) {
+					console.log('scrolling up !');
 				}
+				else{
+					console.log('scrolling down !');
+				}
+				*/
 
 
-			 //do something
-			}, 40));
-
-
-
-
-		 	
-
-		 	/*
-	        if(goingUp) {
-	            console.log('scrolling up !');
-	        }
-	        else{
-	            console.log('scrolling down !');
-	        }
-			*/
-
-
-
+			}
 
 
 	    });
@@ -191,7 +227,7 @@ function renderGraphics(resolve = function() {}){
 		callWasmFunction("initGraphics", [maxH, maxW, 0], function(initialVal){
 		//cjCall("peachtree.options.OptionsAPI", "initGraphics").then(function(initialVal){
 			
-			
+			SCROLLING = false;
 			CANCEL_GRAPHICS = false;
 			$("body").css("overflow", "hidden");
 

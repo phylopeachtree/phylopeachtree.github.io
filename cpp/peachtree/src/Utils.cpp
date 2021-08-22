@@ -29,6 +29,12 @@ vector<string> Utils::split(string s, string delimiter) {
 
 
 
+/*
+*	Log base 10
+*/
+double Utils::log10(double val){
+	return std::log(val) / std::log(10);
+}
 
 /*
  * Is the string a number?

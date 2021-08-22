@@ -55,16 +55,19 @@ public:
 	static DiscreteOption* colourNodesBy;
 
 	// Taxa
-	static NumericalOption* siteHeight;
-	static NumericalOption* fontSizeTaxa;
+	static NumericalOption* zoomScale;
+	//static NumericalOption* siteHeight;
+	//static NumericalOption* fontSizeTaxa;
 	static NumericalOption* taxaSpacing;
 	static BooleanOption* showTaxonNumbers;
 	static BooleanOption* focusOnTaxa;
 	static BooleanOption* focusOnClade;
+	static DiscreteOption* sampleNameAnnotation;
+	
 
 	// Alignment
-	static NumericalOption* ntWidth;
-	static NumericalOption* fontSizeAln;
+	//static NumericalOption* ntWidth;
+	//static NumericalOption* fontSizeAln;
 	static BooleanOption* variantSitesOnly;
 	static BooleanOption* displayMissingPercentage;
 	static DiscreteOption* siteColourType;
@@ -112,6 +115,11 @@ public:
 	static const double INIT_DIV2;
 	static const double SCROLL_Y_NROWS;
 	static const int SITE_NUMBERING_EVERY;
+	
+	static const double NT_HEIGHT;
+	static const double NT_WIDTH;
+	static const double FONT_SIZE_ALN;
+	static const double FONT_SIZE_TAXA;
 
 
 	// Variables

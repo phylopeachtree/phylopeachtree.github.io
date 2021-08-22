@@ -22,6 +22,7 @@ public:
 	virtual jsonObject toJSON() override;
 	double getVal();
 	void setVal(double val);
+	double getStepSize();
 
 private:
 	double value;

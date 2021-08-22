@@ -73,8 +73,8 @@ DiscreteOption* OptionsAPI::colourNodesBy;
 
 // Samples
 NumericalOption* OptionsAPI::zoomScale = new NumericalOption("zoomScale", "Samples", "Zoom scale (log space)", 0, -1, 1, 0.1, true);
-NumericalOption* OptionsAPI::taxaSpacing = new NumericalOption("taxaSpacing", "Samples", "Padding before sample names", 5, 0, 50, 1, true);
-BooleanOption* OptionsAPI::showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false, true);
+NumericalOption* OptionsAPI::taxaSpacing = new NumericalOption("taxaSpacing", "Samples", "Padding before sample names", 5, 0, 50, 1);
+BooleanOption* OptionsAPI::showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false);
 BooleanOption* OptionsAPI::focusOnTaxa = new BooleanOption("focusOnTaxa", "Samples", "Show only selected samples", false, true);
 BooleanOption* OptionsAPI::focusOnClade = new BooleanOption("focusOnClade", "Samples", "Show only clade of selected samples", false, true);
 DiscreteOption* OptionsAPI::sampleNameAnnotation;
@@ -650,7 +650,7 @@ extern "C" {
 
 		if (download){
 			//width = xdivide2*width + fullAlnWidth;
-			//height = fullHeight;
+			height = fullHeight;
 		}
 
 

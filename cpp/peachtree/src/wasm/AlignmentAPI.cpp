@@ -9,6 +9,7 @@
 #include "EpiAPI.h"
 #include "OptionsAPI.h"
 #include "../error/Error.h"
+#include "../epi/Epidemiology.h"
 
 #include "WasmAPI.h"
 
@@ -68,6 +69,26 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 
 
 /*
+	Annotate taxa with epidemological information
+*/
+void AlignmentAPI::annotateTaxa(Epidemiology* epi){
+	if (THE_ALIGNMENT == nullptr) return;
+	if (epi == nullptr) return;
+	THE_ALIGNMENT->annotateTaxa(epi);
+}
+
+/*
+	Annotate taxa with tree information
+*/
+void AlignmentAPI::annotateTaxa(Tree* tree){
+	if (THE_ALIGNMENT == nullptr) return;
+	if (tree == nullptr) return;
+	THE_ALIGNMENT->annotateTaxa(tree);
+}
+
+
+
+/*
  * Get the taxon object
  */
 Taxon* AlignmentAPI::getTaxon(string label){
@@ -78,8 +99,8 @@ Taxon* AlignmentAPI::getTaxon(string label){
 /**
  * Get taxon graphics json
  */
-jsonObject AlignmentAPI::getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage){
-	return THE_ALIGNMENT->getTaxaGraphics(scaling, textSize, filtering, showTaxonNumbers, displayMissingPercentage);
+jsonObject AlignmentAPI::getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation){
+	return THE_ALIGNMENT->getTaxaGraphics(scaling, textSize, filtering, showTaxonNumbers, displayMissingPercentage, sampleNameAnnotation);
 }
 
 
@@ -185,6 +206,9 @@ void AlignmentAPI::makeMockAlignment(Tree* tree){
 	EpiAPI::setEpiAccessionsToDirty();
 	EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
 	OptionsAPI::resetWindowSize();
+	
+	AlignmentAPI::annotateTaxa(PhylogenyAPI::getTree());
+	AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 
 }
 
@@ -246,6 +270,8 @@ extern "C" {
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::THE_ALIGNMENT);
 		EpiAPI::setEpiAccessionsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
+		AlignmentAPI::annotateTaxa(PhylogenyAPI::getTree());
+		AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 		OptionsAPI::resetScroll();
 		OptionsAPI::resetWindowSize();
 

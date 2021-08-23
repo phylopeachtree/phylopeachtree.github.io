@@ -110,18 +110,6 @@ void EpiAPI::addAnnotationsToTree(Tree* tree){
 }
 
 
-/*
- * Add annotations to taxa
- */
-void EpiAPI::addAnnotationsToTaxa(Alignment* alignment){
-	if (!epiAnnotationsAreDirty) return;
-	if (alignment == nullptr) return;
-	if (EPIDEMIOLOGY == nullptr) return;
-	EPIDEMIOLOGY->addAnnotationsToTaxa(alignment);
-	epiAnnotationsAreDirty = false;
-}
-
-
 
 
 /*
@@ -188,7 +176,11 @@ extern "C" {
 		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::getTree());
-		EpiAPI::addAnnotationsToTaxa(AlignmentAPI::getAlignment());
+		
+				
+		// Taxon annotations
+		AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
+		
 		
 		
 

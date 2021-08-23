@@ -250,51 +250,6 @@ void Epidemiology::addAnnotationsToTree(Tree* tree){
 
 
 
-/*
- * Add all annotations to the alignment (and check for duplicate variable names)
- */
-void Epidemiology::addAnnotationsToTaxa(Alignment* alignment){
-
-
-	cout << "annotating taxa with epi" << endl;
-
-	/*
-	// Check for duplicate annotations
-	vector<string> treeAnnotations;
-	tree->getRoot()->getAllAnnotations(treeAnnotations);
-	for (string var : treeAnnotations) {
-		if (std::count(this->annotations.begin(), this->annotations.end(), var)) {
-			Error::throwError("Duplicate annotation " + var + " found in the tree and the epidemiological data. "
-					+ "Please ensure annotation names are unique.");
-			return;
-		}
-	}
-
-
-	// Annotate each taxon
-	for (Node* node : tree->getNodesAsArray()) {
-
-		// Find the matching case
-		Case* c = nullptr;
-		for (Case* c2 : this->cases) {
-			if (c2->getAccession() == node->getAcc()){
-				c = c2;
-				break;
-			}
-		}
-		if (c == nullptr) continue;
-
-
-		node->addAnnotations(c);
-
-	}
-	*/
-
-}
-
-
-
-
 
 
 

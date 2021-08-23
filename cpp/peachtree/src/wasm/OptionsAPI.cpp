@@ -396,31 +396,13 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	annotations.push_back("None");
 	vector<string> annotations2 = PhylogenyAPI::getAllAnnotations();
 	annotations.insert(annotations.end(), annotations2.begin(), annotations2.end());
-	//vector<string> annotations3 = EpiAPI::getAllAnnotations();
-	//annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
-
-
-	for (string a : annotations){
-		cout << "annotation " << a << endl;
+	if (annotations.size() == 1){
+		vector<string> annotations3 = EpiAPI::getAllAnnotations();
+		annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
 	}
+	
 
 
-	// Internal node labels
-	/*
-	if (internalNodeLabels == nullptr){
-		internalNodeLabels = new DiscreteOption("internalNodeLabels", "Phylogeny", "Internal node labels", annotations.at(0), annotations);
-	}else{
-		internalNodeLabels->setValAndDomain(annotations.at(0), annotations);
-	}
-
-	// Leaves
-
-	if (leafNodeLabels == nullptr){
-		leafNodeLabels = new DiscreteOption("leafNodeLabels", "Phylogeny", "Leaf labels", annotations.at(0), annotations);
-	}else{
-		leafNodeLabels->setValAndDomain(annotations.at(0), annotations);
-	}
-	*/
 
 
 	// Sample names
@@ -590,6 +572,9 @@ extern "C" {
 		}
 
 		double zoomScaleLog = std::pow(10, OptionsAPI::zoomScale->getVal());
+		
+		
+
 
 
 		// Clear it so it stops rendering
@@ -844,7 +829,7 @@ extern "C" {
 				objs.push_back(rect);
 
 
-				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal());
+				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal(), OptionsAPI::sampleNameAnnotation->getVal());
 				objs.insert(objs.end(), taxa.begin(), taxa.end());
 
 			}

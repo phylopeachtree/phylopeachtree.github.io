@@ -233,6 +233,9 @@ extern "C" {
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 		
 		
+		AlignmentAPI::annotateTaxa(PhylogenyAPI::THE_TREE);
+		
+		
 		// Prepare tree annotation options
 		OptionsAPI::prepareTreeAnnotationOptions();
 		OptionsAPI::resetScroll();

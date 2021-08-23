@@ -156,7 +156,7 @@ void Sequence::setIsNucleotide(bool b){
 }
 
 
-json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage){
+json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation){
 
 
 	json arr; // = json::array();
@@ -176,7 +176,13 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 		label.append(to_string(seqNum+1));
 		label.append(": ");
 	}
-	label.append(this->getAcc());
+	if (sampleNameAnnotation != "" && sampleNameAnnotation != "None"){
+		label.append(this->getTaxon()->getValue(sampleNameAnnotation));
+	}else{
+		label.append(this->getAcc());
+	}
+	
+	
 	//numberPadding.replaceAll(" ", "&#160;"); // White space
 
 

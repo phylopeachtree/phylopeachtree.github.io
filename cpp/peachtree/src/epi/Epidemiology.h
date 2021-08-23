@@ -28,7 +28,6 @@ public:
 	void validateAccessions(Alignment* alignment);
 	vector<Case*> getCases();
 	void cleanup();
-	void addAnnotationsToTaxa(Alignment* alignment);
 
 private:
 	vector<Case*> cases;

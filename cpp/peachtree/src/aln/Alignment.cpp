@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <locale>
 #include "../error/Error.h"
+#include "../epi/Case.h"
+#include "../epi/Epidemiology.h"
 
 
 
@@ -162,6 +164,61 @@ void Alignment::cleanup(){
 	}
 	this->sequences.clear();
 }
+
+
+
+
+/*
+	Annotate taxa with epidemological information
+*/
+void Alignment::annotateTaxa(Epidemiology* epi){
+	if (epi == nullptr) return;
+	if (this->getNtaxa() == 0) return;
+	
+	
+	for (Case* c : epi->getCases()){
+		string acc = c->getAccession();
+		Taxon* taxon = this->getTaxon(acc);
+		if (taxon == nullptr) continue;
+		
+		for (string var : c->getVariables()){
+			string val = c->getValue(var);
+			if (val == "") continue;
+			taxon->setValue(var, val);
+		}
+		
+		
+	}
+	
+}
+
+/*
+	Annotate taxa with tree information
+*/
+void Alignment::annotateTaxa(Tree* tree){
+	if (tree == nullptr) return;
+	if (this->getNtaxa() == 0) return;
+	
+	vector<string> annotations;
+	tree->getRoot()->getAllAnnotations(annotations);
+	
+	for (Node* c : tree->getLeavesAsArray()){
+		string acc = c->getAcc();
+		Taxon* taxon = this->getTaxon(acc);
+		if (taxon == nullptr) continue;
+		
+		for (string var : annotations){
+			string val = c->getAnnotationValue(var);
+			if (val == "") continue;
+			taxon->setValue(var, val);
+		}
+		
+		
+	}
+	
+	
+}
+
 
 
 /**
@@ -518,7 +575,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
  * Get taxa graphics
  * @return
  */
-json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage){
+json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation){
 
 
 	json objs = json::array();
@@ -546,7 +603,7 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 		if (scaling->isAboveRangeY(seqNumDisplayed)) break;
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift, displayMissingPercentage);
+		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift, displayMissingPercentage, sampleNameAnnotation);
 		objs.insert(objs.end(), j.begin(), j.end()); // Add all
 		seqNumDisplayed ++;
 	}

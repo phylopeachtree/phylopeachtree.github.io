@@ -28,6 +28,16 @@ string Taxon::getName() {
 	return name;
 }
 
+
+string Taxon::getValue(string var){
+	if (this->annotations.find(var) == this->annotations.end()) return "";
+	return this->annotations[var];
+}
+
+void Taxon::setValue(string var, string val){
+	this->annotations[var] = val;
+}
+
 void Taxon::toggleSelection() {
 	this->isSelected = !this->isSelected;
 }

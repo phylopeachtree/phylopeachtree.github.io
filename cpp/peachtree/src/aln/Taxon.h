@@ -10,6 +10,9 @@
 
 
 #include <iostream>
+#include <map>
+
+
 using namespace std;
 
 
@@ -25,6 +28,8 @@ public:
 	void toggleHighlighting();
 	void setIsHighlighted(bool val);
 	bool getIsHighlighted();
+	string getValue(string var);
+	void setValue(string var, string val);
 
 
 private:
@@ -32,6 +37,7 @@ private:
 	string name;
 	bool isSelected;
 	bool isHighlighted;
+	map<string, string> annotations;
 
 
 };

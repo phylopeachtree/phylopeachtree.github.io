@@ -32,7 +32,6 @@ public:
 			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar, double branchWidth);
 	static Timeline* getTimeline();
 	static void prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
-	static void addAnnotationsToTaxa(Alignment* alignment);
 
 
 

@@ -24,10 +24,11 @@
 #include "Filtering.h"
 #include "colourings/Colouring.h"
 
+
 using namespace std;
 using json = nlohmann::json;
 
-
+class Epidemiology;
 class Alignment {
 public:
 
@@ -51,12 +52,14 @@ public:
 	int getLength();
 	int getNtaxa();
 	void cleanup();
+	void annotateTaxa(Epidemiology* epi);
+	void annotateTaxa(Tree* tree);
 
 
 	void sortByTree(Tree* tree);
 	json toJSON();
 	json getAlignmentGraphics(Scaling* scaling, Colouring* colouring, double minNtWidth, double textSize, Filtering* filtering, int siteNumberingEvery);
-	json getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage);
+	json getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation);
 
 	vector<string> getNames();
 	int getPatternCount();

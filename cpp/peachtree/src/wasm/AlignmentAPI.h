@@ -16,15 +16,16 @@
 #include "../aln/Filtering.h"
 #include "../phy/Tree.h"
 #include "../lib/json.hpp"
+
 using namespace std;
 using jsonObject = nlohmann::json;
 
-
+class Epidemiology;
 class AlignmentAPI {
 
 public:
 
-	static jsonObject getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage);
+	static jsonObject getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation);
 	static jsonObject getAlignmentGraphics(Scaling* scaling, double minNtWidth, double textSize, Colouring* colouring, int siteNumberingEvery);
 
 
@@ -46,6 +47,8 @@ public:
 	static void makeMockAlignment(Tree* tree);
 	static bool isMock();
 	static void resetHighlighting();
+	static void annotateTaxa(Epidemiology* epi);
+	static void annotateTaxa(Tree* tree);
 
 
 

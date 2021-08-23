@@ -905,7 +905,7 @@ extern "C" {
 
 
 				// Horizontal scrolling?
-				if (scaling->getScrollXLength() > 0 && nsitesInView > 1) {
+				if (scaling->getScrollXLength() > 0 && nsitesInView > 1 && nsitesInViewInt < AlignmentAPI::getNsitesDisplayed()) {
 
 					// Validate scrollX position
 					//if (OptionsAPI::scrollX->getVal()*alnViewWidth + scaling->getScrollXLength() > alnViewWidth) {

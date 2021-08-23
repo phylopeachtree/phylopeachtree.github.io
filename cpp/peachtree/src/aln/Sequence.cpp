@@ -74,9 +74,18 @@ void Sequence::prepareArray(){
 		
 		if (this->isNucleotide) {
 			val = Alignment::getNucleotideInt(site);
+			if (val == -1) {
+				this->isNucleotide = false;
+				val = Alignment::getAlphaInt(site);
+				this->prepareArray();
+				return;
+			}
 		}else {
 			val = Alignment::getAlphaInt(site);
 		}
+		
+		
+		
 		bool isGap = Alignment::isGap(val, this->isNucleotide);
 		
 		//System.out.println("putting " + val + " at site " + i + " for symbol " + site);
@@ -177,10 +186,15 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 		label.append(": ");
 	}
 	if (sampleNameAnnotation != "" && sampleNameAnnotation != "None"){
-		label.append(this->getTaxon()->getValue(sampleNameAnnotation));
+		label.append(this->getTaxon()->
+		getValue(sampleNameAnnotation));
 	}else{
 		label.append(this->getAcc());
 	}
+	
+	
+	// json library does not seem to like trailing ]'s
+	if (label.back() == ']' || label.back() == '}') label = label + " ";
 	
 	
 	//numberPadding.replaceAll(" ", "&#160;"); // White space

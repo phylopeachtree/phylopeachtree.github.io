@@ -1044,7 +1044,7 @@ extern "C" {
 	/**
 	 * Scroll up/down slightly
 	*/
-	void EMSCRIPTEN_KEEPALIVE scrollABit(int dir) {
+	void EMSCRIPTEN_KEEPALIVE scrollABitVertical(int dir) {
 		double y1 = OptionsAPI::scrollY->getVal();
 		double relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNtaxaDisplayed();
 		double y2 = y1 + dir*relativeScrollAmnt;
@@ -1052,6 +1052,20 @@ extern "C" {
 		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
 		WasmAPI::messageFromWasmToJS("");
 	}
+	
+	
+	/**
+	 * Scroll left/right slightly
+	*/
+	void EMSCRIPTEN_KEEPALIVE scrollABitHorizontal(int dir) {
+		double x1 = OptionsAPI::scrollX->getVal();
+		double relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNsitesDisplayed();
+		double x2 = x1 + dir*relativeScrollAmnt;
+		OptionsAPI::scrollX->setVal(x2);
+		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
+		WasmAPI::messageFromWasmToJS("");
+	}
+	
 	
 	
 		/**

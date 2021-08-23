@@ -8,8 +8,6 @@ DOWNLOADING = false;
 function initGraphics(){
 	
 	
-
-	MOUSEWHEEL_DY = 0;
 	SCROLLING = false;
 	RESIZING = false;
 	$(document).ready(function() {
@@ -37,85 +35,24 @@ function initGraphics(){
 			
 
 		 	let goingUp = e.originalEvent.wheelDelta/120 > 0;
-		 	let goingUpInt = goingUp ? -1 : 1;
+		 	
 
 			// Control mousewheel is zoom
 			if (e.ctrlKey) {
 				e.preventDefault();
 				
+				zoom(goingUp);
 				
-				clearTimeout($.data(this, 'timer'));
-				$.data(this, 'timer', setTimeout(function() {
-					//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
-					
-					CANCEL_GRAPHICS = true;
-					if (SCROLLING) return;
-
-
-					let mw = -goingUpInt;
-
-					if (mw != 0){
-
-						SCROLLING = true;
-						callWasmFunction("zoomABit", [mw], function(val){
-							renderGraphics(function() {  });
-						});
-					}
-
-
-				 //do something
-				}, 40));
+				
 				
 			}
 			
 			
 			// Scroll
 			else{
-
-
-				MOUSEWHEEL_DY += goingUpInt;
-
-				clearTimeout($.data(this, 'timer'));
-				$.data(this, 'timer', setTimeout(function() {
-					//console.log("Haven't scrolled in 50ms! dy = " + MOUSEWHEEL_DY);
-					
-					CANCEL_GRAPHICS = true;
-					if (SCROLLING) return;
-
-					let mw = MOUSEWHEEL_DY;
-					MOUSEWHEEL_DY = 0;
-					if (mw != 0){
-
-						SCROLLING = true;
-						callWasmFunction("scrollABit", [mw], function(val){
-						//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
-							renderGraphics(function() {  });
-							//setTimeout(function() {
-								//clearTimeout($.data(this, 'timer'));
-							
-							//}, 100);
-							
-						});
-					}
-
-
-				 //do something
-				}, 40));
-
-
-
-
 				
-
-				/*
-				if(goingUp) {
-					console.log('scrolling up !');
-				}
-				else{
-					console.log('scrolling down !');
-				}
-				*/
-
+				
+				scrollVertical(goingUp);
 
 			}
 
@@ -606,6 +543,7 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = functio
 			if (objects.length == 0){
 				
 				removeLoader($("#ctrl_loading_div"));
+				$("#svg").removeClass("resizing");
 				
 				// Taxon selection
 				$(svgBtm).parent().find(".taxon").click(function(){
@@ -629,7 +567,7 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = functio
 
 				
 				updateSelectionCSS();
-
+				
 				resolve();
 
 				return;
@@ -874,4 +812,93 @@ function saveSvg(svgEl, name) {
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
 }
+
+
+
+/*
+	Zoom in/out
+*/
+function zoom(zoomIn){
+	
+	
+	clearTimeout($.data(this, 'timer'));
+	$.data(this, 'timer', setTimeout(function() {
+
+		CANCEL_GRAPHICS = true;
+		if (SCROLLING) return;
+		$("#svg").addClass("resizing");
+
+
+		SCROLLING = true;
+		callWasmFunction("zoomABit", [(zoomIn ? 1 : -1)], function(val){
+			renderGraphics(function() {  });
+		});
+		
+
+
+	 //do something
+	}, 40));
+	
+}
+
+
+/*
+	Scroll up/down slightly
+*/
+function scrollVertical(goingUp){
+	
+	
+	let goingUpInt = goingUp ? -1 : 1;
+
+	clearTimeout($.data(this, 'timer'));
+	$.data(this, 'timer', setTimeout(function() {
+		
+		
+		CANCEL_GRAPHICS = true;
+		if (SCROLLING) return;
+		$("#svg").addClass("resizing");
+
+
+
+		SCROLLING = true;
+		callWasmFunction("scrollABitVertical", [goingUpInt], function(val){
+			renderGraphics(function() {  });
+		});
+		
+
+	}, 40));
+
+
+	
+}
+
+
+/*
+	Scroll left/right slightly
+*/
+function scrollHorizontal(goingRight){
+	
+	
+	let goingRightInt = goingRight ? 1 : -1;
+
+	clearTimeout($.data(this, 'timer'));
+	$.data(this, 'timer', setTimeout(function() {
+		
+		
+		CANCEL_GRAPHICS = true;
+		if (SCROLLING) return;
+		$("#svg").addClass("resizing");
+
+
+		SCROLLING = true;
+		callWasmFunction("scrollABitHorizontal", [goingRightInt], function(val){
+			renderGraphics(function() {  });
+		});
+		
+
+	}, 40));
+	
+}
+
+
 

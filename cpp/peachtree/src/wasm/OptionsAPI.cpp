@@ -1053,7 +1053,13 @@ extern "C" {
 		double y2 = y1 + dir*relativeScrollAmnt;
 		OptionsAPI::scrollY->setVal(y2);
 		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
-		WasmAPI::messageFromWasmToJS("");
+		
+		jsonObject result;
+		if (dir < 0 && y1 <= OptionsAPI::scrollY->getMin()) result["changed"] = false;
+		else if (dir > 0 && y1 >= OptionsAPI::scrollY->getMax()) result["changed"] = false;
+		else result["changed"] = true;
+
+		WasmAPI::messageFromWasmToJS(result.dump(0));
 	}
 	
 	
@@ -1065,8 +1071,15 @@ extern "C" {
 		double relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNsitesDisplayed();
 		double x2 = x1 + dir*relativeScrollAmnt;
 		OptionsAPI::scrollX->setVal(x2);
-		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
-		WasmAPI::messageFromWasmToJS("");
+
+		
+		
+		jsonObject result;
+		if (dir < 0 && x1 <= OptionsAPI::scrollX->getMin()) result["changed"] = false;
+		else if (dir > 0 && x1 >= OptionsAPI::scrollX->getMax()) result["changed"] = false;
+		else result["changed"] = true;
+		
+		WasmAPI::messageFromWasmToJS(result.dump(0));
 	}
 	
 	
@@ -1078,8 +1091,15 @@ extern "C" {
 		double y1 = OptionsAPI::zoomScale->getVal();
 		double y2 = y1 + dir*OptionsAPI::zoomScale->getStepSize();
 		OptionsAPI::zoomScale->setVal(y2);
-		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
-		WasmAPI::messageFromWasmToJS("");
+	
+		
+		
+		jsonObject result;
+		if (dir < 0 && y1 <= OptionsAPI::zoomScale->getMin()) result["changed"] = false;
+		else if (dir > 0 && y1 >= OptionsAPI::zoomScale->getMax()) result["changed"] = false;
+		else result["changed"] = true;
+		
+		WasmAPI::messageFromWasmToJS(result.dump(0));
 	}
 
 

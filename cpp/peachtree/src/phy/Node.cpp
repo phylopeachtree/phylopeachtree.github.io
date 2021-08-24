@@ -604,6 +604,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		node_json["cy"] = yscaled;
 		node_json["r"] = nodeRadius;
 		node_json["fill"] = ncol;
+		node_json["stroke"] = "black";
 		node_json["layer"] = 2;
 		if (!this->isLeaf()) {
 			node_json["class"] = "node";

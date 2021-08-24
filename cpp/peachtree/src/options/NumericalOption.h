@@ -21,6 +21,8 @@ public:
 	NumericalOption(string name, string section, string title, double val, double min, double max, double stepSize, bool hidden);
 	virtual jsonObject toJSON() override;
 	double getVal();
+	double getMin();
+	double getMax();
 	void setVal(double val);
 	double getStepSize();
 

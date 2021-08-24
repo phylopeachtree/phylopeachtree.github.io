@@ -56,10 +56,19 @@ double NumericalOption::getVal() {
 	return this->value;
 }
 
+
+double NumericalOption::getMin(){
+	return this->min;
+}
+
+double NumericalOption::getMax(){
+	return this->max;
+}
+
 void NumericalOption::setVal(double val) {
 	//if (Double.isNaN(val)) return;
-	if (val < this->min) val = this->min;
-	if (val > this->max) val = this->max;
+	if (val <= this->min) val = this->min;
+	if (val >= this->max) val = this->max;
 	this->value = val;
 }
 

@@ -846,14 +846,19 @@ function zoom(zoomIn){
 	clearTimeout($.data(this, 'timer'));
 	$.data(this, 'timer', setTimeout(function() {
 
-		CANCEL_GRAPHICS = true;
+		
+		
 		if (SCROLLING) return;
-		$("#svg").addClass("resizing");
 
 
-		SCROLLING = true;
-		callWasmFunction("zoomABit", [(zoomIn ? 1 : -1)], function(val){
-			renderGraphics(function() {  });
+		
+		callWasmFunction("zoomABit", [(zoomIn ? 1 : -1)], function(result){
+			if (result.changed) {
+				SCROLLING = true;
+				CANCEL_GRAPHICS = true;
+				$("#svg").addClass("resizing");
+				renderGraphics(function() {  });
+			}
 		});
 		
 
@@ -876,15 +881,20 @@ function scrollVertical(goingUp){
 	$.data(this, 'timer', setTimeout(function() {
 		
 		
-		CANCEL_GRAPHICS = true;
+		
 		if (SCROLLING) return;
-		$("#svg").addClass("resizing");
+		
 
 
 
-		SCROLLING = true;
-		callWasmFunction("scrollABitVertical", [goingUpInt], function(val){
-			renderGraphics(function() {  });
+		
+		callWasmFunction("scrollABitVertical", [goingUpInt], function(result){
+			if (result.changed) {
+				SCROLLING = true;
+				CANCEL_GRAPHICS = true;
+				$("#svg").addClass("resizing");
+				renderGraphics(function() {  });
+			}
 		});
 		
 
@@ -907,14 +917,19 @@ function scrollHorizontal(goingRight){
 	$.data(this, 'timer', setTimeout(function() {
 		
 		
-		CANCEL_GRAPHICS = true;
+		
 		if (SCROLLING) return;
-		$("#svg").addClass("resizing");
+		
 
 
-		SCROLLING = true;
-		callWasmFunction("scrollABitHorizontal", [goingRightInt], function(val){
-			renderGraphics(function() {  });
+		
+		callWasmFunction("scrollABitHorizontal", [goingRightInt], function(result){
+			if (result.changed) {
+				SCROLLING = true;
+				CANCEL_GRAPHICS = true;
+				$("#svg").addClass("resizing");
+				renderGraphics(function() {  });
+			}
 		});
 		
 

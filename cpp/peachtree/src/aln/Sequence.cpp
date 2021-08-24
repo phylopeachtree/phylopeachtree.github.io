@@ -186,8 +186,7 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 		label.append(": ");
 	}
 	if (sampleNameAnnotation != "" && sampleNameAnnotation != "None"){
-		label.append(this->getTaxon()->
-		getValue(sampleNameAnnotation));
+		label.append(this->getTaxon()->getValue(sampleNameAnnotation));
 	}else{
 		label.append(this->getAcc());
 	}
@@ -345,6 +344,10 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 			nt_font["y"] = yc_text_scaled;
 			nt_font["value"] = symbol;
 			nt_font["text_anchor"] = "middle"; // Right alignment
+			if (colouring != nullptr) {
+				colour = colouring->getTextColour(symbol, site);
+				nt_font["fill"] = colour;
+			}
 			string str1 = "Site ";
 			str1.append(to_string(site+1));
 			///cout << site << endl;
@@ -400,6 +403,16 @@ void Sequence::editSiteInt(int siteNum, int newSymbol){
 }
 
 
-
+/*
+* Get filtered sequence 
+*/
+string Sequence::getSeq(Filtering* filtering){
+	
+	string seq = "";
+	for (int site : filtering->getSites()) {
+		seq += this->getSymbol(site);
+	}
+	return seq;
+}
 
 

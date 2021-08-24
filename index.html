@@ -177,9 +177,6 @@
 				</div>
 
 
-				<div>
-					<span style="margin:auto;" id="downloadBtn" onclick="download();" class="button" title="Download the image in SVG format">Download</span>
-				</div>
 
 				<div>
 					<span style="margin:auto;" id="zoomOutBtn" onclick="zoom(false);" class="button" title="Zoom out  (ctrl + mousewheel up)">&minus;</span>
@@ -192,6 +189,23 @@
 					<span style="margin:auto;" id="scrollRightBtn" onclick="scrollHorizontal(true);" class="button" title="Pan right">&rightarrow;</span>
 					
 					<span class="usermsg mediumfont"></span>
+				</div>
+				
+				
+				
+				<div>
+					
+				
+					<span class="dropdown">
+					<button class="dropbtn">Download &#x25BC;</button>
+					  <div class="dropdown-content">
+						<a id="downloadImageBtn" onclick="downloadImage()" title="Download the image in svg format">Image (.svg)</a>
+						<a id="downloadAlignmentBtn" onclick="downloadAlignment()" title="Download the displayed samples and sites in fasta format">Alignment (.fasta)</a>
+						<!--<a id="downloadTreeBtn" onclick="downloadTree()" title="Download the displayed tree in nexus format">Tree (.nexus)</a>-->
+					  </div>
+					</span>
+									
+				
 				</div>
 				
 				

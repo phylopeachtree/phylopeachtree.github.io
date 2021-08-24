@@ -257,6 +257,17 @@ string Tree::toNewick(){
 	return this->root->toSortedNewick(dummy, true) + ")";
 }
 
+
+/*
+ * To newick string
+ */
+string Tree::toNewick(Filtering* filtering){
+	int dummy = 0;
+	Node* subtree = this->root;
+	if (filtering->getSubtreeRoot() != nullptr) subtree = filtering->getSubtreeRoot();
+	return subtree->toSortedNewick(dummy, true) + ")";
+}
+
 string Tree::toString(){
 	return this->toNewick();
 }

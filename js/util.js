@@ -517,16 +517,30 @@ function renderOptions(){
 		
 		callWasmFunction("treeIsReady", [], function(result){
 			
-			if (result.ready) $("#btn_clade").show(100);
-			else $("#btn_clade").hide(0);
+			if (result.ready) {
+				$("#btn_clade").show(100);
+				$("#downloadTreeBtn").show(0);
+			}
+			else {
+				$("#btn_clade").hide(0);
+				$("#downloadTreeBtn").hide(0);
+			}
 			
 		});
 		
 		
 		callWasmFunction("alignmentIsMock", [], function(result){
 			
-			if (!result.mock) $("#buildTreeBtn").show(100);
-			else $("#buildTreeBtn").hide(0);
+			if (!result.mock) {
+				$("#buildTreeBtn").show(100);
+				$("#downloadAlignmentBtn").show(0);
+			}
+			else {
+				$("#buildTreeBtn").hide(0);
+				$("#downloadAlignmentBtn").hide(0);
+			}
+			
+			
 			
 		});
 		

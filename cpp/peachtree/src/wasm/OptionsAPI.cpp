@@ -802,6 +802,7 @@ extern "C" {
 
 
 		// Width of taxa
+		int nsitesInViewInt = 0;
 		if (AlignmentAPI::isReady()) {
 
 
@@ -846,7 +847,7 @@ extern "C" {
 				if (nsitesInView > AlignmentAPI::getNsitesDisplayed()) nsitesInView = AlignmentAPI::getNsitesDisplayed();
 				double remainder = minWidth * (nsitesInView - std::floor(nsitesInView));
 				alnViewWidth = alnViewWidth - remainder;
-				int nsitesInViewInt = std::floor(nsitesInView);
+				nsitesInViewInt = std::floor(nsitesInView);
 				Colouring* cols = OptionsAPI::getSelectedColouring();
 				cols->setSiteColourFilter(OptionsAPI::siteColourType->getVal(), AlignmentAPI::getFiltering());
 				//cout << "Using the " << cols->getName() << " scheme" << endl;
@@ -947,6 +948,23 @@ extern "C" {
 		jsonObject topObjs; // = new JSONArray();
 		topObjs.push_back(top);
 		topObjs.push_back(left);
+		json["objects"] = topObjs;
+		
+		
+		
+		// If downloading, print some metadata on top bg
+		if (download){
+			jsonObject metaData;
+			metaData["ele"] = "text";
+			metaData["x"] = OptionsAPI::MARGIN_SIZE;
+			metaData["y"] = OptionsAPI::MARGIN_SIZE/2;
+			string label = "Showing " + to_string(AlignmentAPI::getNtaxaDisplayed()) + "/" + to_string(AlignmentAPI::getNtaxa()) + " samples";
+			metaData["value"] = label;
+			metaData["text_anchor"] = "start";
+			metaData["font_size"] = 9;
+			topObjs.push_back(metaData);
+		}
+		
 		json["objects"] = topObjs;
 
 

@@ -9,29 +9,40 @@
 
 ClustalAmino::ClustalAmino() {
 
-	colours["G"] = "orange";
-	colours["P"] = "orange";
-	colours["S"] = "orange";
-	colours["T"] = "orange";
+	colours["A"] = "#80a0f0";
+	colours["I"] = "#80a0f0";
+	colours["L"] = "#80a0f0";
+	colours["M"] = "#80a0f0";
+	colours["F"] = "#80a0f0";
+	colours["W"] = "#80a0f0";
+	colours["V"] = "#80a0f0";
+	colours["C"] = "#80a0f0";
 
-	colours["H"] = "red";
-	colours["K"] = "red";
-	colours["R"] = "red";
+	colours["K"] = "#f01505";
+	colours["R"] = "#f01505";
+	
+	colours["E"] = "#c048c0";
+	colours["D"] = "#c048c0";
+	
+	colours["N"] = "#15c015";
+	colours["Q"] = "#15c015";
+	colours["S"] = "#15c015";
+	colours["T"] = "#15c015";
 
-	colours["F"] = "blue";
-	colours["W"] = "blue";
-	colours["Y"] = "blue";
-
-	colours["I"] = "green";
-	colours["L"] = "green";
-	colours["M"] = "green";
-	colours["V"] = "green";
+	colours["C"] = "#f08080";
+	
+	colours["G"] = "#f09048";
+	
+	colours["P"] = "#c0c000";
+	
+	colours["H"] = "#15a4a4";
+	colours["Y"] = "#15a4a4";
 
 }
 
 
 string ClustalAmino::getName(){
-	return "ClustalAmino";
+	return "ClustalX";
 }
 
 

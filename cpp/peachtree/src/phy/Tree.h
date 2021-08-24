@@ -40,6 +40,7 @@ public:
 	vector<Node*> getLeavesAsArray();
 	int getLeafNodeCount();
 	string toNewick();
+	string toNewick(Filtering* filtering);
 	string toString();
 	vector<Node*> listNodes(Node* theRoot);
 	static int getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos);

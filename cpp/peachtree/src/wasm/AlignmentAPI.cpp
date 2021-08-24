@@ -404,6 +404,18 @@ extern "C" {
 
 
 
+	/**
+	 *Download the alignment
+	 */
+	void EMSCRIPTEN_KEEPALIVE downloadAlignment() {
+		
+		jsonObject contents;
+		if (AlignmentAPI::THE_ALIGNMENT != nullptr && !AlignmentAPI::isMock()){
+			contents["contents"] = AlignmentAPI::THE_ALIGNMENT->toFasta(AlignmentAPI::filtering);
+		}
+		WasmAPI::messageFromWasmToJS(contents.dump(0));
+		
+	}
 
 
 

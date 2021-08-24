@@ -44,6 +44,7 @@ public:
 	static bool isAmbiguousOrGap(string symbol, bool isNT);
 	static void prepareAlignmentChars();
 	static bool isGap(int index, bool isNT);
+	
 
 
 	Sequence* getSequence(int i);
@@ -54,6 +55,7 @@ public:
 	void cleanup();
 	void annotateTaxa(Epidemiology* epi);
 	void annotateTaxa(Tree* tree);
+	string toFasta( Filtering* filtering);
 
 
 	void sortByTree(Tree* tree);

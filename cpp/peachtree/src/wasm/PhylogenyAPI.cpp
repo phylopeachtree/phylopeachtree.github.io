@@ -279,6 +279,18 @@ extern "C" {
 
 
 
+	/**
+	 * Download the tree
+	 */
+	void EMSCRIPTEN_KEEPALIVE downloadTree() {
+		
+		jsonObject contents;
+		if (PhylogenyAPI::THE_TREE != nullptr){
+			contents["contents"] = PhylogenyAPI::THE_TREE->toNewick(AlignmentAPI::filtering);
+		}
+		WasmAPI::messageFromWasmToJS(contents.dump(0));
+		
+	}
 
 
 

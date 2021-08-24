@@ -43,6 +43,9 @@ string Colouring::getDefaultCol(){
 	return "white";
 }
 
+string Colouring::getDefaultTextCol(){
+	return "black";
+}
 
 
 /*
@@ -56,6 +59,31 @@ vector<string> Colouring::getSiteColourFilters(){
 string Colouring::getDefaultSiteColourFilter(){
 	return "minor";
 }
+
+string Colouring::getTextColour(string symbol, int siteNum){
+	
+	
+	Filtering* f = this->filtering;
+
+	// Major alleles only
+	if (this->colFilter == SiteColourFilter::major) {
+		if (!f->isMajorAllele(symbol, siteNum)) return this->getDefaultTextCol();
+	}
+
+
+	// Minor alleles only
+	else if (this->colFilter == SiteColourFilter::minor) {
+		if (!f->isMinorAllele(symbol, siteNum)) return this->getDefaultTextCol();
+	}
+
+	// All
+	string col = this->textColours[symbol];
+	if (col == "") return this->getDefaultTextCol();
+	return col;
+	
+	
+}
+
 
 string Colouring::getColour(string symbol, int siteNum){
 

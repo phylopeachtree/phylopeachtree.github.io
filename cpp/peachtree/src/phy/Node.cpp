@@ -250,7 +250,7 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
 
     if (!isLeaf()) {
 
-        if (getChildCount() <= 2) {
+        if (this->getChildCount() <= 2) {
             // Computationally cheap method for special case of <=2 children
 
             buf.append("(");

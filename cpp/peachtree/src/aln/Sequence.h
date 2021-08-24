@@ -33,6 +33,7 @@ public:
 	Sequence* copy();
 	void prepareArray();
 	string getSeq();
+	string getSeq(Filtering* filtering);
 	Taxon* getTaxon();
 	string getAcc();
 	int getID();

@@ -39,7 +39,9 @@ public:
 	void setSiteColourFilter(SiteColourFilter val, Filtering* filtering);
 	void setSiteColourFilter(string val, Filtering* filtering);
 	string getDefaultCol();
+	string getDefaultTextCol();
 	string getColour(string symbol, int siteNum);
+	string getTextColour(string symbol, int siteNum);
 	string toJSON();
 	string toString();
 
@@ -50,6 +52,7 @@ public:
 
 protected:
 	std::map<string, string> colours;
+	std::map<string, string> textColours;
 	SiteColourFilter colFilter;
 	Filtering* filtering;
 

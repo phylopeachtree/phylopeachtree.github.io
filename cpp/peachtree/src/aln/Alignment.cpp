@@ -959,4 +959,24 @@ void Alignment::prepareAlignmentChars(){
 }
 
 
+/*
+* Download selected taxa/sites as fasta
+*/
+string Alignment::toFasta(Filtering* filtering){
+	
+	string fasta = "";
+	
+	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
+		Sequence* sequence = this->getSequence(seqNum);
+		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
+		fasta = fasta + ">" + sequence->getTaxon()->getName() + "\n" + sequence->getSeq(filtering) + "\n";
+	}
+	
+	
+	return fasta;
+	
+}
+
+
+
 

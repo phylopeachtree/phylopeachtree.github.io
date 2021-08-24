@@ -691,12 +691,34 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
 
 
+/*
+	Download the alignment
+*/
+function downloadAlignment(){
+	
+	console.log("Downloading alignment");
+	callWasmFunction("downloadAlignment", [], function(result){
+		download("peachtree.fasta", result.contents);
+	});
+}
+
+
+/*
+	Download the tree
+*/
+function downloadTree(){
+	console.log("Downloading tree");
+		callWasmFunction("downloadTree", [], function(result){
+		download("peachtree.nexus", result.contents);
+	});
+}
+
 
 
 /*
 	Download the svg
 */
-function download(){
+function downloadImage(){
 
 
 	isReadyToRender(function(ready){
@@ -902,3 +924,19 @@ function scrollHorizontal(goingRight){
 
 
 
+/*
+* Download a textfile
+*/
+function download(filename, text) {
+	
+	if (filename == "" || filename == null || text == "" || text == null) return;
+	
+	var element = document.createElement('a');
+	element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+	element.setAttribute('download', filename);
+	element.style.display = 'none';
+	document.body.appendChild(element);
+	element.click();
+	document.body.removeChild(element);
+	
+}

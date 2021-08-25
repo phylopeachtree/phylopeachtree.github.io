@@ -512,7 +512,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 
 
 			// Draw a tick
-			if (x > 0){
+			//if (x > 0){
 				json tick_json;
 				tick_json["ele"] = "line";
 				tick_json["x1"] = xc;
@@ -523,7 +523,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 				tick_json["stroke"] = "black";
 				tick_json["stroke_linecap"] = "round";
 				objs.push_back(tick_json);
-			}
+			//}
 
 
 			// Plot the number

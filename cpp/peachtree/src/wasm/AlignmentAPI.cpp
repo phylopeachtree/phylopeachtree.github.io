@@ -342,6 +342,12 @@ extern "C" {
 
 		jsonObject toColour = json::array();
 
+		if (AlignmentAPI::mostRecentlySelectedTaxon == -1) {
+			WasmAPI::messageFromWasmToJS(toColour.dump(0));
+		}
+
+		
+
 
 		// Toggle the currently selected one
 		if (newTaxonNum == AlignmentAPI::mostRecentlySelectedTaxon) {
@@ -352,12 +358,54 @@ extern "C" {
 			toColour.push_back(obj);
 		}
 		else {
+			
+			
+			// Are they all in the same state?
+			bool setTo = true;
+			bool thereExistsSelected = false;
+			bool thereExistsDeselected = false;
+			if (newTaxonNum > AlignmentAPI::mostRecentlySelectedTaxon) {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon; i <= newTaxonNum; i ++ ) {
 
-			// Set all the selected ones to the same state as the previously selected one
-			bool setTo = AlignmentAPI::THE_ALIGNMENT->taxonIsSelected(AlignmentAPI::mostRecentlySelectedTaxon);
+					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
+					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
+					if (taxon->getIsSelected()) thereExistsSelected = true;
+					else thereExistsDeselected = true;
+					
+					if (thereExistsSelected && thereExistsDeselected) break;
+				}
+			}else {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon; i >= newTaxonNum; i -- ) {
+
+					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
+					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
+					if (taxon->getIsSelected()) thereExistsSelected = true;
+					else thereExistsDeselected = true;
+					
+					if (thereExistsSelected && thereExistsDeselected) break;
+					
+				}
+				
+				
+				
+			}
+			
+			// If all are the same state, then toggle all
+			if (thereExistsSelected != thereExistsDeselected) {
+				if (thereExistsSelected) setTo = false;
+				else setTo = true;
+			}
+			
+			// Else set all the selected ones to the same state as the previously selected one
+			else{
+				setTo = AlignmentAPI::THE_ALIGNMENT->taxonIsSelected(AlignmentAPI::mostRecentlySelectedTaxon);
+			}
+
+			
+			
 
 			if (newTaxonNum > AlignmentAPI::mostRecentlySelectedTaxon) {
-				for (int i = AlignmentAPI::mostRecentlySelectedTaxon+1; i <= newTaxonNum; i ++ ) {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon; i <= newTaxonNum; i ++ ) {
 
 					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
 					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
@@ -369,7 +417,7 @@ extern "C" {
 					toColour.push_back(obj);
 				}
 			}else {
-				for (int i = AlignmentAPI::mostRecentlySelectedTaxon-1; i >= newTaxonNum; i -- ) {
+				for (int i = AlignmentAPI::mostRecentlySelectedTaxon; i >= newTaxonNum; i -- ) {
 
 					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
 					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
@@ -381,7 +429,13 @@ extern "C" {
 					toColour.push_back(obj);
 				}
 			}
+			
+			if (setTo == false) AlignmentAPI::mostRecentlySelectedTaxon = -1;
+			
 		}
+		
+		
+		
 
 		AlignmentAPI::setSelectionToDirty();
 		WasmAPI::messageFromWasmToJS(toColour.dump(0));

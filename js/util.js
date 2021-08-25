@@ -706,7 +706,12 @@ function isReadyToRender(callback = function(response) { }){
 function toggleTaxon(ele){
 
 	// Update class
+	
 	ele.toggleClass("selected");
+	if (ele.hasClass("selected")) {
+		$("#svg .selected").removeClass("main");
+		ele.addClass("main");
+	}
 	
 	
 	updateSelectionCSS();

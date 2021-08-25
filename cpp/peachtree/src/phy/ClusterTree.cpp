@@ -28,7 +28,8 @@ ClusterTree::ClusterTree(Alignment* alignment, LinkType linkType){
 
 
 	this->setRoot(root);
-
+	
+	
 	// Ensure that last tip is at 0
 	double latestTip = Utils::INFTY;
     for (int i = 0; i < this->nodes.size(); i++) {
@@ -123,7 +124,7 @@ Node* ClusterTree::buildClusterer(){
 void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, vector<NodeX*>& clusterNodes){
 
 
-	cout << "NJ" << endl;
+
 
 	const int n = taxaNames.size();
 
@@ -140,7 +141,7 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 	}
 
 
-	cout << "NJ 2" << endl;
+
 
 	vector<double> separationSums(n);
 	vector<double> separations(n);
@@ -158,7 +159,6 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 	}
 
 
-	cout << "NJ 3" << endl;
 
 	while (clusters > 2) {
 		// find minimum
@@ -230,7 +230,6 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 	}
 
 
-	cout << "NJ 4" << endl;
 
 	for (int i = 0; i < n; i++) {
 		if (clusterID.at(i).size() > 0) {

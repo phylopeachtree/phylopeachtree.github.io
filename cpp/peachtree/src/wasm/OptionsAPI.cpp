@@ -625,6 +625,9 @@ extern "C" {
 		OptionsAPI::TOP_MARGIN = ntHeight;
 
 
+		// Reset active selection on redraw
+		AlignmentAPI::mostRecentlySelectedTaxon = -1;
+		
 
 
 		// Full size of view

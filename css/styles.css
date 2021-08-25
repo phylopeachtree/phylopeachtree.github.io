@@ -414,8 +414,14 @@ body {
 
 #svg .taxon.selected {
 	fill:#5ca904;
-	font-weight:bold;
+	font-weight:bold !important;
 }
+
+
+#svg .taxon.selected.main {
+	fill:orange !important;
+}
+
 
 
 #svg .symptom:hover{

@@ -55,7 +55,7 @@ public:
 	void cleanup();
 	void annotateTaxa(Epidemiology* epi);
 	void annotateTaxa(Tree* tree);
-	string toFasta( Filtering* filtering);
+	string toFasta( Filtering* filtering, string annotation);
 
 
 	void sortByTree(Tree* tree);

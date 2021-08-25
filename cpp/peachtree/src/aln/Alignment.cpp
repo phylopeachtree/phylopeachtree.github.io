@@ -962,14 +962,20 @@ void Alignment::prepareAlignmentChars(){
 /*
 * Download selected taxa/sites as fasta
 */
-string Alignment::toFasta(Filtering* filtering){
+string Alignment::toFasta(Filtering* filtering, string annotation){
 	
 	string fasta = "";
 	
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		fasta = fasta + ">" + sequence->getTaxon()->getName() + "\n" + sequence->getSeq(filtering) + "\n";
+		
+		string label = sequence->getTaxon()->getName();
+		if (annotation != "" && annotation != "None"){
+			label = sequence->getTaxon()->getValue(annotation);
+			if (label == "") label = sequence->getTaxon()->getName();
+		}
+		fasta = fasta + ">" + label + "\n" + sequence->getSeq(filtering) + "\n";
 	}
 	
 	

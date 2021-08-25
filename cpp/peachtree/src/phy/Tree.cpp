@@ -253,8 +253,11 @@ int Tree::getLeafNodeCount(){
  * To newick string
  */
 string Tree::toNewick(){
-	int dummy = 0;
-	return this->root->toSortedNewick(dummy, true) + ")";
+	int dummy = -1;
+	vector<string>* labels = new vector<string>();
+	string str = this->root->toSortedNewick(dummy, true, labels);
+	delete labels;
+	return str;
 }
 
 
@@ -262,10 +265,13 @@ string Tree::toNewick(){
  * To newick string
  */
 string Tree::toNewick(Filtering* filtering){
-	int dummy = 0;
+	int dummy = -1;
 	Node* subtree = this->root;
 	if (filtering->getSubtreeRoot() != nullptr) subtree = filtering->getSubtreeRoot();
-	return subtree->toSortedNewick(dummy, true) + ")";
+	vector<string>* labels = new vector<string>();
+	string str = subtree->toSortedNewick(dummy, true, labels);
+	delete labels;
+	return str;
 }
 
 string Tree::toString(){
@@ -462,6 +468,9 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius,
 			branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions,
 			branchCol, nodeCol, minMaxNode, minMaxBranch);
+			
+
+			
 
 	return objs;
 

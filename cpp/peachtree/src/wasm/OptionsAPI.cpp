@@ -934,6 +934,7 @@ extern "C" {
 		top["width"] = width;
 		top["height"] = OptionsAPI::MARGIN_SIZE;
 		top["fill"] = "#FFDAB9";
+		top["layer"] = 2;
 
 		jsonObject left;
 		left["ele"] = "rect";
@@ -942,6 +943,7 @@ extern "C" {
 		left["width"] = OptionsAPI::MARGIN_SIZE;
 		left["height"] = height;
 		left["fill"] = "#FFDAB9";
+		left["layer"] = 2;
 
 
 		// Add top layer objects
@@ -962,6 +964,7 @@ extern "C" {
 			metaData["value"] = label;
 			metaData["text_anchor"] = "start";
 			metaData["font_size"] = 9;
+			metaData["layer"] = 2;
 			topObjs.push_back(metaData);
 		}
 		

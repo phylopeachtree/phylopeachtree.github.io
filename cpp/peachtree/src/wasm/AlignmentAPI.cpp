@@ -411,7 +411,7 @@ extern "C" {
 		
 		jsonObject contents;
 		if (AlignmentAPI::THE_ALIGNMENT != nullptr && !AlignmentAPI::isMock()){
-			contents["contents"] = AlignmentAPI::THE_ALIGNMENT->toFasta(AlignmentAPI::filtering);
+			contents["contents"] = AlignmentAPI::THE_ALIGNMENT->toFasta(AlignmentAPI::filtering, OptionsAPI::sampleNameAnnotation->getVal());
 		}
 		WasmAPI::messageFromWasmToJS(contents.dump(0));
 		

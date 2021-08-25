@@ -709,7 +709,9 @@ function downloadAlignment(){
 function downloadTree(){
 	console.log("Downloading tree");
 		callWasmFunction("downloadTree", [], function(result){
-		download("peachtree.nexus", result.contents);
+			//console.log(result.contents);
+			
+			download("peachtree.nexus", result.contents);
 	});
 }
 

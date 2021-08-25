@@ -236,16 +236,25 @@ double Node::getLength(){
 }
 
 string Node::tostring(){
-	int dummy = 0;
-	return this->toSortedNewick(dummy, false);
+	int dummy = -1;
+	vector<string>* labels = new vector<string>();
+	string str = this->toSortedNewick(dummy, false, labels);
+	delete labels;
+	return str;
 }
 
 /*
  * Print node as a newick
  * Adapted from beast2.evolution.tree.Node
  */
-string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
+string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData, vector<string>* labels){
 	string buf;
+	
+	bool isStart = false;
+	if (maxNodeInClade == -1) {
+		maxNodeInClade = 0;
+		isStart = true;
+	}
 
 
     if (!isLeaf()) {
@@ -254,10 +263,10 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
             // Computationally cheap method for special case of <=2 children
 
             buf.append("(");
-            string child1 = getChild(0)->toSortedNewick(maxNodeInClade, printMetaData);
+            string child1 = getChild(0)->toSortedNewick(maxNodeInClade, printMetaData, labels);
             int child1Index = maxNodeInClade;
             if (getChildCount() > 1) {
-                string child2 = getChild(1)->toSortedNewick(maxNodeInClade, printMetaData);
+                string child2 = getChild(1)->toSortedNewick(maxNodeInClade, printMetaData, labels);
                 int child2Index = maxNodeInClade;
                 if (child1Index > child2Index) {
                     buf.append(child2);
@@ -282,7 +291,7 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
             vector<int> maxNodeNrs(getChildCount());
             vector<int> indices(getChildCount());
             for (int i = 0; i < getChildCount(); i++) {
-                childStrings.at(i) = getChild(i)->toSortedNewick(maxNodeInClade, printMetaData);
+                childStrings.at(i) = getChild(i)->toSortedNewick(maxNodeInClade, printMetaData, labels);
                 maxNodeNrs.at(i) = maxNodeInClade;
                 indices.at(i) = i;
             }
@@ -306,11 +315,15 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
         }
 
     } else {
-        maxNodeInClade = nodeNr;
+        //maxNodeInClade = nodeNr;
+		if (labels != nullptr) labels->push_back(this->getAcc());
         //buf.append(nodeNr + 1);
     }
 
-    buf.append(this->getAcc());
+	buf.append(to_string(maxNodeInClade));
+	maxNodeInClade++;
+	
+   // buf.append(this->getAcc());
 
     if (printMetaData) {
         buf.append(getNewickMetaData());
@@ -319,6 +332,40 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData){
 
     //if (printMetaData) buf.append(getNewickLengthMetaData());
     buf.append(to_string(getLength()));
+	
+	
+	// Translate
+	if (isStart && labels != nullptr){
+		
+		string header = "#NEXUS\n";
+		header += "Begin taxa;\n";
+		header += "\tDimensions ntax=" + to_string(this->getLeafNodeCount()) + ";\n";
+		header += "\t\tTaxlabels\n";
+		for (int i = 0; i < labels->size(); i++){
+			header += "\t\t\t" + labels->at(i) + "\n";
+		}
+		header += "\t\t\t;\n";
+		
+		header += "End;\n";
+		header += "Begin trees;\n";
+		header += "\tTranslate\n";
+		for (int i = 0; i < labels->size(); i++){
+			header += "\t\t" + to_string(i+1) + " " + labels->at(i);
+			if (i < labels->size()-1) header += ",";
+			header += "\n";
+		}
+		header += "\t\t;\n";
+		
+		
+		header += "tree TREE1 = " +  buf + ";\n";
+		header += "End;";
+		buf = header;
+
+
+		
+		
+	}
+	
 
     return buf;
 
@@ -756,6 +803,8 @@ void Node::parseFromNewick(string newick){
 			lengthStr = regex_replace(lengthStr, re3, "$1");
 			//.replaceAll("(,|[(]|[)]).*", "");
 			length = stod(lengthStr);
+
+			
 			if (!hasChildren) break;
 		}
 
@@ -786,7 +835,7 @@ void Node::parseFromNewick(string newick){
 			annotationPos = pos+1;
 		}
 		else if (char2 == ']') {
-			if ((!hasChildren || level == -1) && annotationLevel == 1) {
+			if ((/*!hasChildren ||*/ level == -1) && annotationLevel == 1) {
 				this->parseAnnotation(newick.substr(annotationPos, pos-annotationPos));
 				break;
 			}
@@ -848,8 +897,8 @@ void Node::parseAnnotation(string annotation){
 	string key = annotation.substr(0, pos);
 	string val = annotation.substr(pos+1);
 	key.erase(std::remove(key.begin(), key.end(), '&'), key.end());
-	val.erase(std::remove(val.begin(), val.end(), '{'), val.end());
-	val.erase(std::remove(val.begin(), val.end(), '}'), val.end());
+	//val.erase(std::remove(val.begin(), val.end(), '{'), val.end());
+	//val.erase(std::remove(val.begin(), val.end(), '}'), val.end());
 	this->annotations[key] = val;
 	//cout << key << " =" << val << endl;
 

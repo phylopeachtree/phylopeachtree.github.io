@@ -640,11 +640,13 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 	// Draw node and annotate it
-	bool drawNode = nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1);
-	if (nodeColourBy != "" && this->getAnnotationValue(nodeColourBy) == "") drawNode = false;
+	bool drawNode =  nodeRadius > 0 && inrangeY && (this->isLeaf() || nValidChildren > 1);
+	
 
 	if (drawNode) {
 
+
+		
 		jsonObject node_json;
 		node_json["ele"] = "circle";
 		node_json["cx"] = x2Scaled;
@@ -700,7 +702,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 				// Get leaf
 				Node* descendant = this->getChild(0);
-				cout << " child of " << this->getAcc() << " is " << descendant->getAcc() << endl;
+				//cout << " child of " << this->getAcc() << " is " << descendant->getAcc() << endl;
 				while (!descendant->isLeaf()) {
 					string a = descendant->getAcc();
 					descendant = descendant->getChild(0);
@@ -713,7 +715,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		}
 
 		node_json["title"] = title;
-		objs.push_back(node_json);
+		if (nodeColourBy == "" || this->getAnnotationValue(nodeColourBy) != "") objs.push_back(node_json);
 
 	}
 
@@ -1034,6 +1036,59 @@ void Node::getMinMax(string var, vector<double>& minMax){
 
 }
 
+
+bool sortNodeHeight(pair<Node*, double> a, pair<Node*, double> b) { 
+	return (a.second < b.second);
+}
+
+
+/*
+ * Get the 1st child's 1st childs' ... leaf
+ */
+Node* Node::getFirstLeaf(){
+	if (this->isLeaf()) return this;
+	return this->children.at(0)->getFirstLeaf();
+}
+
+/*
+ * Reorder nodes in the transmission tree to maximise compatibility with infectious periods
+ * Post-order traversal: sort children in chronological order of symptom onset date
+ */
+void Node::reorderTransmissions(Timeline* timeline, string symptomDateVar){
+	
+	if (timeline == nullptr) return;
+	
+	// Np need to make changes if this is a leaf
+	if (this->isLeaf()) return;
+	
+	// Do children first
+	for (Node* child : this->getChildren()){
+		child->reorderTransmissions(timeline, symptomDateVar);
+	}
+	
+	// Sort children by symptom onset date
+	vector<pair<Node*, double>> nodeSymptomTimes;
+	for (Node* child : this->getChildren()){
+		Node* leaf = child->getFirstLeaf();
+		string val = leaf->getAnnotationValue(symptomDateVar);
+		double height = timeline->getDateAsTime(val);
+		pair<Node*, double> node_height{child, height};
+		nodeSymptomTimes.push_back(node_height);
+	}
+	std::sort (nodeSymptomTimes.begin(), nodeSymptomTimes.end(), sortNodeHeight);  
+	
+	
+	// Reorder children
+	vector<Node*> newChildren;
+	for (pair<Node*, double>& x : nodeSymptomTimes){
+		newChildren.push_back(x.first);
+	}
+	
+	this->children = newChildren;
+	
+
+	
+}
 
 
 

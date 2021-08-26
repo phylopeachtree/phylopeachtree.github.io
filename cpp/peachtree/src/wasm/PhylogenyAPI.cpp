@@ -124,6 +124,21 @@ jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, b
 }
 
 
+
+
+/*
+* Reorder nodes in the tree
+*/
+void PhylogenyAPI::reorderTree(Timeline* timeline, string symptomDateVar) {
+	
+	if (THE_TREE == nullptr) return;
+	if (timeline == nullptr) return;
+	if (!timeline->isReady()) return;
+	THE_TREE->reorderTree(timeline, symptomDateVar);
+	
+}
+
+
 /*
  * Build a tree from the alignment using the specified method
  */

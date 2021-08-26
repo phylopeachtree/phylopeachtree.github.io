@@ -24,6 +24,10 @@ void test(string& str){
 }
 
 
+bool myfunction (pair<int, double> a, pair<int, double> b) { 
+	return (a.second < b.second);
+}
+
 int main() {
 
 	cout << "hello there" << endl;
@@ -41,6 +45,21 @@ int main() {
 	Utils::getNiceTimes(t1, -15, 10, heights, labels);
 	for (int i = 0; i < heights.size(); i ++){
 		cout << heights.at(i) << " / " << labels.at(i) << endl;
+	}
+	
+	
+	vector<pair<int, double>> x;
+	pair<int, double> x1{1, 1.5};
+	pair<int, double> x2{2, 0.1};
+	pair<int, double> x3{3, 0.7};
+	x.push_back(x1);
+	x.push_back(x2);
+	x.push_back(x3);
+	
+	std::sort(x.begin(), x.end(), myfunction);
+	
+	for (pair<int, double>& y : x){
+		cout << y.first << "/" << y.second << endl;
 	}
 
 

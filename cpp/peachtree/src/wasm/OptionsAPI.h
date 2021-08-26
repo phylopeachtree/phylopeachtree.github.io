@@ -101,6 +101,7 @@ public:
 	static void setFocusingOnTaxa(bool val);
 	static void setFocusOnClade(bool val);
 	static void prepareEpiAnnotations();
+	static void reorderTree();
 
 
 

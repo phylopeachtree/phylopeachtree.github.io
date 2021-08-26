@@ -38,7 +38,7 @@ public:
 	jsonObject getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize, string symptomDateVar,
 			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar, double branchWidth);
 	void prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
-
+	double getDateAsTime(string val);
 
 
 	tm getLatestDate();

@@ -34,6 +34,7 @@ public:
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
 	static void cleanup();
 	static void setOrderingToDirty();
+	static void reorderTree(Timeline* timeline, string symptomDateVar);
 
 	//Variables
 	static Tree* THE_TREE;

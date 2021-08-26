@@ -519,7 +519,7 @@ function renderOptions(){
 			
 			if (result.ready) {
 				$("#btn_clade").show(100);
-				$("#downloadTreeBtn").show(0);
+				$("#downloadTreeBtn").show(100);
 			}
 			else {
 				$("#btn_clade").hide(0);
@@ -543,6 +543,27 @@ function renderOptions(){
 			
 			
 		});
+		
+		
+				
+		callWasmFunction("transmissionTreeCanBeReordered", [], function(result){
+			
+			if (result.ready) {
+				$("#reorderTreeBtn").show(100);
+			}
+			else {
+				$("#reorderTreeBtn").hide(0);
+			}
+			
+		});
+		
+		
+		
+		
+		
+
+		
+		
 		
 				
 	});
@@ -642,13 +663,10 @@ function buildTree(){
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {
 		callWasmFunction("buildTree", [], function(results){
-		//cjCall("peachtree.options.OptionsAPI", "buildTree").then(function(results){
-			
-			
-			//console.log("tree", results.newick);
+
 			removeLoader($("#ctrl_loading_div"));
 			$(btnID).removeClass("disabled");
-			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();;
+			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();
 			BUILDING_TREE = false;
 			
 			renderGraphics();
@@ -658,6 +676,43 @@ function buildTree(){
 	}, 10);
 	
 }
+
+
+/*
+	Build a tree from the alignment using the selected method
+*/
+function reorderTree(){
+	
+	if (BUILDING_TREE) return;
+	BUILDING_TREE = true;
+	
+	let btnID = "#reorderTreeBtn";
+	
+	$(btnID).addClass("disabled");
+	addLoader($("#ctrl_loading_div"));
+	$(btnID).parent().find(".usermsg").html("");
+	
+	// Asynchronous call to allow dom to update
+	setTimeout(function() {
+		callWasmFunction("reorderTree", [], function(results){
+
+			removeLoader($("#ctrl_loading_div"));
+			$(btnID).removeClass("disabled");
+			BUILDING_TREE = false;
+			
+			renderGraphics();
+			
+			
+		});
+	}, 10);
+	
+}
+
+
+
+
+
+
 
 
 /*

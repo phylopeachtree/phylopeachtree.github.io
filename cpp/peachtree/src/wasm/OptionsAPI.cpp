@@ -264,6 +264,17 @@ bool OptionsAPI::isReady(){
 }
 
 
+	
+/**
+ * Reorder the tree using infectious periods
+ */
+void OptionsAPI::reorderTree() {
+	if (OptionsAPI::transmissionTree->getVal() && OptionsAPI::epiSymptomDate->getVal() != "None") { 
+		PhylogenyAPI::reorderTree(EpiAPI::getTimeline(), OptionsAPI::epiSymptomDate->getVal());
+	}
+}
+
+
 
 
 /**
@@ -555,7 +566,18 @@ extern "C" {
 		WasmAPI::messageFromWasmToJS(j.dump(0));
 
 	}
-
+	
+	
+	
+	/**
+	 * Reorder children in the transmission tree to improve compatibility with infectious periods
+	 */
+	void EMSCRIPTEN_KEEPALIVE reorderTree() {
+		OptionsAPI::reorderTree();
+		WasmAPI::messageFromWasmToJS("");
+	}
+	
+	
 
 
 	/**
@@ -753,6 +775,9 @@ extern "C" {
 		Scaling* treeScaling = nullptr;
 		Node* subtree = AlignmentAPI::getFiltering()->getSubtreeRoot() == nullptr ? PhylogenyAPI::getTree()->getRoot() : AlignmentAPI::getFiltering()->getSubtreeRoot();
 		if (PhylogenyAPI::isReady()) {
+			
+			
+			
 
 
 			PhylogenyAPI::applyFiltering(AlignmentAPI::getFiltering());
@@ -1185,7 +1210,10 @@ extern "C" {
 				// If 'displayIncompatibleTranmissions' becomes true, set 'transmissionTree' to true
 				if (option == OptionsAPI::displayIncompatibleTranmissions && val == true){
 					OptionsAPI::transmissionTree->setVal(true);
+					reorderTree();
 				}
+				
+
 
 				//cout << "setting " << option->getName() << " to " << val << "|" << value << endl;
 
@@ -1302,7 +1330,17 @@ extern "C" {
 	
 	
 	
-
+	/**
+	* Can the tree be reordered as a transmission tree
+	*/
+	void EMSCRIPTEN_KEEPALIVE transmissionTreeCanBeReordered() {
+		jsonObject json;
+		json["ready"] = EpiAPI::getTimeline() != nullptr && PhylogenyAPI::THE_TREE != nullptr && 
+						OptionsAPI::epiSymptomDate->getVal() != "None" && OptionsAPI::transmissionTree->getVal()
+						&& EpiAPI::getTimeline()->isReady();
+		WasmAPI::messageFromWasmToJS(json.dump(0));
+	}
+	
 
 
 	/**

@@ -383,6 +383,21 @@ void Timeline::cleanup(){
 
 
 /*
+ * Get the date of this, using the current format
+ * Returns Inf if invalid
+ */
+double Timeline::getDateAsTime(string val){
+	struct tm date;
+	if (!Utils::parseDate(val, dateFormatCanonical, date)) {
+		return Utils::INFTY;
+
+	}
+	
+	return Utils::getTimeFromDate(date);
+}
+
+
+/*
  * Get the json object encoding the timeline x-axis
  */
 jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double axisFontSize,
@@ -497,69 +512,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			arr.push_back(node_json);
 
 
-
-			/*
-			// Compatible?
-			if (displayIncompatibleTranmissions && !node->isRoot()){
-
-				Node* parent = node->getParent();
-
-				// Check that this is the infector
-				if (parent->getChild(0) == node){
-
-
-					// Is the parent node within the infectious period of this node?
-					double transmissionHeight = this->getSampleHeight(parent);
-					bool compatible = infectiousStartX_height > transmissionHeight && transmissionHeight > infectiousEndX_height;
-
-					// Get siblings (ie. secondary cases)
-					if (!compatible){
-
-						cout << node->getAcc() << " is not compatible" << endl;
-
-						double const rectW = 5;
-						double parentX = scaling->scaleX(transmissionHeight);
-						double parentY = scaling->scaleY(parent->getFilteredNr() + 0.5) + yshift;
-						tm transmissionDate = Utils::addYears(latestDate, -transmissionHeight);
-
-						string title = node->getAcc() + " could not have cause this transmission event because they were not infectious on " + Utils::formatDate(transmissionDate);
-
-						double const tickLen = 6;
-						double const tickWid = 3;
-
-						// Top-left to bottom-right
-						jsonObject tick1;
-						tick1["ele"] = "line";
-						tick1["x1"] = parentX - tickLen;
-						tick1["x2"] = parentX + tickLen;
-						tick1["y1"] = parentY - tickLen;
-						tick1["y2"] = parentY + tickLen;
-						tick1["stroke_width"] = tickWid;
-						tick1["stroke"] = "red";
-						tick1["stroke_linecap"] = "round";
-						tick1["title"] = title;
-						arr.push_back(tick1);
-
-
-						// Bottom-left to top-right
-						jsonObject tick2;
-						tick2["ele"] = "line";
-						tick2["x1"] = parentX - tickLen;
-						tick2["x2"] = parentX + tickLen;
-						tick2["y1"] = parentY + tickLen;
-						tick2["y2"] = parentY - tickLen;
-						tick2["stroke_width"] = tickWid;
-						tick2["stroke"] = "red";
-						tick2["stroke_linecap"] = "round";
-						tick2["title"] = title;
-						arr.push_back(tick2);
-
-					}
-
-				}
-
-			}
-			*/
 
 		}
 

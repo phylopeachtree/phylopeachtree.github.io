@@ -57,6 +57,7 @@ public:
 	vector<string> getAllAnnotations();
 	void flipSubtree(int index);
 	void cleanup();
+	void reorderTree(Timeline* timeline, string symptomDateVar);
 
 
 

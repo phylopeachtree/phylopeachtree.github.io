@@ -626,3 +626,15 @@ void Tree::flipSubtree(int index){
 }
 
 
+/*
+ * Reorder nodes in the transmission tree to maximise compatibility with infectious periods
+ */
+void Tree::reorderTree(Timeline* timeline, string symptomDateVar){
+	if (timeline == nullptr || symptomDateVar == "") return;
+	cout << "reordering tree" << endl;
+	this->root->reorderTransmissions(timeline, symptomDateVar);
+}
+
+
+
+

@@ -75,6 +75,9 @@ public:
 	void getMinMax(string var, vector<double>& minMax);
 	string getAnnotationColour(string var, double min, double max, string colourMax);
 	string getAnnotationColour(double val, double min, double max, string colourMax);
+	void reorderTransmissions(Timeline* timeline, string symptomDateVar);
+	
+	Node* getFirstLeaf();
 
 
 private:

@@ -12,6 +12,7 @@ Taxon::Taxon(int id, string name) {
 	this->name = name;
 	this->isHighlighted = false;
 	this->isSelected = false;
+	this->numInfections = -1;
 }
 
 
@@ -63,4 +64,13 @@ void Taxon::setIsHighlighted(bool val) {
 bool Taxon::getIsHighlighted() {
 	return this->isHighlighted;
 }
+
+void Taxon::setInfectionCount(int numInfections){
+	this->numInfections = numInfections;
+}
+
+int Taxon::getInfectionCount(){
+	return this->numInfections;
+}
+
 

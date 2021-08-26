@@ -41,7 +41,7 @@ public:
 	int getLength();
 	bool getIsNucleotide();
 	void setIsNucleotide(bool b);
-	json getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation);
+	json getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections);
 	json getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth, Colouring* colouring, Filtering* filtering, double textSize, double yshift);
 	int getSymbolInt(int site);
 	string getSymbol(int site);

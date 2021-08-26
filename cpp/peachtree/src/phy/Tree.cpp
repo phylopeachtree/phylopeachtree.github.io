@@ -635,6 +635,14 @@ void Tree::reorderTree(Timeline* timeline, string symptomDateVar){
 	this->root->reorderTransmissions(timeline, symptomDateVar);
 }
 
+/*
+ * Count the number of infections cased by each case
+ */
+void Tree::countInfections(){
+	this->root->countInfections();
+}
+
+
 
 
 

@@ -21,6 +21,7 @@ using json = nlohmann::json;
 
 Tree* PhylogenyAPI::THE_TREE;
 bool PhylogenyAPI::orderingIsDirty;
+bool PhylogenyAPI::infectionCountIsDirty;
 
 
 
@@ -140,6 +141,17 @@ void PhylogenyAPI::reorderTree(Timeline* timeline, string symptomDateVar) {
 
 
 /*
+ * Count the number of infections cased by each case
+ */
+void PhylogenyAPI::countInfections(){
+	if (THE_TREE == nullptr) return;
+	if (!PhylogenyAPI::infectionCountIsDirty) return;
+	THE_TREE->countInfections();
+	PhylogenyAPI::infectionCountIsDirty = false;
+}
+
+
+/*
  * Build a tree from the alignment using the specified method
  */
 jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
@@ -158,7 +170,7 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 
 		// Build tree
 		THE_TREE = new ClusterTree(alignment, method);
-
+		
 
 		// Sort taxa by tree
 		sortTaxaByTree(THE_TREE, alignment);
@@ -166,7 +178,7 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::addAnnotationsToTree(THE_TREE);
 		PhylogenyAPI::orderingIsDirty = false;
-
+		PhylogenyAPI::infectionCountIsDirty = true;
 
 		// Prepare tree annotation options
 		OptionsAPI::prepareTreeAnnotationOptions();
@@ -232,7 +244,7 @@ extern "C" {
 		PhylogenyAPI::THE_TREE = new Tree();
 		PhylogenyAPI::THE_TREE->parseFromNexus(contents);
 		PhylogenyAPI::orderingIsDirty = true;
-
+		PhylogenyAPI::infectionCountIsDirty = true;
 
 		if (Error::wasError()) {
 			PhylogenyAPI::cleanup();
@@ -287,6 +299,7 @@ extern "C" {
 		if (PhylogenyAPI::THE_TREE != nullptr) {
 			PhylogenyAPI::THE_TREE->flipSubtree(index);
 			PhylogenyAPI::orderingIsDirty = true;
+			PhylogenyAPI::infectionCountIsDirty = true;
 		}
 		WasmAPI::messageFromWasmToJS("{}");
 

@@ -97,7 +97,7 @@ NumericalOption* OptionsAPI::infectiousPeriodAfter = new NumericalOption("infect
 DiscreteOption* OptionsAPI::dateFormat;
 NumericalOption* OptionsAPI::timelineFontSize = new NumericalOption("timelineFontSize", "Epidemiology", "Font size of dates on timeline", 12, 0, 28, 1);
 BooleanOption* OptionsAPI::displayIncompatibleTranmissions = new BooleanOption("displayIncompatibleTranmissions", "Epidemiology", "Highlight incompatible transmissions", false);
-
+BooleanOption* OptionsAPI::reportNumberOfInfections = new BooleanOption("reportNumberOfInfections", "Epidemiology", "Report number of infections of each case", false);
 
 
 // Variables
@@ -169,6 +169,9 @@ vector<Colouring*> OptionsAPI::colouringClasses;
 	options.push_back(infectiousPeriodAfter);
 	options.push_back(timelineFontSize);
 	options.push_back(displayIncompatibleTranmissions);
+	options.push_back(reportNumberOfInfections);
+	
+	
 
 
 
@@ -777,6 +780,10 @@ extern "C" {
 		if (PhylogenyAPI::isReady()) {
 			
 			
+			// Count number of infections?
+			if (OptionsAPI::reportNumberOfInfections->getVal()){
+				PhylogenyAPI::countInfections();
+			}
 			
 
 
@@ -858,7 +865,10 @@ extern "C" {
 				objs.push_back(rect);
 
 
-				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal(), OptionsAPI::sampleNameAnnotation->getVal());
+				// Report number of infections?
+				bool reportInfections = OptionsAPI::reportNumberOfInfections->getVal() && PhylogenyAPI::isReady();
+
+				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal(), OptionsAPI::sampleNameAnnotation->getVal(), reportInfections);
 				objs.insert(objs.end(), taxa.begin(), taxa.end());
 
 			}

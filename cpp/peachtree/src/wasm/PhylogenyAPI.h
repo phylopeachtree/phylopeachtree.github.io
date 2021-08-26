@@ -35,10 +35,12 @@ public:
 	static void cleanup();
 	static void setOrderingToDirty();
 	static void reorderTree(Timeline* timeline, string symptomDateVar);
+	static void countInfections();
 
 	//Variables
 	static Tree* THE_TREE;
 	static bool orderingIsDirty;
+	static bool infectionCountIsDirty;
 
 };
 

@@ -58,6 +58,7 @@ public:
 	void flipSubtree(int index);
 	void cleanup();
 	void reorderTree(Timeline* timeline, string symptomDateVar);
+	void countInfections();
 
 
 

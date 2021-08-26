@@ -706,7 +706,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 				while (!descendant->isLeaf()) {
 					string a = descendant->getAcc();
 					descendant = descendant->getChild(0);
-					cout << " child of " << a << " is " << descendant->getAcc() << endl;
+					
 				}
 
 				title = title + "\n\n" + descendant->getAcc() + " could not have caused this transmission event because they were not infectious on " + Utils::formatDate(transmissionDate);
@@ -1083,14 +1083,50 @@ void Node::reorderTransmissions(Timeline* timeline, string symptomDateVar){
 	for (pair<Node*, double>& x : nodeSymptomTimes){
 		newChildren.push_back(x.first);
 	}
-	
 	this->children = newChildren;
 	
+
 
 	
 }
 
 
+
+/*
+ * Count the number of infections cased by each case
+ */
+void Node::countInfections(){
+	
+	if (this->isLeaf()){
+		
+		// Count the number of internal nodes going back until this leaf was infected
+		int numInfections = 0;
+		Node* parent = this->getParent();
+		Node* child = this;
+		while (parent != nullptr){
+			
+			
+			if (parent->getChild(0) == child){
+				numInfections++;
+			}else{
+				break;
+			}
+			
+			child = parent;
+			parent = parent->getParent();
+		}
+		
+		this->taxon->setInfectionCount(numInfections);
+		
+		
+	}else{
+		for (Node* child : this->getChildren()){
+			child->countInfections();
+		}
+	}
+	
+	
+}
 
 
 

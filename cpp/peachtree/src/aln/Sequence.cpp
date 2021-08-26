@@ -165,7 +165,7 @@ void Sequence::setIsNucleotide(bool b){
 }
 
 
-json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation){
+json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections){
 
 
 	json arr; // = json::array();
@@ -199,18 +199,36 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 	//numberPadding.replaceAll(" ", "&#160;"); // White space
 
 
+	// Meta data on sample label
 	string missingStr = "";
 	string missingStrTitle = "";
-	if (this->getLength() > 0) {
-		string percentage;
-		if (this->missingDataProportion == 0) percentage = "0";
-		else{
-			percentage = to_string(Utils::roundToSF(100*this->missingDataProportion, 2));
-			percentage.erase(percentage.find_last_not_of('0') + 1, std::string::npos);
-		}
-		if (displayMissingPercentage) missingStr = " (" + percentage + "%)";
-		missingStrTitle = "\n" + percentage + "% missing data";
+	displayMissingPercentage = displayMissingPercentage && this->getLength() > 0;
+		
+	if (displayMissingPercentage || reportInfections) missingStr += " (";
+	
+	// Missing data
+	string percentage;
+	if (this->missingDataProportion == 0) percentage = "0";
+	else{
+		percentage = to_string(Utils::roundToSF(100*this->missingDataProportion, 2));
+		percentage.erase(percentage.find_last_not_of('0') + 1, std::string::npos);
 	}
+	if (displayMissingPercentage) missingStr = percentage + "%";
+	missingStrTitle += "\n" + percentage + "% missing data";
+	
+	
+	// Infection count
+	if (reportInfections){
+		int count = this->taxon->getInfectionCount();
+		if (displayMissingPercentage) missingStr += ", ";
+		missingStr += to_string(count);
+		missingStrTitle += "\n" + to_string(count) + " infections";
+	}
+	
+	if (displayMissingPercentage || reportInfections) missingStr += ")";
+	
+		
+	
 
 	// Plot accession
 	json acc_json;

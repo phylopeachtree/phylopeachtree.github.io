@@ -410,7 +410,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 	if (axisFontSize <= 0) return arr;
 
 
-	cout << "plotting timeline" << endl;
+	//cout << "plotting timeline" << endl;
 
 
 	// x-axis line at bottom (ignore scroll)
@@ -593,8 +593,6 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			double x_scaled = scaling->scaleX(x);
 			string label = labels.at(t);
 
-
-			cout << height << "/" << x << "/" << x_scaled << endl;
 
 
 			// Vertical line

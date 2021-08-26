@@ -99,8 +99,8 @@ Taxon* AlignmentAPI::getTaxon(string label){
 /**
  * Get taxon graphics json
  */
-jsonObject AlignmentAPI::getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation){
-	return THE_ALIGNMENT->getTaxaGraphics(scaling, textSize, filtering, showTaxonNumbers, displayMissingPercentage, sampleNameAnnotation);
+jsonObject AlignmentAPI::getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections){
+	return THE_ALIGNMENT->getTaxaGraphics(scaling, textSize, filtering, showTaxonNumbers, displayMissingPercentage, sampleNameAnnotation, reportInfections);
 }
 
 

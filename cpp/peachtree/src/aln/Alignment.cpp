@@ -575,7 +575,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
  * Get taxa graphics
  * @return
  */
-json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation){
+json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections){
 
 
 	json objs = json::array();
@@ -603,7 +603,7 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 		if (scaling->isAboveRangeY(seqNumDisplayed)) break;
 		Sequence* sequence = this->getSequence(seqNum);
 		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
-		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift, displayMissingPercentage, sampleNameAnnotation);
+		json j = sequence->getTaxonGraphics(scaling, seqNumDisplayed, filtering, textSize, showTaxonNumbers, yshift, displayMissingPercentage, sampleNameAnnotation, reportInfections);
 		objs.insert(objs.end(), j.begin(), j.end()); // Add all
 		seqNumDisplayed ++;
 	}

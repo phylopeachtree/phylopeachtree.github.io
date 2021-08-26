@@ -85,6 +85,7 @@ public:
 	static DiscreteOption* dateFormat;
 	static NumericalOption* timelineFontSize;
 	static BooleanOption* displayIncompatibleTranmissions;
+	static BooleanOption* reportNumberOfInfections;
 
 
 	// Methods

@@ -66,7 +66,7 @@ void Timeline::prepareNodeSampleHeights(Node* subtree, string symptomDateVar, in
 			// Attempt to parse date
 			struct tm symptomDate;
 			if (!Utils::parseDate(val, dateFormatCanonical, symptomDate)) {
-				cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
+				//cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
 				continue;
 			}
 
@@ -187,7 +187,7 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 		// Attempt to parse date
 		struct tm tm;
 		if (!Utils::parseDate(val, dateFormatCanonicalNew, tm)) {
-			cout << "Warning: could not parse date '" << val << "' from " << dateFormatCanonicalNew << endl;
+			//cout << "Warning: could not parse date '" << val << "' from " << dateFormatCanonicalNew << endl;
 			tm.tm_mon = -1;
 			caseDatesNew.push_back(tm);
 			continue;
@@ -237,13 +237,13 @@ void Timeline::setSampleDateVariable(string sampleDateVariable, string dateForma
 		for (tm d : this->caseDates){
 			if (d.tm_mon < 0) continue;
 			nValidDates++;
-			cout << "tip height " << Utils::getTimeFromDate(d) << "/" << (this->latestTime - Utils::getTimeFromDate(d)) << endl;
+			//cout << "tip height " << Utils::getTimeFromDate(d) << "/" << (this->latestTime - Utils::getTimeFromDate(d)) << endl;
 			this->meanTipHeight_cases += (this->latestTime - Utils::getTimeFromDate(d));
 		}
 		this->meanTipHeight_cases = this->meanTipHeight_cases / nValidDates;
-		cout << "this->meanTipHeight_cases " << this->meanTipHeight_cases << "/" << nValidDates << endl;
+		//cout << "this->meanTipHeight_cases " << this->meanTipHeight_cases << "/" << nValidDates << endl;
 
-		cout << "There are " << uniqueDates.size() << " unique dates. The earliest is " << Utils::getTimeFromDate(earliestDate) << " and the latest is " << Utils::getTimeFromDate(latestDate) << endl;
+		//cout << "There are " << uniqueDates.size() << " unique dates. The earliest is " << Utils::getTimeFromDate(earliestDate) << " and the latest is " << Utils::getTimeFromDate(latestDate) << endl;
 
 	}
 
@@ -461,7 +461,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			// Attempt to parse date
 			struct tm symptomDate;
 			if (!Utils::parseDate(val, dateFormatCanonical, symptomDate)) {
-				cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
+				//cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
 				continue;
 			}
 
@@ -533,7 +533,7 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			// Attempt to parse date
 			struct tm isolationDate;
 			if (!Utils::parseDate(val, dateFormatCanonical, isolationDate)) {
-				cout << "Warning: could not parse isolation date '" << val << "' from " << dateFormatCanonical << endl;
+				//cout << "Warning: could not parse isolation date '" << val << "' from " << dateFormatCanonical << endl;
 				continue;
 			}
 

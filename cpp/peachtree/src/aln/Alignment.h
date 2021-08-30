@@ -55,7 +55,8 @@ public:
 	void cleanup();
 	void annotateTaxa(Epidemiology* epi);
 	void annotateTaxa(Tree* tree);
-	string toFasta( Filtering* filtering, string annotation);
+	string toFasta(Filtering* filtering, string annotation);
+	string downloadSamples(Filtering* filtering, string sampleNameAnnotation, bool displayMissingPercentage, bool reportInfections);
 
 
 	void sortByTree(Tree* tree);

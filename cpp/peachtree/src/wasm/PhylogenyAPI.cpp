@@ -20,6 +20,8 @@ using json = nlohmann::json;
 
 
 Tree* PhylogenyAPI::THE_TREE;
+vector<Tree*> PhylogenyAPI::allTrees;
+int PhylogenyAPI::treeNumber = -1;
 bool PhylogenyAPI::orderingIsDirty;
 bool PhylogenyAPI::infectionCountIsDirty;
 
@@ -80,11 +82,15 @@ bool PhylogenyAPI::isReady(){
 
 
 void PhylogenyAPI::cleanup(){
-	if (PhylogenyAPI::THE_TREE != nullptr){
-		PhylogenyAPI::THE_TREE->cleanup();
-		delete PhylogenyAPI::THE_TREE;
-		PhylogenyAPI::THE_TREE = nullptr;
+	
+	for (Tree* tree : PhylogenyAPI::allTrees){
+		tree->cleanup();
+		delete tree;
 	}
+	PhylogenyAPI::allTrees.clear();
+	PhylogenyAPI::THE_TREE = nullptr;
+	PhylogenyAPI::treeNumber = -1;
+
 
 	AlignmentAPI::filtering = nullptr;
 	AlignmentAPI::selectionIsDirty = false;
@@ -100,9 +106,12 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
 	if (!orderingIsDirty) return;
 	if (alignment == nullptr) {
 		AlignmentAPI::makeMockAlignment(THE_TREE);
-	}else{
-		PhylogenyAPI::sortTaxaByTree(THE_TREE, alignment);
 	}
+	for (Tree* tree : PhylogenyAPI::allTrees){
+		PhylogenyAPI::sortTaxaByTree(tree, alignment);
+	}
+		
+	
 
 
 	AlignmentAPI::setOrderingToDirty();
@@ -135,7 +144,13 @@ void PhylogenyAPI::reorderTree(Timeline* timeline, string symptomDateVar) {
 	if (THE_TREE == nullptr) return;
 	if (timeline == nullptr) return;
 	if (!timeline->isReady()) return;
-	THE_TREE->reorderTree(timeline, symptomDateVar);
+	//THE_TREE->reorderTree(timeline, symptomDateVar);
+	
+	// Count again
+	for (Tree* tree : allTrees){
+		tree->reorderTree(timeline, symptomDateVar);
+	}
+	
 	
 }
 
@@ -146,8 +161,28 @@ void PhylogenyAPI::reorderTree(Timeline* timeline, string symptomDateVar) {
 void PhylogenyAPI::countInfections(){
 	if (THE_TREE == nullptr) return;
 	if (!PhylogenyAPI::infectionCountIsDirty) return;
-	THE_TREE->countInfections();
+	
+	// Reset count to 0
+	THE_TREE->resetInfections();
+	
+	// Count again
+	for (Tree* tree : allTrees){
+		tree->countInfections();
+	}
+	
+	
+	// Divide by num trees
+	THE_TREE->normaliseInfections(allTrees.size());
+	
 	PhylogenyAPI::infectionCountIsDirty = false;
+}
+
+
+/*
+ * Number of trees
+ */
+int PhylogenyAPI::getNumberOfTrees(){
+	return PhylogenyAPI::allTrees.size();
 }
 
 
@@ -170,6 +205,9 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 
 		// Build tree
 		THE_TREE = new ClusterTree(alignment, method);
+		
+		PhylogenyAPI::allTrees.push_back(THE_TREE);
+		PhylogenyAPI::treeNumber = 0;
 		
 
 		// Sort taxa by tree
@@ -239,10 +277,15 @@ extern "C" {
 
 		auto start = high_resolution_clock::now();
 
+		//PhylogenyAPI::allTrees.push_back(THE_TREE);
+		//PhylogenyAPI::treeNumber = 0;
+		PhylogenyAPI::allTrees = Tree::parseTrees(contents);
+		PhylogenyAPI::treeNumber = PhylogenyAPI::allTrees.size() - 1;
+		PhylogenyAPI::THE_TREE = PhylogenyAPI::allTrees.at(PhylogenyAPI::treeNumber);
 
 
-		PhylogenyAPI::THE_TREE = new Tree();
-		PhylogenyAPI::THE_TREE->parseFromNexus(contents);
+		
+		
 		PhylogenyAPI::orderingIsDirty = true;
 		PhylogenyAPI::infectionCountIsDirty = true;
 
@@ -257,10 +300,15 @@ extern "C" {
 
 		// Epidemiological annotations
 		EpiAPI::setEpiAnnotationsToDirty();
-		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
+		for (Tree* tree : PhylogenyAPI::allTrees){
+			EpiAPI::setEpiAnnotationsToDirty();
+			EpiAPI::addAnnotationsToTree(tree);
+			AlignmentAPI::annotateTaxa(tree);
+		}
 		
 		
-		AlignmentAPI::annotateTaxa(PhylogenyAPI::THE_TREE);
+		
+		
 		
 		
 		// Prepare tree annotation options
@@ -274,7 +322,7 @@ extern "C" {
 
 
 
-		cout << "Parsed tree successfully (" << duration.count() << "s)" << endl;
+		cout << "Parsed " << PhylogenyAPI::allTrees.size() << " trees successfully (" << duration.count() << "s)" << endl;
 
 
 		//cout << "tree " << PhylogenyAPI::THE_TREE->toNewick() << endl;
@@ -318,6 +366,35 @@ extern "C" {
 		}
 		WasmAPI::messageFromWasmToJS(contents.dump(0));
 		
+	}
+	
+	
+	
+	/**
+	 * Go to next tree in posterior
+	 */
+	void EMSCRIPTEN_KEEPALIVE moveTree(int plus) {
+		
+		int origNumber = PhylogenyAPI::treeNumber;
+		jsonObject contents;
+		contents["treeNum"] = PhylogenyAPI::treeNumber;
+		contents["changed"] = false;
+		if (PhylogenyAPI::allTrees.size() == 0) {
+			WasmAPI::messageFromWasmToJS(contents.dump(0));
+			return;
+		}
+		
+		PhylogenyAPI::treeNumber += plus;
+		if (PhylogenyAPI::treeNumber < 0) PhylogenyAPI::treeNumber = 0;
+		if (PhylogenyAPI::treeNumber >= PhylogenyAPI::allTrees.size()) PhylogenyAPI::treeNumber = PhylogenyAPI::allTrees.size()-1;
+		
+		PhylogenyAPI::THE_TREE = PhylogenyAPI::allTrees.at(PhylogenyAPI::treeNumber);
+		PhylogenyAPI::orderingIsDirty = true;
+		
+		contents["treeNum"] = PhylogenyAPI::treeNumber;
+		contents["changed"] = origNumber != PhylogenyAPI::treeNumber;
+		cout << "Viewing tree number " << contents["treeNum"] << endl;
+		WasmAPI::messageFromWasmToJS(contents.dump(0));
 	}
 
 

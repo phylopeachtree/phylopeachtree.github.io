@@ -65,11 +65,11 @@ bool Taxon::getIsHighlighted() {
 	return this->isHighlighted;
 }
 
-void Taxon::setInfectionCount(int numInfections){
+void Taxon::setInfectionCount(double numInfections){
 	this->numInfections = numInfections;
 }
 
-int Taxon::getInfectionCount(){
+double Taxon::getInfectionCount(){
 	return this->numInfections;
 }
 

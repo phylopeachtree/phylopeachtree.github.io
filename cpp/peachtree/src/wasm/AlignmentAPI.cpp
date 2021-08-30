@@ -87,6 +87,15 @@ void AlignmentAPI::annotateTaxa(Tree* tree){
 }
 
 
+/*
+	Download the samples and their displayed metadata
+*/
+string AlignmentAPI::downloadSamples(string sampleNameAnnotation, bool displayMissingPercentage, bool reportInfections){
+	if (THE_ALIGNMENT == nullptr) return "";
+	return THE_ALIGNMENT->downloadSamples(filtering, sampleNameAnnotation, displayMissingPercentage, reportInfections);
+}
+
+
 
 /*
  * Get the taxon object
@@ -207,7 +216,7 @@ void AlignmentAPI::makeMockAlignment(Tree* tree){
 	EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
 	OptionsAPI::resetWindowSize();
 	
-	AlignmentAPI::annotateTaxa(PhylogenyAPI::getTree());
+	AlignmentAPI::annotateTaxa(tree);
 	AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 
 }
@@ -270,7 +279,10 @@ extern "C" {
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::THE_ALIGNMENT);
 		EpiAPI::setEpiAccessionsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
-		AlignmentAPI::annotateTaxa(PhylogenyAPI::getTree());
+		for (Tree* tree : PhylogenyAPI::allTrees){
+			AlignmentAPI::annotateTaxa(tree);
+		}
+		
 		AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 		OptionsAPI::resetScroll();
 		OptionsAPI::resetWindowSize();

@@ -202,27 +202,32 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 	// Meta data on sample label
 	string missingStr = "";
 	string missingStrTitle = "";
-	displayMissingPercentage = displayMissingPercentage && this->getLength() > 0;
+
 		
-	if (displayMissingPercentage || reportInfections) missingStr += " (";
+	if ( (this->getLength() > 0 && displayMissingPercentage) || reportInfections) missingStr += " (";
 	
 	// Missing data
-	string percentage;
-	if (this->missingDataProportion == 0) percentage = "0";
-	else{
-		percentage = to_string(Utils::roundToSF(100*this->missingDataProportion, 2));
-		percentage.erase(percentage.find_last_not_of('0') + 1, std::string::npos);
+	if (this->getLength() > 0) {
+		string percentage;
+		if (this->missingDataProportion == 0) percentage = "0";
+		else{
+			percentage = to_string(Utils::roundToSF(100*this->missingDataProportion, 2));
+			percentage.erase(percentage.find_last_not_of('0') + 1, std::string::npos);
+			percentage.erase(percentage.find_last_not_of('.') + 1, std::string::npos);
+		}
+		if (displayMissingPercentage) missingStr += percentage + "%";
+		missingStrTitle += "\n" + percentage + "% missing data";
 	}
-	if (displayMissingPercentage) missingStr = percentage + "%";
-	missingStrTitle += "\n" + percentage + "% missing data";
-	
 	
 	// Infection count
 	if (reportInfections){
-		int count = this->taxon->getInfectionCount();
+		double count = this->taxon->getInfectionCount();
+		string count_str = to_string(Utils::roundToSF(count, 2));
+		count_str.erase(count_str.find_last_not_of('0') + 1, std::string::npos);
+		count_str.erase(count_str.find_last_not_of('.') + 1, std::string::npos);
 		if (displayMissingPercentage) missingStr += ", ";
-		missingStr += to_string(count);
-		missingStrTitle += "\n" + to_string(count) + " infections";
+		missingStr += count_str;
+		missingStrTitle += "\n" + count_str + " infections";
 	}
 	
 	if (displayMissingPercentage || reportInfections) missingStr += ")";

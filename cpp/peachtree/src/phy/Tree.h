@@ -31,7 +31,8 @@ public:
 	Tree(Node* root, Alignment* alignment);
 
 	bool getParsedFromFile();
-	void parseFromNexus(string nexus);
+	static vector<Tree*> parseTrees(string contents);
+	void parseFromNewick(string nexus, map<string, string> translateMap);
 	void setRoot(Node* root);
 	Node* getRoot();
 	Tree* copy();
@@ -59,6 +60,8 @@ public:
 	void cleanup();
 	void reorderTree(Timeline* timeline, string symptomDateVar);
 	void countInfections();
+	void resetInfections();
+	void normaliseInfections(int numTrees);
 
 
 

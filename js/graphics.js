@@ -695,10 +695,19 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 	Download the alignment
 */
 function downloadAlignment(){
-	
-	console.log("Downloading alignment");
 	callWasmFunction("downloadAlignment", [], function(result){
 		download("peachtree.fasta", result.contents);
+	});
+}
+
+
+
+/*
+	Download the samples
+*/
+function downloadSamples(){
+	callWasmFunction("downloadSamples", [], function(result){
+		download("peachtree.csv", result.contents);
 	});
 }
 
@@ -707,11 +716,8 @@ function downloadAlignment(){
 	Download the tree
 */
 function downloadTree(){
-	console.log("Downloading tree");
-		callWasmFunction("downloadTree", [], function(result){
-			//console.log(result.contents);
-			
-			download("peachtree.nexus", result.contents);
+	callWasmFunction("downloadTree", [], function(result){
+		download("peachtree.nexus", result.contents);
 	});
 }
 
@@ -870,6 +876,21 @@ function zoom(zoomIn){
 	
 }
 
+
+/*
+ * Go to next / prev tree
+*/
+function moveTree(plus){
+	
+	callWasmFunction("moveTree", [plus], function(result){
+		//if (result.changed) {
+			CANCEL_GRAPHICS = true;
+			$("#svg").addClass("resizing");
+			renderGraphics(function() {  });
+		//}
+	});
+	
+}
 
 /*
 	Scroll up/down slightly

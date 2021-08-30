@@ -30,8 +30,8 @@ public:
 	bool getIsHighlighted();
 	string getValue(string var);
 	void setValue(string var, string val);
-	void setInfectionCount(int numInfections);
-	int getInfectionCount();
+	void setInfectionCount(double numInfections);
+	double getInfectionCount();
 
 
 private:
@@ -40,7 +40,7 @@ private:
 	bool isSelected;
 	bool isHighlighted;
 	map<string, string> annotations;
-	int numInfections;
+	double numInfections;
 
 
 };

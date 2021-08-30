@@ -173,9 +173,11 @@ extern "C" {
 		EpiAPI::EPIDEMIOLOGY = new Epidemiology();
 		EpiAPI::EPIDEMIOLOGY->parseFile(contents);
 		EpiAPI::setEpiAccessionsToDirty();
-		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
-		EpiAPI::addAnnotationsToTree(PhylogenyAPI::getTree());
+		for (Tree* tree : PhylogenyAPI::allTrees){
+			EpiAPI::setEpiAnnotationsToDirty();
+			EpiAPI::addAnnotationsToTree(tree);
+		}
 		
 				
 		// Taxon annotations

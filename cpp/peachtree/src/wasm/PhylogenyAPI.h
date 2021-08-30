@@ -36,9 +36,12 @@ public:
 	static void setOrderingToDirty();
 	static void reorderTree(Timeline* timeline, string symptomDateVar);
 	static void countInfections();
+	static int getNumberOfTrees();
 
 	//Variables
 	static Tree* THE_TREE;
+	static vector<Tree*> allTrees;
+	static int treeNumber;
 	static bool orderingIsDirty;
 	static bool infectionCountIsDirty;
 

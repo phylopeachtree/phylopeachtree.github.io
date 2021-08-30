@@ -868,7 +868,8 @@ extern "C" {
 				// Report number of infections?
 				bool reportInfections = OptionsAPI::reportNumberOfInfections->getVal() && PhylogenyAPI::isReady();
 
-				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal(), OptionsAPI::sampleNameAnnotation->getVal(), reportInfections);
+				jsonObject taxa = AlignmentAPI::getTaxaGraphics(scaling, labelFontSize, OptionsAPI::showTaxonNumbers->getVal(), OptionsAPI::displayMissingPercentage->getVal(), 
+																OptionsAPI::sampleNameAnnotation->getVal(), reportInfections);
 				objs.insert(objs.end(), taxa.begin(), taxa.end());
 
 			}
@@ -1367,13 +1368,22 @@ extern "C" {
 		WasmAPI::messageFromWasmToJS(arr.dump(0));
 
 	}
-
-
-
-
-
-
-
+	
+	
+	/**
+	 * Download the tree
+	 */
+	void EMSCRIPTEN_KEEPALIVE downloadSamples() {
+		
+		jsonObject contents;
+		if (AlignmentAPI::THE_ALIGNMENT != nullptr){
+			bool reportInfections = OptionsAPI::reportNumberOfInfections->getVal() && PhylogenyAPI::isReady();
+			contents["contents"] = AlignmentAPI::downloadSamples(OptionsAPI::sampleNameAnnotation->getVal(), OptionsAPI::displayMissingPercentage->getVal(), reportInfections);
+		}
+		WasmAPI::messageFromWasmToJS(contents.dump(0));
+		
+	}
+	
 
 
 

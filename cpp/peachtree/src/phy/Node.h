@@ -77,6 +77,8 @@ public:
 	string getAnnotationColour(double val, double min, double max, string colourMax);
 	void reorderTransmissions(Timeline* timeline, string symptomDateVar);
 	void countInfections();
+	void resetInfections();
+	void normaliseInfections(int numTrees);
 	Node* getFirstLeaf();
 
 

@@ -177,21 +177,39 @@
 					<span style="margin:auto;" id="buildTreeBtn" onclick="reupload();" class="button" title="Go back to the upload screen">Back</span>
 					<span class="usermsg mediumfont"></span>
 				</div>
-
+				
+				<!--
+				<div>
+					<span style="margin:auto;" id="minussOneTreeBtn" onclick="moveTree(-1);" class="button" title="Pan left">&leftarrow;</span>
+					Next tree
+					<span style="margin:auto;" id="plusOneTreeBtn" onclick="moveTree(+1);" class="button" title="Pan right">&rightarrow;</span>
+					
+					<span class="usermsg mediumfont"></span>
+				</div>
+				-->
 
 
 				<div>
 					<span style="margin:auto;" id="zoomOutBtn" onclick="zoom(false);" class="button" title="Zoom out  (ctrl + mousewheel down)">&minus;</span>
+					Zoom
 					<span style="margin:auto;" id="zoomInBtn" onclick="zoom(true);" class="button" title="Zoom in  (ctrl + mousewheel up)">&plus;</span>
 					
+				</div>
+				<div>
 					<span style="margin:auto;" id="scrollDownBtn" onclick="scrollVertical(false);" class="button" title="Pan down (mousewheel down)">&downarrow;</span>
+					Scroll
 					<span style="margin:auto;" id="scrollUpBtn" onclick="scrollVertical(true);" class="button" title="Pan up (mousewheel up)">&uparrow;</span>
-					
+				</div>
+				<div>					
 					<span style="margin:auto;" id="scrollLeftBtn" onclick="scrollHorizontal(false);" class="button" title="Pan left">&leftarrow;</span>
+					Scroll
 					<span style="margin:auto;" id="scrollRightBtn" onclick="scrollHorizontal(true);" class="button" title="Pan right">&rightarrow;</span>
-					
+				</div>
+				<div>
 					<span class="usermsg mediumfont"></span>
 				</div>
+				
+			
 				
 				
 				
@@ -202,10 +220,14 @@
 					<button class="dropbtn">Download &#x25BC;</button>
 					  <div class="dropdown-content">
 						<a id="downloadImageBtn" onclick="downloadImage()" title="Download the image in svg format">Image (.svg)</a>
+						<a id="downloadSamplesBtn" onclick="downloadSamples()" title="Download the displayed samples and any metadata they display">Samples (.csv)</a>
 						<a id="downloadAlignmentBtn" onclick="downloadAlignment()" title="Download the displayed samples and sites in fasta format">Alignment (.fasta)</a>
 						<a id="downloadTreeBtn" onclick="downloadTree()" title="Download the displayed tree in nexus format">Tree (.nexus)</a>
 					  </div>
 					</span>
+					
+					
+					
 									
 				
 				</div>

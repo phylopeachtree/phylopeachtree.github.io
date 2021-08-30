@@ -1116,9 +1116,9 @@ void Node::countInfections(){
 			parent = parent->getParent();
 		}
 		
-		this->taxon->setInfectionCount(numInfections);
-		
-		
+		//cout << "numInfections " << taxon->getName() << ": " << numInfections << " " << this->taxon->getInfectionCount() << endl;
+		this->taxon->setInfectionCount(this->taxon->getInfectionCount() + numInfections);
+
 	}else{
 		for (Node* child : this->getChildren()){
 			child->countInfections();
@@ -1130,7 +1130,32 @@ void Node::countInfections(){
 
 
 
-
+/*
+ * Set num infections of each case to 0
+ */
+void Node::resetInfections(){
+	if (this->isLeaf()){
+		this->taxon->setInfectionCount(0);
+	}else{
+		for (Node* child : this->getChildren()){
+			child->resetInfections();
+		}
+	}
+}
+/*
+ * Divide num infections of each case by 'numTrees'
+ */
+void Node::normaliseInfections(int numTrees){
+	if (this->isLeaf()){
+		double newCount = 1.0 * this->taxon->getInfectionCount() / numTrees;
+		cout << this->getTaxon()->getName() << " : " << this->taxon->getInfectionCount() << "/" << numTrees << " = " << newCount << endl;
+		this->taxon->setInfectionCount(newCount);
+	}else{
+		for (Node* child : this->getChildren()){
+			child->normaliseInfections(numTrees);
+		}
+	}
+}
 
 
 

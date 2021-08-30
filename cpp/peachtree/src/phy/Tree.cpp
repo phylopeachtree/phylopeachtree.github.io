@@ -44,17 +44,15 @@ void Tree::cleanup(){
 }
 
 
+
 /*
- * Parse from nexus/newick
+ * Parse a list of trees
  */
-void Tree::parseFromNexus(string nexus){
-
-
-
-	this->parsedFromFile = true;
-
-
-	// Parse fasta
+vector<Tree*> Tree::parseTrees(string nexus){
+	
+	vector<Tree*> trees;
+	
+	// Parse nexus
 	nexus.erase(std::remove(nexus.begin(), nexus.end(), '\r'), nexus.end());
 	vector<string> lines = Utils::split(nexus, "\n");
 
@@ -64,7 +62,8 @@ void Tree::parseFromNexus(string nexus){
 	bool beganTrees = false;
 	bool beganTranslate = false;
 	vector<string> splt;
-	for (int lineNum = 0; lineNum < lines.size(); lineNum++) {
+	int lineNum = 0;
+	for (lineNum = 0; lineNum < lines.size(); lineNum++) {
 		string line = lines.at(lineNum);
 		Utils::trim(line);
 
@@ -89,7 +88,7 @@ void Tree::parseFromNexus(string nexus){
 			splt =  Utils::split(line, " ");
 			if (splt.size() < 2) {
 				Error::throwError("Cannot parse translate line " + line + " because there are not 2 tokens split by a single space");
-				return;
+				return trees;
 			}
 
 			string id = splt.at(0);
@@ -114,7 +113,7 @@ void Tree::parseFromNexus(string nexus){
 
 			if (translateMap.count(id) > 0) {
 				Error::throwError("Duplicate translate id detected " + id);
-				return;
+				return trees;
 			}
 			translateMap[id] = label;
 
@@ -123,42 +122,61 @@ void Tree::parseFromNexus(string nexus){
 	}
 
 
-	// Get the last tree's newick
-	string newick = "";
-	for (int lineNum = lines.size()-1; lineNum >= 0; lineNum --) {
-		//String[] lineSplit = lines[lineNum].split("[=]", 2);
+
+	// Get newicks
+	for (lineNum = lineNum; lineNum < lines.size(); lineNum ++) {
 
 
 		vector<string> lineSplit = Utils::split(lines.at(lineNum), "=", 2);
-		if (lineNum == lines.size()-2) {
-			//if (lineSplit[0].length() >= 4) System.out.println(lineSplit[0].toLowerCase().substring(0, 4));
-		}
 		if (lineSplit.size() == 2 && lineSplit.at(0).length() >= 4 && Utils::toLower(lineSplit.at(0)).substr(0, 4) == "tree") {
-			newick = lineSplit.at(1);
+			string newick = lineSplit.at(1);
 			Utils::trim(newick);
-			break;
+			
+			Tree* tree = new Tree();
+			tree->parseFromNewick(newick, translateMap);
+			trees.push_back(tree);
+			
 		}
 	}
-
-
+	
+	
 
 
 	// Maybe it's just newick not nexus. Take first non empty line
-	if (newick.empty()) {
+	if (trees.empty()) {
 
-		for (int lineNum = 0; lineNum < lines.size(); lineNum ++) {
+		for (lineNum = 0; lineNum < lines.size(); lineNum ++) {
 			if (!lines.at(lineNum).empty()) {
-				newick = lines.at(lineNum);
-				break;
+				string newick = lines.at(lineNum);
+				Tree* tree = new Tree();
+				tree->parseFromNewick(newick, translateMap);
+				trees.push_back(tree);
 			}
-		}
-
-		if (newick.empty()) {
-			Error::throwError("Cannot locate any newick trees in file");
-			return;
 		}
 	}
 
+
+	if (trees.empty()) {
+		Error::throwError("Cannot locate any newick trees in file");
+		return trees;
+	}
+
+	
+	
+	return trees;
+
+	
+}
+
+
+/*
+ * Parse from nexus/newick
+ */
+void Tree::parseFromNewick(string newick, map<string, string> translateMap){
+
+
+
+	this->parsedFromFile = true;
 
 
 
@@ -173,8 +191,6 @@ void Tree::parseFromNexus(string nexus){
 	this->root->parseFromNewick(newick);
 	this->initArray();
 
-
-	cout << "333" << endl;
 
 	// Normalise so that the smallest leaf is at height 0
 	double minimalHeight = Utils::INFTY;
@@ -642,7 +658,18 @@ void Tree::countInfections(){
 	this->root->countInfections();
 }
 
-
+/*
+ * Set num infections of each case to 0
+ */
+void Tree::resetInfections(){
+	this->root->resetInfections();
+}
+/*
+ * Divide num infections of each case by 'numTrees'
+ */
+void Tree::normaliseInfections(int numTrees){
+	this->root->normaliseInfections(numTrees);
+}
 
 
 

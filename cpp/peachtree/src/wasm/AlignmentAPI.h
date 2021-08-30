@@ -49,6 +49,7 @@ public:
 	static void resetHighlighting();
 	static void annotateTaxa(Epidemiology* epi);
 	static void annotateTaxa(Tree* tree);
+	static string downloadSamples(string sampleNameAnnotation, bool displayMissingPercentage, bool reportInfections);
 
 
 

@@ -348,6 +348,8 @@ void Alignment::parseSequence(string acc, string seq, int seqID){
 void Alignment::sortByTree(Tree* tree){
 
 
+	cout << "sorting by tree" << endl;
+
 	vector<Node*> leaves = tree->getLeavesAsArray();
 
 	// Find a new ordering
@@ -984,5 +986,48 @@ string Alignment::toFasta(Filtering* filtering, string annotation){
 }
 
 
+/*
+* Download selected samples and displayed metadata as a csv
+*/
+string Alignment::downloadSamples(Filtering* filtering, string sampleNameAnnotation, bool displayMissingPercentage, bool reportInfections){
+	
+	
+	bool displayAlternativeName = sampleNameAnnotation != "" && sampleNameAnnotation != "None";
+	
+	
+	// Header
+	string csv = "accession";
+	if (displayAlternativeName) csv+= "," + sampleNameAnnotation;
+	if (displayMissingPercentage) csv+= ",missingData";
+	if (reportInfections) csv+= ",numInfections";
+	csv += "\n";
+	
+	// Body
+	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
+		Sequence* sequence = this->getSequence(seqNum);
+		if (!filtering->includeTaxon(sequence->getTaxon())) continue;
+		
+		csv += sequence->getTaxon()->getName();
+		if (displayAlternativeName) csv += "," + sequence->getTaxon()->getValue(sampleNameAnnotation);
+		if (displayMissingPercentage) {
+			string count_str = to_string(Utils::roundToSF(sequence->getMissingDataProportion(), 3));
+			count_str.erase(count_str.find_last_not_of('0') + 1, std::string::npos);
+			count_str.erase(count_str.find_last_not_of('.') + 1, std::string::npos);
+			csv += "," + count_str;
+		}
+		if (reportInfections) {
+			string count_str = to_string(Utils::roundToSF(sequence->getTaxon()->getInfectionCount(), 3));
+			count_str.erase(count_str.find_last_not_of('0') + 1, std::string::npos);
+			count_str.erase(count_str.find_last_not_of('.') + 1, std::string::npos);
+			csv += "," + count_str;
+		}
+		csv += "\n";
+		
+	}
+	
+	
+	return csv;
+	
+}
 
 

@@ -248,7 +248,7 @@ json Sequence::getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filteri
 	string str1 = "taxon";
 	str1.append(this->getTaxon()->getIsHighlighted() ? " selected" : "");
 	acc_json["class"] = str1;
-	acc_json["i"] = seqNum;
+	acc_json["i"] = this->getTaxon()->getID();
 
 	arr.push_back(acc_json);
 

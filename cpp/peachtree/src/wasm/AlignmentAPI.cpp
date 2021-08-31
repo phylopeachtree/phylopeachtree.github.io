@@ -62,6 +62,8 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 		filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
 		selectionIsDirty = false;
 		orderingIsDirty = false;
+		AlignmentAPI::THE_ALIGNMENT->clearSelection();
+		AlignmentAPI::THE_ALIGNMENT->clearHighlighting();
 	}
 
 }
@@ -340,6 +342,8 @@ extern "C" {
 	 * @param taxonNum
 	 */
 	void EMSCRIPTEN_KEEPALIVE selectTaxon(int taxonNum) {
+		//cout << "selecting " << taxonNum << endl;
+		
 		AlignmentAPI::mostRecentlySelectedTaxon = taxonNum;
 		AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxonNum);
 		AlignmentAPI::setSelectionToDirty();

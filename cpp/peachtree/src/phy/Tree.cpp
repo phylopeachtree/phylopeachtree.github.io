@@ -545,7 +545,7 @@ void Tree::applyFiltering(Filtering* filtering){
 
 		// Maintain a separate numbering system where filtered-out leaves are omitted
 		if (filtering->getFocusing()) {
-			if (leaf->getTaxon()->getIsSelected()) {
+			if (filtering->includeTaxon(leaf->getTaxon())) {
 				leaf->setFilteredNr(nr);
 				nr ++;
 			}else {

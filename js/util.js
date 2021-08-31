@@ -324,6 +324,7 @@ function addLoader(ele, large=false){
 		ele.append(`<div title="Loading..." class="loader large"></div>`);
 	}else{
 		ele.append(`<div title="Loading..." class="loader"></div>`);
+		$("body").addClass("loading");
 	}
 	
 }
@@ -331,6 +332,7 @@ function addLoader(ele, large=false){
 function removeLoader(ele){
 	ele.parent().removeClass("loading");
 	ele.find(" .loader").remove();
+	$("body").removeClass("loading");
 }
 
 
@@ -773,6 +775,7 @@ function toggleTaxon(ele){
 	
 	// Inform the model
 	let index = parseFloat(ele.attr("i"));
+	console.log("selecting", index);
 	callWasmFunction("selectTaxon", [index]);
 	//cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
 	

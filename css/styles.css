@@ -31,6 +31,12 @@ body {
 
 	
 }
+
+
+body.loading{
+	cursor:wait;
+}
+
 /*
 	leaf green #5ca904
 	peach pink #FFDAB9

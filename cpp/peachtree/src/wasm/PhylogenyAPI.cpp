@@ -121,12 +121,12 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
 /*
  * Generate graphics for the tree
  */
-jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scaling, double branchWidth, bool showTaxaOnTree, double nodeRadius,
+jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, bool showTaxaOnTree, double nodeRadius,
 									string branchColourBy, string nodeColourBy, double fontSize, int rounding,
 									bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
 									string branchCol, string nodeCol){
 
-	return PhylogenyAPI::THE_TREE->getTreeGraphics(scaling, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
+	return PhylogenyAPI::THE_TREE->getTreeGraphics(scalingTree, scalingLadder, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
 				nodeRadius, branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions,
 				branchCol, nodeCol);
 

@@ -45,8 +45,8 @@ public:
 	string toString();
 	vector<Node*> listNodes(Node* theRoot);
 	static int getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos);
-	jsonObject getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, string maxCol);
-	jsonObject getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
+	
+	jsonObject getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
 								double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree,
 								Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol);
 	double getHeight();
@@ -70,7 +70,7 @@ protected:
 	vector<Node*> nodes;
 	Alignment* alignment;
 	bool parsedFromFile;
-
+	jsonObject getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, string maxCol);
 };
 
 #endif /* PHY_TREE_H_ */

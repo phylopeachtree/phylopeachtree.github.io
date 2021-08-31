@@ -401,6 +401,7 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
 	max_json["value"] = Utils::roundToSF(max, 3);
 	max_json["text_anchor"] = "start";
 	max_json["font_size"] = textSize;
+	//max_json["transform"] = "translate(" + to_string(left + stepWidth + textMargin + textSize) + "," + to_string(top + stepHeight/2) + ") rotate(90)";
 	arr.push_back(max_json);
 
 
@@ -412,6 +413,7 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
 	min_json["value"] =  Utils::roundToSF(min, 3);
 	min_json["text_anchor"] = "start";
 	min_json["font_size"] = textSize;
+	//max_json["transform"] = "translate(" + to_string(left + stepWidth + textMargin + textSize) + "," + to_string(top + stepHeight*(ladderSize-0.5)) + ") rotate(90)";
 	arr.push_back(min_json);
 
 
@@ -424,21 +426,21 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
 /*
  * Get a json array of graphics
  */
-jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
+jsonObject Tree::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
 						double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree,
 						Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol){
 
 
 	jsonObject objs = json::array();
-	if (!scaling->inView()) return objs;
+	if (!scalingTree->inView()) return objs;
 
 	// Calculate yshift to avoid clipping top margin
 	// First, the top most leaf in the view must be found
 	double yshift = 0;
 	for (int leafNr = 0; leafNr < this->getLeafNodeCount(); leafNr ++) {
 		int filteredNr = this->nodes.at(leafNr)->getFilteredNr();
-		if (filteredNr >= 0 && scaling->inRangeY(filteredNr)){
-			yshift = scaling->getCanvasMinY() - scaling->scaleY(filteredNr);
+		if (filteredNr >= 0 && scalingTree->inRangeY(filteredNr)){
+			yshift = scalingTree->getCanvasMinY() - scalingTree->scaleY(filteredNr);
 			break;
 		}
 	}
@@ -450,41 +452,74 @@ jsonObject Tree::getTreeGraphics(Scaling* scaling, double branchWidth, Filtering
 
 
 	// Draw colour legends?
-	const int ladderSize = 10;
-	const double ladderWidth = 18;
-	const double ladderHeight = 11;
-	const double ladderMargin = 2;
 	if (nodeColourBy != ""){
-
 		subtree->getMinMax(nodeColourBy, minMaxNode);
 
 		// Set 0 to origin if the min is above 0
 		if (minMaxNode.at(0) > 0) minMaxNode.at(0) = 0;
-
-		double top = scaling->getCanvasMinY() + ladderMargin;
-		double left = scaling->getCanvasMinX() + ladderMargin;
-		jsonObject ladder = getLadderGraphics("Node " + nodeColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxNode.at(0), minMaxNode.at(1),  subtree, nodeCol);
-		objs.insert(objs.end(), ladder.begin(), ladder.end());
 	}
 	if (branchColourBy != ""){
-
 		subtree->getMinMax(branchColourBy, minMaxBranch);
-
+		
 		// Set 0 to origin if the min is above 0
-		if (minMaxBranch.at(0) > 0) minMaxBranch.at(0) = 0;
-
-		double top = scaling->getCanvasMinY() + ladderMargin;
-		if (nodeColourBy != "") top += ladderMargin + ladderHeight*(ladderSize+2);
-		double left = scaling->getCanvasMinX() + ladderMargin;
-		jsonObject ladder = getLadderGraphics("Branch " + branchColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxBranch.at(0), minMaxBranch.at(1),  subtree, branchCol);
-		objs.insert(objs.end(), ladder.begin(), ladder.end());
+		if (minMaxNode.at(0) > 0) minMaxNode.at(0) = 0;
+		
 	}
+	
+	
+	
+	
 
 
-	subtree->getGraphics(true, objs, filtering, scaling, branchWidth, showTaxaOnTree, yshift, nodeRadius,
+	subtree->getGraphics(true, objs, filtering, scalingTree, branchWidth, showTaxaOnTree, yshift, nodeRadius,
 			branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions,
 			branchCol, nodeCol, minMaxNode, minMaxBranch);
 			
+			
+			
+	if (scalingLadder != nullptr){
+		
+		// White bg
+		jsonObject rect;
+		rect["ele"] = "rect";
+		rect["x"] = scalingLadder->getCanvasMinX();;
+		rect["y"] = scalingLadder->getCanvasMinY();
+		rect["width"] = scalingLadder->getCanvasMaxX() - scalingLadder->getCanvasMinX();
+		rect["height"] = scalingLadder->getCanvasMaxY() - scalingLadder->getCanvasMinY();
+		rect["fill"] = "white";
+		objs.push_back(rect);
+		
+		
+		// Draw colour legends
+		const int ladderSize = 10;
+		const double ladderMargin = 4;
+		const double ladderHeight = 11;
+		const double ladderWidth = scalingLadder->getCanvasMaxX() - scalingLadder->getCanvasMinX() - 2*ladderMargin - 2*ladderHeight; 
+		
+		if (nodeColourBy != ""){
+			
+
+			double top = scalingLadder->getCanvasMinY() + ladderMargin;
+			double left = scalingLadder->getCanvasMinX() + ladderMargin;
+			jsonObject ladder = getLadderGraphics("Node " + nodeColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxNode.at(0), minMaxNode.at(1),  subtree, nodeCol);
+			objs.insert(objs.end(), ladder.begin(), ladder.end());
+		}
+		if (branchColourBy != ""){
+
+
+
+			double top = scalingLadder->getCanvasMinY() + ladderMargin;
+			if (nodeColourBy != "") top = scalingLadder->getCanvasMaxY() - ladderMargin - ladderHeight*(ladderSize+2);
+			double left = scalingLadder->getCanvasMinX() + ladderMargin;
+			jsonObject ladder = getLadderGraphics("Branch " + branchColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxBranch.at(0), minMaxBranch.at(1),  subtree, branchCol);
+			objs.insert(objs.end(), ladder.begin(), ladder.end());
+		}
+
+		
+	}
+		
+
+		
 
 			
 

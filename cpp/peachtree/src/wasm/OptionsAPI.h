@@ -122,7 +122,8 @@ public:
 	static const double NT_WIDTH;
 	static const double FONT_SIZE_ALN;
 	static const double FONT_SIZE_TAXA;
-
+	
+	static const double TREE_LADDER_WIDTH;
 
 	// Variables
 	static jsonObject graphicalObjects;

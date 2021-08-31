@@ -36,6 +36,7 @@ const double OptionsAPI::NT_HEIGHT = 15;
 const double OptionsAPI::NT_WIDTH = 15;
 const double OptionsAPI::FONT_SIZE_ALN = 14;
 const double OptionsAPI::FONT_SIZE_TAXA = 12;
+const double OptionsAPI::TREE_LADDER_WIDTH = 50;
 
 
 // Boundaries
@@ -808,14 +809,6 @@ extern "C" {
 			}
 
 
-
-
-			// Scaling
-			treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing,  xdivide1*width - spacing,
-										OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
-			treeScaling->setRowHeight(ntHeight);
-			treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
-
 			// Annotations
 			string branchColourBy = OptionsAPI::colourBranchesBy == nullptr ? "" : OptionsAPI::colourBranchesBy->getVal();
 			string nodeColourBy = OptionsAPI::colourNodesBy == nullptr ? "" : OptionsAPI::colourNodesBy->getVal();
@@ -825,9 +818,38 @@ extern "C" {
 			int rounding = (int)OptionsAPI::annotationRounding->getVal();
 
 
+			// Ladder scaling
+			Scaling* ladderScaling = nullptr;
+			if (branchColourBy == "" && nodeColourBy == ""){
+
+
+				// No ladder
+				treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing,  xdivide1*width - spacing,
+											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
+										
+										
+			}else{
+				
+				
+				// Yes ladder
+				treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing + OptionsAPI::TREE_LADDER_WIDTH,  xdivide1*width - spacing,
+											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
+											
+				ladderScaling = new Scaling(OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE, OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE+OptionsAPI::TREE_LADDER_WIDTH,
+											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
+				ladderScaling->setRowHeight(ntHeight);
+				
+				
+			}
+										
+			treeScaling->setRowHeight(ntHeight);
+			treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+
+		
+
 			// Plot tree
 			bool displayIncompat = OptionsAPI::transmissionTree->getVal() && OptionsAPI::displayIncompatibleTranmissions->getVal();
-			jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
+			jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, ladderScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
 					branchColourBy, nodeColourBy, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline(), displayIncompat,
 					OptionsAPI::branchColouring->getVal(), OptionsAPI::nodeColouring->getVal());
 			objs.insert(objs.end(), tree.begin(), tree.end());

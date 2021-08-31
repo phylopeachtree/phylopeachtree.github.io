@@ -302,8 +302,10 @@ int Filtering::getNumUniqueSequences(){
 
 	// Create a list of sequence classes and try to match each subsequent sequence to a class
 	vector<Sequence*> seqClasses;
+	vector<int> classSizes;
 	Sequence* copy = seqsToInclude.at(0)->copy();
 	seqClasses.push_back(copy);
+	classSizes.push_back(1);
 
 
 	for (int i = 1; i < seqsToInclude.size(); i ++) {
@@ -312,8 +314,9 @@ int Filtering::getNumUniqueSequences(){
 
 		// Match it to other classes?
 		bool foundMatch = false;
-		for (Sequence* refseq : seqClasses) {
-
+		for (int refseqNum = 0; refseqNum < seqClasses.size(); refseqNum++) {
+			
+			Sequence* refseq = seqClasses.at(refseqNum);
 
 			if (this->numTaxa == 4) cout << "Comparing " << sequence->getAcc() << " with " << refseq->getAcc();
 
@@ -331,6 +334,7 @@ int Filtering::getNumUniqueSequences(){
 
 
 				// Otherwise the match failed
+				
 				refSeqMatch = false;
 				break;
 
@@ -339,7 +343,7 @@ int Filtering::getNumUniqueSequences(){
 
 			if (refSeqMatch) {
 				foundMatch = true;
-
+				classSizes.at(refseqNum) = classSizes.at(refseqNum) + 1;
 
 				// Fill in all ambiguous sites in the ref seq with those in this seq
 				for (int siteNum : this->sitesToIncludeList) {
@@ -352,7 +356,7 @@ int Filtering::getNumUniqueSequences(){
 					}
 
 				}
-
+				
 				break;
 			}
 
@@ -362,10 +366,21 @@ int Filtering::getNumUniqueSequences(){
 		if (!foundMatch) {
 			Sequence* copy = sequence->copy();
 			seqClasses.push_back(copy);
+			classSizes.push_back(1);
 		}
 
 
 	}
+	
+	
+	
+	// What is the largest class size?
+	int largest = 0;
+	for (int size : classSizes){
+		largest = std::max(largest, size);
+	}
+	cout << "The largest seq class has " << largest << " sequences" << endl;
+	
 
 	this->numUniqueSeqs = seqClasses.size();
 	return this->numUniqueSeqs;

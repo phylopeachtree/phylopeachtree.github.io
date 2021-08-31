@@ -12,6 +12,8 @@
 #include "../Utils.h"
 #include "../error/Error.h"
 #include "../epi/Timeline.h"
+#include "../epi/Case.h"
+
 
 Node::Node(){
 	this->acc = "";
@@ -173,6 +175,7 @@ Node* Node::copy(){
 	for (Node* child : children) {
 		clone->addChild(child->copy());
 	}
+	clone->taxon = this->taxon;
 	return clone;
 }
 
@@ -414,8 +417,8 @@ string Node::getTidyMetaData(Timeline* timeline){
 		str.append(to_string(this->getParent()->getHeight(timeline) - this->getHeight(timeline))); //OptionsAPI.sf(this->getHeight()));
 	}
 
-	if (this->annotations.empty()) return str;
-	str.append("\n");
+	if (!this->annotations.empty()) str.append("\n");
+	
 	int i = 0;
 	for (const auto & pair: this->annotations) {
 		string key = pair.first;
@@ -433,6 +436,28 @@ string Node::getTidyMetaData(Timeline* timeline){
 		if (i < this->annotations.size()-1) str.append("\n");
 		i++;
 	}
+	
+	
+	// epi annotations
+	i = 0;
+	if (this->getTaxon() != nullptr && this->getTaxon()->getCase() != nullptr){
+		
+		str.append("\n\nEpidemiology:\n");
+		
+		Case* c = this->getTaxon()->getCase();
+		for (string var : c->getVariables()) {
+			string val = c->getValue(var);
+		
+			str.append(var).append("=").append(val);
+			if (i < c->getVariables().size()-1) str.append("\n");
+			i++;
+		
+		}
+		
+		
+	}
+	
+	
 
 	return str;
 
@@ -442,8 +467,16 @@ string Node::getTidyMetaData(Timeline* timeline){
  * Get annotation value
  */
 string Node::getAnnotationValue(string var){
-	if (this->annotations.find(var) == this->annotations.end()) return "";
-	return annotations[var];
+	if (this->annotations.find(var) != this->annotations.end()) return annotations[var];
+	
+	if (this->getTaxon() != nullptr && this->getTaxon()->getCase() != nullptr){
+		Case* c = this->getTaxon()->getCase();
+		return c->getValue(var);
+	}
+	
+	
+	return "";
+	
 }
 
 

@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <map>
-
+#include "../epi/Case.h"
 
 using namespace std;
 
@@ -32,6 +32,8 @@ public:
 	void setValue(string var, string val);
 	void setInfectionCount(double numInfections);
 	double getInfectionCount();
+	void setCase(Case* casePatient);
+	Case* getCase();
 
 
 private:
@@ -41,6 +43,7 @@ private:
 	bool isHighlighted;
 	map<string, string> annotations;
 	double numInfections;
+	Case* casePatient;
 
 
 };

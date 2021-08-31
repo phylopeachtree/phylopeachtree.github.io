@@ -259,6 +259,9 @@ extern "C" {
 		OptionsAPI::resetScroll();
 		OptionsAPI::resetWindowSize();
 		OptionsAPI::prepareTreeAnnotationOptions();
+		
+		if (AlignmentAPI::isMock()) AlignmentAPI::cleanup();
+		
 		WasmAPI::messageFromWasmToJS("");
 	}
 
@@ -298,14 +301,14 @@ extern "C" {
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 
 
-		// Epidemiological annotations
-		EpiAPI::setEpiAnnotationsToDirty();
+		
 		for (Tree* tree : PhylogenyAPI::allTrees){
-			EpiAPI::setEpiAnnotationsToDirty();
-			EpiAPI::addAnnotationsToTree(tree);
 			AlignmentAPI::annotateTaxa(tree);
 		}
 		
+		// Epidemiological annotations
+		EpiAPI::setEpiAnnotationsToDirty();
+		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 		
 		
 		

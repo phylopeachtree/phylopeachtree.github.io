@@ -39,7 +39,9 @@ jsonObject EpiAPI::getTimelineGraphics(Node* subtree, Scaling* scaling, double a
 }
 
 
-
+bool EpiAPI::isReady(){
+	return EpiAPI::EPIDEMIOLOGY != nullptr;
+}
 
 /*
  * Reset sample heights if the subtree has changed
@@ -129,6 +131,7 @@ vector<string> EpiAPI::getAllAnnotations(){
 void EpiAPI::cleanup(){
 	if (EPIDEMIOLOGY != nullptr){
 		EPIDEMIOLOGY->cleanup();
+		EPIDEMIOLOGY->clearAnnotationsFromTree(PhylogenyAPI::THE_TREE);
 		delete EPIDEMIOLOGY;
 		EPIDEMIOLOGY = nullptr;
 	}
@@ -153,6 +156,7 @@ extern "C" {
 		OptionsAPI::resetScroll();
 		OptionsAPI::resetWindowSize();
 		OptionsAPI::prepareEpiAnnotations();
+		OptionsAPI::prepareTreeAnnotationOptions();
 		WasmAPI::messageFromWasmToJS("");
 	}
 
@@ -174,16 +178,16 @@ extern "C" {
 		EpiAPI::EPIDEMIOLOGY->parseFile(contents);
 		EpiAPI::setEpiAccessionsToDirty();
 		EpiAPI::validateAccessions(AlignmentAPI::getAlignment());
-		for (Tree* tree : PhylogenyAPI::allTrees){
-			EpiAPI::setEpiAnnotationsToDirty();
-			EpiAPI::addAnnotationsToTree(tree);
-		}
 		
-				
+
+		
 		// Taxon annotations
 		AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 		
 		
+		// Annotate tree
+		EpiAPI::setEpiAnnotationsToDirty();
+		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 		
 
 		OptionsAPI::prepareEpiAnnotations();

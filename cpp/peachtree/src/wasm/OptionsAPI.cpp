@@ -264,7 +264,7 @@ void OptionsAPI::prepareEpiAnnotations() {
  * Ready for graphics?
  */
 bool OptionsAPI::isReady(){
-	return AlignmentAPI::isReady() || PhylogenyAPI::isReady();
+	return AlignmentAPI::isReady() || PhylogenyAPI::isReady() || EpiAPI::isReady();
 }
 
 

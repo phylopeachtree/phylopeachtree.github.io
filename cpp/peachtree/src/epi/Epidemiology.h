@@ -25,6 +25,7 @@ public:
 	void parseFile(string contents);
 	vector<string> getAnnotations();
 	void addAnnotationsToTree(Tree* tree);
+	void clearAnnotationsFromTree(Tree* tree);
 	void validateAccessions(Alignment* alignment);
 	vector<Case*> getCases();
 	void cleanup();

@@ -203,13 +203,56 @@ void Epidemiology::validateAccessions(Alignment* alignment){
 }
 
 
+
+/*
+ * Clear epidemiological annotations from the tree
+ */
+void Epidemiology::clearAnnotationsFromTree(Tree* tree){
+	
+	
+	if (tree == nullptr) return;
+	
+	for (Node* node : tree->getNodesAsArray()) {
+		
+		Taxon* taxon = node->getTaxon();
+		if (taxon == nullptr) continue;
+		taxon->setCase(nullptr);
+		
+	}
+	
+}
+
 /*
  * Add all annotations to the tree (and check for duplicate variable names)
  */
 void Epidemiology::addAnnotationsToTree(Tree* tree){
+	
+	//cout << "annotating tree with epi" << endl;
+	if (tree == nullptr) return;
+	
+	for (Node* node : tree->getNodesAsArray()) {
+		
+		Taxon* taxon = node->getTaxon();
+		if (taxon == nullptr) continue;
+
+		// Find the matching case
+		Case* c = nullptr;
+		for (Case* c2 : this->cases) {
+			if (c2->getAccession() == node->getAcc()){
+				c = c2;
+				break;
+			}
+		}
+		if (c == nullptr) continue;
 
 
-	cout << "annotating tree with epi" << endl;
+		taxon->setCase(c);
+
+	}
+	
+
+	/*
+	
 
 	// Check for duplicate annotations
 	vector<string> treeAnnotations;
@@ -240,7 +283,7 @@ void Epidemiology::addAnnotationsToTree(Tree* tree){
 		node->addAnnotations(c);
 
 	}
-
+	*/
 
 }
 

@@ -13,8 +13,17 @@ Taxon::Taxon(int id, string name) {
 	this->isHighlighted = false;
 	this->isSelected = false;
 	this->numInfections = -1;
+	this->casePatient = nullptr;
 }
 
+
+void Taxon::setCase(Case* casePatient){
+	this->casePatient = casePatient;
+}
+
+Case* Taxon::getCase(){
+	return this->casePatient;
+}
 
 
 int Taxon::getID() {

@@ -13,7 +13,12 @@
 #include <vector>
 
 Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree) {
+	this->init(variantSitesOnly, focus, alignment, tree);
+}
 
+void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree) {
+	
+	this->cleanup();
 
 	cout << "...preparing filtering..." << endl;
 	this->alignment = alignment;
@@ -212,10 +217,9 @@ vector<int> Filtering::getSites(){
 
 
 void Filtering::cleanup(){
-	if (this->subtree != nullptr) {
-		this->subtree->cleanup();
-		delete this->subtree;
-	}
+	this->alignment = nullptr;
+	this->subtree = nullptr;
+	this->tree = nullptr;
 	this->taxaIDsToInclude.clear();
 	this->sitesToIncludeMap.clear();
 	this->sitesToIncludeList.clear();

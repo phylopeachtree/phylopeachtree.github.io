@@ -263,14 +263,14 @@ function renderGraphics(resolve = function() {}){
 
 
 
-
+		
 
 
 					// Other meta info
-					if (initialVal.ntaxa != null){
-						$("#ntaxa_span").html(initialVal.ntaxa);
+					$("#ntaxa_span").html(initialVal.ntaxa);
+					$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
+					if (initialVal.nsites != null){
 						$("#nsites_span").html(initialVal.nsites);
-						$("#ntaxadisplayed_span").html(initialVal.ntaxadisplayed );
 						$("#nsitesdisplayed_span").html(initialVal.nsitesdisplayed );
 						$("#nuniqueseqs_span").html(initialVal.nuniqueseqs);
 						$(".alignmentSummary").show(50);

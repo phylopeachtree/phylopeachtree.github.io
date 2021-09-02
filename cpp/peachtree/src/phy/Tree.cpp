@@ -122,21 +122,40 @@ vector<Tree*> Tree::parseTrees(string nexus){
 	}
 
 
+	bool justonetree = true;
 
 	// Get newicks
-	for (lineNum = lineNum; lineNum < lines.size(); lineNum ++) {
+	if (!justonetree) {
+		for (lineNum = lineNum; lineNum < lines.size(); lineNum ++) {
 
-
-		vector<string> lineSplit = Utils::split(lines.at(lineNum), "=", 2);
-		if (lineSplit.size() == 2 && lineSplit.at(0).length() >= 4 && Utils::toLower(lineSplit.at(0)).substr(0, 4) == "tree") {
-			string newick = lineSplit.at(1);
-			Utils::trim(newick);
-			
-			Tree* tree = new Tree();
-			tree->parseFromNewick(newick, translateMap);
-			trees.push_back(tree);
-			
+			vector<string> lineSplit = Utils::split(lines.at(lineNum), "=", 2);
+			if (lineSplit.size() == 2 && lineSplit.at(0).length() >= 4 && Utils::toLower(lineSplit.at(0)).substr(0, 4) == "tree") {
+				string newick = lineSplit.at(1);
+				Utils::trim(newick);
+				
+				Tree* tree = new Tree();
+				tree->parseFromNewick(newick, translateMap);
+				trees.push_back(tree);
+				
+			}
 		}
+	}else{
+		for (lineNum = lines.size()-1; lineNum >= 0; lineNum --) {
+
+			vector<string> lineSplit = Utils::split(lines.at(lineNum), "=", 2);
+			if (lineSplit.size() == 2 && lineSplit.at(0).length() >= 4 && Utils::toLower(lineSplit.at(0)).substr(0, 4) == "tree") {
+				string newick = lineSplit.at(1);
+				Utils::trim(newick);
+				
+				Tree* tree = new Tree();
+				tree->parseFromNewick(newick, translateMap);
+				trees.push_back(tree);
+				
+				break;
+				
+			}
+		}
+		
 	}
 	
 	
@@ -568,6 +587,16 @@ void Tree::applyFiltering(Filtering* filtering){
  */
 vector<Taxon*> Tree::getClade(vector<Taxon*> taxa){
 
+	vector<Taxon*> clade;
+
+	if (taxa.empty()) {
+		clade.push_back(this->root->getTaxon());
+		return clade;
+	}
+
+	if (taxa.size() == 1){
+		return taxa;
+	}
 
 	// Find the mrca
 	Node* mrca = getMRCA(taxa);
@@ -579,7 +608,7 @@ vector<Taxon*> Tree::getClade(vector<Taxon*> taxa){
 	
 
 	// Return their taxa
-	vector<Taxon*> clade;
+	
 	for (Node* leaf : leaves) clade.push_back(leaf->getTaxon());
 	return clade;
 
@@ -590,6 +619,9 @@ vector<Taxon*> Tree::getClade(vector<Taxon*> taxa){
  * Get the MRCA of a list of taxa
  */
 Node* Tree::getMRCA(vector<Taxon*> taxa){
+	
+	if (taxa.size() == 0) return this->root;
+	if (taxa.size() == 1) return getNode(taxa.at(0));
 
 	Node* mrca = nullptr;
 	for (int i = 0; i < taxa.size(); i ++) {

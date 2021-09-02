@@ -341,7 +341,7 @@ double Timeline::getSampleHeight(Node* node){
 		}
 
 		sampleTime = Utils::getTimeFromDate(tm);
-		cout << "Case height to " << sampleTime << endl;
+		//cout << "Case height to " << sampleTime << endl;
 		node->setSampleTime(sampleTime);
 
 	}

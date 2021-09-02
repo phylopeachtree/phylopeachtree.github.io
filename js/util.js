@@ -598,7 +598,7 @@ function setOptionFromEle(ele){
 /*
 	Sets the value of this option and draw the graphics again
 */
-function setOptionToVal(optionID, newVal){
+function setOptionToVal(optionID, newVal, resolve = function() { }){
 	
 	console.log("Setting", optionID, "to", newVal);
 
@@ -611,6 +611,7 @@ function setOptionToVal(optionID, newVal){
 		//console.log("done", val);
 		CANCEL_GRAPHICS = false;
 		renderGraphics();
+		resolve();
 			
 	});
 	
@@ -841,10 +842,10 @@ function clearSelection(){
 	//if ($("#svg .taxon.selected").length == 0) return;
 	$("#svg").find(".taxon.selected").removeClass("selected");
 	updateSelectionCSS();
+	addLoader($("#ctrl_loading_div"));
 	callWasmFunction("clearSelection", [], function(val) {
-	//callWasmFunction("clearSelection", [], function(val){
-	//cjCall("peachtree.aln.AlignmentAPI", "clearSelection").then(function(val){
 		renderGraphics();
+		removeLoader($("#ctrl_loading_div"));
 	});
 	
 	
@@ -858,7 +859,8 @@ function clearSelection(){
 function focusSelection() {
 	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing selection...");
-	setOptionToVal("focusOnTaxa", "true");
+	addLoader($("#ctrl_loading_div"));
+	setOptionToVal("focusOnTaxa", "true", function() { removeLoader($("#ctrl_loading_div")); });
 }
 
 /*
@@ -867,7 +869,8 @@ function focusSelection() {
 function cladeSelection() {
 	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing clade...");
-	setOptionToVal("focusOnClade", "true");
+	addLoader($("#ctrl_loading_div"));
+	setOptionToVal("focusOnClade", "true", function() { removeLoader($("#ctrl_loading_div")); });
 }
 
 

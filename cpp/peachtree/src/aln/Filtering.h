@@ -34,6 +34,7 @@ class Filtering {
 public:
 
 	Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree);
+	void init(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree);
 
 	bool includeTaxon(Taxon* taxon);
 	Node* getSubtreeRoot();

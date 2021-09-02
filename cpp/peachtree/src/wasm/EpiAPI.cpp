@@ -59,6 +59,10 @@ void EpiAPI::prepareTimeline(Tree* tree, string sampleDateVariable, string dateF
 
 	if (EpiAPI::EPIDEMIOLOGY == nullptr) return;
 	if (timeline == nullptr || epiAccessionsAreDirty){
+		if (timeline != nullptr) {
+			timeline->cleanup();
+			delete timeline;
+		}
 		timeline = new Timeline(tree, EpiAPI::EPIDEMIOLOGY, sampleDateVariable, dateFormat);
 	}else{
 		timeline->setSampleDateVariable(sampleDateVariable, dateFormat);

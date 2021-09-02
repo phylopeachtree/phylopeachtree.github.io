@@ -59,11 +59,21 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 
 	// Default filtering
 	if (initRequired) {
-		filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+		
+		// Cleanup
+		if (filtering == nullptr) {
+			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+		}else{
+			filtering->init(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+		}
+		
+		
 		selectionIsDirty = false;
 		orderingIsDirty = false;
-		AlignmentAPI::THE_ALIGNMENT->clearSelection();
-		AlignmentAPI::THE_ALIGNMENT->clearHighlighting();
+		if (focus || tree != nullptr){
+			AlignmentAPI::THE_ALIGNMENT->clearSelection();
+			AlignmentAPI::THE_ALIGNMENT->clearHighlighting();
+		}
 	}
 
 }

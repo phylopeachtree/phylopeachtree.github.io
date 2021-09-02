@@ -411,12 +411,15 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 	annotations.push_back("None");
 	vector<string> annotations2 = PhylogenyAPI::getAllAnnotations();
 	annotations.insert(annotations.end(), annotations2.begin(), annotations2.end());
-	if (annotations.size() == 1){
+	//if (annotations.size() == 1){
 		vector<string> annotations3 = EpiAPI::getAllAnnotations();
 		annotations.insert(annotations.end(), annotations3.begin(), annotations3.end());
-	}
+	//}
 	
 
+	//for (string a : annotations){
+		//cout << "Adding annotation " << a << endl;
+	//}		
 
 
 
@@ -687,7 +690,7 @@ extern "C" {
 
 					// Scroll Y value
 					scaling->setScroll(0, 0, 0, fullHeight);
-					double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE - height / 2;
+					double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE; // + height / 2;
 					OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE));
 					scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
 
@@ -946,8 +949,6 @@ extern "C" {
 
 				json["nsites"] = AlignmentAPI::getNsites();
 				json["nsitesdisplayed"] = AlignmentAPI::getNsitesDisplayed();
-				json["ntaxa"] = AlignmentAPI::getNtaxa();
-				json["ntaxadisplayed"] = AlignmentAPI::getNtaxaDisplayed();
 				json["nuniqueseqs"] = AlignmentAPI::getNumUniqueSequences();
 
 
@@ -1036,9 +1037,8 @@ extern "C" {
 
 
 		json["scrolls"] = scrolls;
-
-
-
+		json["ntaxa"] = AlignmentAPI::getNtaxa();
+		json["ntaxadisplayed"] = AlignmentAPI::getNtaxaDisplayed();
 
 
 		// Return

@@ -50,6 +50,9 @@ void Tree::cleanup(){
  */
 vector<Tree*> Tree::parseTrees(string nexus){
 	
+	
+	const bool justonetree = false;
+	
 	vector<Tree*> trees;
 	
 	// Parse nexus
@@ -122,7 +125,7 @@ vector<Tree*> Tree::parseTrees(string nexus){
 	}
 
 
-	bool justonetree = true;
+	
 
 	// Get newicks
 	if (!justonetree) {

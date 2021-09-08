@@ -107,6 +107,7 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 				// What is the symbol?
 				int symbol = sequence->getSymbolInt(site);
 				if (Alignment::isAmbiguousOrGap(symbol, sequence->getIsNucleotide())) continue;
+				//if (Alignment::isAmbiguous(symbol, sequence->getIsNucleotide())) continue;
 
 				if (uniqueSymbol == -1) {
 					uniqueSymbol = symbol;

@@ -30,6 +30,10 @@ int Taxon::getID() {
 	return id;
 }
 
+void Taxon::setID(int id){
+	this->id = id;
+}
+
 void Taxon::setName(string name) {
 	this->name = name;
 }

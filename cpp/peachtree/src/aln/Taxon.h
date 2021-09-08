@@ -20,6 +20,7 @@ class Taxon {
 public:
 	Taxon(int id, string name);
 	int getID();
+	void setID(int id);
 	void setName(string name);
 	string getName();
 	void toggleSelection();

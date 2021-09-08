@@ -61,9 +61,7 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 	if (initRequired) {
 		
 		// Cleanup
-		if (true || filtering == nullptr) {
-			filtering->cleanup();
-			delete filtering;
+		if (filtering == nullptr) {
 			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
 			
 		}else{

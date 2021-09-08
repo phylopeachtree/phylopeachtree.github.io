@@ -385,7 +385,9 @@ void Alignment::sortByTree(Tree* tree){
 	// Reorder the array
 	for (int newIndex = 0; newIndex < leaves.size(); newIndex ++) {
 		int oldIndex = newOrdering.at(newIndex);
-		sequencesNew.push_back(this->getSequence(oldIndex));
+		Sequence* s = this->getSequence(oldIndex);
+		sequencesNew.push_back(s);
+		s->getTaxon()->setID(newIndex);
 	}
 
 
@@ -664,6 +666,10 @@ double Alignment::getPatternWeight(int i){
  * Toggle selection of this taxon
  */
 bool Alignment::selectTaxon(int taxonNum){
+	
+	
+	//cout << "selecting " << taxonNum << "/" << this->sequences.at(taxonNum)->getTaxon()->getID() << endl;
+	
 	this->sequences.at(taxonNum)->getTaxon()->toggleSelection();
 	this->sequences.at(taxonNum)->getTaxon()->toggleHighlighting();
 	return this->sequences.at(taxonNum)->getTaxon()->getIsSelected();

@@ -51,7 +51,7 @@ void Tree::cleanup(){
 vector<Tree*> Tree::parseTrees(string nexus){
 	
 	
-	const bool justonetree = false;
+	const bool justonetree = true;
 	
 	vector<Tree*> trees;
 	

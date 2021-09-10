@@ -51,6 +51,7 @@ void Tree::cleanup(){
 vector<Tree*> Tree::parseTrees(string nexus){
 	
 	
+
 	const bool justonetree = true;
 	
 	vector<Tree*> trees;
@@ -197,6 +198,7 @@ vector<Tree*> Tree::parseTrees(string nexus){
 void Tree::parseFromNewick(string newick, map<string, string> translateMap){
 
 
+	//cout << "parsing newick" << newick << endl;
 
 	this->parsedFromFile = true;
 
@@ -208,16 +210,21 @@ void Tree::parseFromNewick(string newick, map<string, string> translateMap){
 
 
 
+
 	this->root = new Node();
 	this->root->setHeight(0);
 	this->root->parseFromNewick(newick);
+	
 	this->initArray();
+	
 
 
 	// Normalise so that the smallest leaf is at height 0
 	double minimalHeight = Utils::INFTY;
 	for (Node* node : this->getNodesAsArray()) minimalHeight = std::min(minimalHeight, node->getHeight());
 	for (Node* node : this->getNodesAsArray()) node->setHeight(node->getHeight() - minimalHeight);
+
+
 
 
 	// Apply label translation
@@ -230,6 +237,9 @@ void Tree::parseFromNewick(string newick, map<string, string> translateMap){
 			}
 		}
 	}
+	
+	
+
 
 
 }

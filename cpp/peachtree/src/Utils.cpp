@@ -7,12 +7,14 @@
 
 #include "Utils.h"
 
-
+#include <fstream>
 #include <iostream>
 #include <sstream>
 #include <cstring>
 #include <cmath>
 #include <cstdlib>
+
+
 
 using namespace std;
 
@@ -478,6 +480,170 @@ double Utils::roundToSF(double N, int n){
 
 	return j;
 
+}
+
+
+
+/*
+ * Return file contents
+ */
+string Utils::openFile(string fileName){
+	std::ifstream t(fileName);
+	std::stringstream buffer;
+	buffer << t.rdbuf();
+	return buffer.str();
+}
+
+
+
+string Utils::toSVG(double width, double height, jsonObject json){
+	
+	
+	//<?xml version="1.0" standalone="no"?>
+	//<svg id="downloadSVG" style="font-family: &quot;Courier New&quot;; dominant-baseline: middle; height: 9464.53px; width: 1487px;" xmlns="http://www.w3.org/2000/svg">
+	
+	
+	
+	//cout << json.dump(0) << endl;
+	
+	stringstream svg;
+	
+	/*
+	for (const auto& item : json.items()) {
+        std::cout << item.key() << "\n";
+        for (const auto& val : item.value().items())
+        {
+            cout << "  " << val.key() << ": " << val.value() << "\n";
+        }
+    }
+	*/
+	
+	stringstream btmG;
+	stringstream midG;
+	stringstream topG;
+
+	size_t pos;
+	for (int i = 0; i < json.size(); i ++){
+		
+		//cout << i << "/" << json.size() << endl;
+		
+		jsonObject obj = json.at(i);
+		string eleAType = to_string(obj["ele"]);
+		
+		while ((pos = eleAType.find("\"")) != std::string::npos) eleAType = eleAType.replace(pos, 1, "");
+		
+		stringstream ele;
+		string value = "";
+		if (obj["value"] != nullptr) {
+			value = to_string(obj["value"]);
+			while ((pos = value.find("\"")) != std::string::npos) value = value.replace(pos, 1, "");
+		}
+		
+		int layer = 1;
+		if (obj["layer"] != nullptr) layer = obj["layer"];
+		ele << "<" << eleAType << " ";
+		
+		for (auto it = obj.begin(); it != obj.end(); ++it) {
+			//std::cout << it.key() << " | " << it.value() << "\n";
+			string key = it.key();
+			string val = to_string(it.value());
+			
+			if (key == "ele" || key == "layer" || key == "value") continue;
+			//key = key
+			
+			
+			// Replace all _ with -
+			while ((pos = key.find("_")) != std::string::npos) key = key.replace(pos, 1, "-");
+			
+			// Remove ""
+			while ((pos = val.find("\"")) != std::string::npos) val = val.replace(pos, 1, "");
+			
+			
+			ele << key << "='" << val << "' ";
+					
+			
+		}
+		 
+		//string valStr = value.str();
+		if (!value.empty()) ele << ">" << value << "</" << eleAType << ">" << endl;
+		else ele << "/>" << endl;
+		
+		
+		if (layer == 0) btmG << ele.str();
+		else if (layer == 1) midG << ele.str();
+		else topG << ele.str();
+        
+		
+	}
+	
+	svg << "<?xml version='1.0' standalone='no'?>" << endl;
+	svg << "<svg style='font-family: \"Courier New\"; dominant-baseline: middle; height: " << height << "px; width: " << width << "px;' xmlns='http://www.w3.org/2000/svg'>" << endl;
+	svg << "<g>" << btmG.str() << "</g>" << endl;
+	svg << "<g>" << midG.str() << "</g>" << endl;
+	svg << "<g>" << topG.str() << "</g>" << endl;
+	svg << "</svg>" << endl;
+	
+	return svg.str();
+	
+	/*
+		
+		string ele = "<" + obj["ele"];
+		int layer = 1;
+		
+		
+			
+			
+			
+			if (a == "ele") continue;
+		if (a == "layer") continue;
+		else if (a == "value") newObj.innerHTML += object[a];
+		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
+		//else if (a == "col") newObj.setAttribute("color", object[a]);
+		else if (a == "title") {
+			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
+			title.innerHTML += object[a];
+			newObj.append(title);
+		}
+		
+		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
+		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
+		//else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
+		else newObj.setAttribute(a.replace("_", "-"), object[a]);
+			
+			
+			
+			std::cout << item.key() << "\n";
+			std::cout << "  " << item.value()["Name"].get<std::string>() << "\n";
+			
+			ele += 
+			
+		}
+		
+	// Set attributes
+	for (var a in object){
+		if (a == "ele") continue;
+		if (a == "layer") continue;
+		else if (a == "value") newObj.innerHTML += object[a];
+		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
+		//else if (a == "col") newObj.setAttribute("color", object[a]);
+		else if (a == "title") {
+			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
+			title.innerHTML += object[a];
+			newObj.append(title);
+		}
+		
+		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
+		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
+		//else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
+		else newObj.setAttribute(a.replace("_", "-"), object[a]);
+	}
+
+
+		
+	}
+	*/
+	
+	
 }
 
 

@@ -89,6 +89,8 @@ public:
 
 
 	// Methods
+	static void init();
+	static jsonObject initGraphics(double maxH, double maxW, int downloadInt);
 	static bool isReady();
 	static bool getVariantSitesOnly();
 	static void prepareColourings();

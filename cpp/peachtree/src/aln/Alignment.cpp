@@ -505,7 +505,7 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 			// Is there enough space?
 			int len = label.size();
 			if (filtering->getVariantSitesOnly()) {
-				label += "&#10203";
+				label += "&#10203;";
 				len++;
 			}
 			if (!scaling->inRangeX(x+len, minNtWidth)) continue;
@@ -582,6 +582,8 @@ json Alignment::getAlignmentGraphics(Scaling* scaling, Colouring* colouring, dou
 json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* filtering, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections){
 
 
+	//cout << "getTaxaGraphics 1" << endl;
+
 	json objs = json::array();
 	if (!scaling->inView() || this->sequences.size() == 0) return objs;
 
@@ -600,6 +602,9 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 
 	}
 	
+	
+	//cout << "getTaxaGraphics 2" << endl;
+	
 
 
 	int seqNumDisplayed = 0;
@@ -613,6 +618,8 @@ json Alignment::getTaxaGraphics(Scaling* scaling, double textSize, Filtering* fi
 	}
 
 	//delete yshift;
+	
+	//cout << "getTaxaGraphics 3" << endl;
 
 	return objs;
 

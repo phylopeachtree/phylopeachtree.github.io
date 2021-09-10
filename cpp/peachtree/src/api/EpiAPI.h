@@ -21,6 +21,7 @@ using jsonObject = nlohmann::json;
 
 class EpiAPI {
 public:
+	static void setEpi(Epidemiology* epi);
 	static void setEpiAccessionsToDirty();
 	static void setEpiAnnotationsToDirty();
 	static void validateAccessions(Alignment* alignment);

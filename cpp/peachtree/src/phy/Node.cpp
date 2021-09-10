@@ -6,7 +6,6 @@
  */
 
 
-#include <regex>
 
 #include "Node.h"
 #include "../Utils.h"
@@ -770,13 +769,8 @@ void Node::parseFromNewick(string newick){
 	bool hasChildren = char1 == '(';
 
 
-	std::regex re("\\[.+");
-	std::regex re1(".*:");
-	std::regex re2("[(].*");
-	std::regex re3("[)].*");
 
-
-
+	
 	// Get label
 	//String[] labelSplit = labelAndAnnotations.split("\\[");
 	//System.out.println(labelSplit[0] + " -> " + acc);
@@ -793,21 +787,21 @@ void Node::parseFromNewick(string newick){
 
 		string acc = bits.at(0); //.replaceAll("([(]|\\[.+)", "");
 		acc.erase(std::remove(acc.begin(), acc.end(), '('), acc.end());
-		acc = regex_replace(acc, re, "$1");
+		size_t found = acc.find_first_of("[");
+		if (found != -1) acc = acc.substr(0, found);
+		//acc = regex_replace(acc, re, "$1");
 		this->setAcc(acc);
 
 	}
 
-
-	//cout << newick << endl;
 
 
 	// Find the first closing bracket on the same level
 	char char2;
 	vector<string> childSubtrees;// = new ArrayList<>();
 	int level = 0;
-	int pos = 1;
-	int childPos = 1;
+	long pos = 1;
+	long childPos = 1;
 	int annotationLevel = 0;
 	int annotationPos = -1;
 	double length = 0;
@@ -818,6 +812,8 @@ void Node::parseFromNewick(string newick){
 
 
 		if (annotationLevel == 1 && char2 == ',') {
+
+
 
 			// Parse annotation
 			if (!hasChildren || level == -1) {
@@ -833,11 +829,22 @@ void Node::parseFromNewick(string newick){
 		// Parse node height
 		else if (annotationLevel == 0 && level == 0 && char2 == ':') {
 			string lengthStr = newick.substr(pos+1);
-			lengthStr = regex_replace(lengthStr, re1, "$1");
-			lengthStr = regex_replace(lengthStr, re2, "$1");
-			lengthStr = regex_replace(lengthStr, re3, "$1");
-			//.replaceAll("(,|[(]|[)]).*", "");
+
+			size_t found = lengthStr.find_first_of(":");
+			if (found != -1 && found < lengthStr.size()-1) lengthStr = lengthStr.substr(found+1);
+			
+			
+			found = lengthStr.find_first_of("(");
+			if (found != -1) lengthStr = lengthStr.substr(0, found);
+			
+			
+			found = lengthStr.find_first_of(")");
+			if (found != -1) lengthStr = lengthStr.substr(0, found);
+			
+			
+
 			length = stod(lengthStr);
+
 
 			
 			if (!hasChildren) break;
@@ -856,6 +863,7 @@ void Node::parseFromNewick(string newick){
 
 		// Child subtree has closed
 		else if (annotationLevel == 0 && char2 == ')') {
+			
 			if (level == 0) {
 				childSubtrees.push_back(newick.substr(childPos, pos+1-childPos));
 				childPos = pos+1;
@@ -892,6 +900,8 @@ void Node::parseFromNewick(string newick){
 
 
 
+
+
 	// Validate
 	if (hasChildren && childSubtrees.empty()) {
 		Error::throwError("Could not parse newick. Perhaps there is a missing ).");
@@ -912,6 +922,8 @@ void Node::parseFromNewick(string newick){
 		//cout << "child newick: " << subtree << "\n\n" << endl;
 		child->parseFromNewick(subtree);
 	}
+	
+	
 
 
 
@@ -925,8 +937,7 @@ void Node::parseFromNewick(string newick){
 void Node::parseAnnotation(string annotation){
 	
 	
-	
-	//cout << "parsing " << annotation << endl;
+
 
 	int pos = annotation.find("=");
 	string key = annotation.substr(0, pos);
@@ -935,7 +946,7 @@ void Node::parseAnnotation(string annotation){
 	//val.erase(std::remove(val.begin(), val.end(), '{'), val.end());
 	//val.erase(std::remove(val.begin(), val.end(), '}'), val.end());
 	this->annotations[key] = val;
-	//cout << key << " =" << val << endl;
+	
 
 }
 

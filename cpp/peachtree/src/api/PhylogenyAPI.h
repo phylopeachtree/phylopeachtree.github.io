@@ -7,7 +7,6 @@
 
 
 #include <iostream>
-#include "WasmAPI.h"
 #include "../phy/Tree.h"
 #include "../phy/ClusterTree.h"
 #include "../epi/Timeline.h"
@@ -20,7 +19,10 @@ using namespace std;
 class PhylogenyAPI {
 public:
 
+
+
 	// Methods
+	static void setTree(Tree* tree);
 	static Tree* getTree();
 	static vector<string> getAllAnnotations();
 	static void prepareLabelling(Alignment* alignment);

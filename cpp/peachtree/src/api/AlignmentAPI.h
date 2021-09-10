@@ -28,6 +28,7 @@ public:
 	static jsonObject getTaxaGraphics(Scaling* scaling, double textSize, bool showTaxonNumbers, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections);
 	static jsonObject getAlignmentGraphics(Scaling* scaling, double minNtWidth, double textSize, Colouring* colouring, int siteNumberingEvery);
 
+	static void setAlignment(Alignment* aln);
 
 	static bool isReady();
 	static void initFiltering(bool variantSitesOnly, bool focus, Tree* tree);

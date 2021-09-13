@@ -17,6 +17,13 @@
 #include "api/PhylogenyAPI.h"
 #include "api/EpiAPI.h"
 
+
+#include "options/Option.h"
+#include "options/NumericalOption.h"
+#include "options/DiscreteOption.h"
+#include "options/BooleanOption.h"
+#include "options/ColourOption.h"
+
 #include "lib/json.hpp"
 
 
@@ -55,6 +62,7 @@ int printHelp(){
 	cout << "\t-tree <tree.nexus>. The tree (optional)" << endl;
 	cout << "\t-epi <metadata.tsv>. Epidemiological metadata (optional)" << endl;
 	cout << "\t-subtree <acc1,acc2,...>. List of comma-seperated accessions to focus on clade for (optional)" << endl;
+	cout << "\t-highlight <acc1,acc2,...>. List of comma-seperated accessions to highlight (optional)" << endl;
 	
 	
 	cout << "---------------------------" << endl;
@@ -99,6 +107,10 @@ int main(int argc, char *argv[]) {
 		Epidemiology* epi = nullptr;
 		string svgOut = "";
 		vector<string> subtreeAccessions;
+		vector<string> toHighlight;
+		
+		vector<Option*> options;
+		vector<string> optionValues;
 	
 	
 		// Parse options
@@ -172,10 +184,60 @@ int main(int argc, char *argv[]) {
 			}
 			
 			
-			else {
-				cout << "Unknown option detected " << arg << endl;
-				return printHelp();
+			// Highlight some
+			else if (arg == "-highlight" || arg == "--highlight"){
+				
+				if (i+1 < argc){
+					i++;
+					string val =  string(argv[i]);
+					toHighlight = Utils::split(val, ",");
+				}else return printHelp();
+				
+				
 			}
+			
+			
+			// Option
+			else {
+				bool isOption = false;
+				for (Option* opt : OptionsAPI::getOptionList()){
+					
+					if (opt == nullptr) continue;
+					
+					if (arg == "-" + opt->getName() || arg == "--" + opt->getName()){
+						
+						if (i+1 < argc){
+							i++;
+							string val =  string(argv[i]);
+							
+							cout << "Setting " << opt->getName() << " to " << val << endl;
+							
+							
+							
+							options.push_back(opt);
+							optionValues.push_back(val);
+							isOption = true;
+							
+							
+						}else return printHelp();
+						
+						
+						
+					}
+					
+					
+				}
+				
+				
+				if (!isOption) {
+					cout << "Unknown option detected " << arg << endl;
+					return printHelp();
+				}
+				
+			}
+			
+			
+		
 			
 		
 		
@@ -231,6 +293,15 @@ int main(int argc, char *argv[]) {
 		
 		
 		
+		// Option values
+		for (int i = 0; i < options.size(); i ++){
+			OptionsAPI::setOption(options.at(i)->getName(), optionValues.at(i));
+		}
+		
+									
+		
+		
+		
 		
 		// Taxon selection?
 		if (subtreeAccessions.size() > 0){
@@ -245,6 +316,16 @@ int main(int argc, char *argv[]) {
 				AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxon->getID());
 			}
 			
+		}
+		
+		// Initialise filtering
+		AlignmentAPI::initFiltering(OptionsAPI::variantSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), (OptionsAPI::focusOnClade->getVal() ? PhylogenyAPI::getTree() : nullptr));
+		
+		
+		// Highlight
+		for (string acc : toHighlight){
+			Taxon* taxon = aln->getTaxon(acc);
+			aln->selectTaxon(taxon->getID());
 		}
 		
 		

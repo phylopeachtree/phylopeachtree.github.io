@@ -38,8 +38,8 @@ const double OptionsAPI::TREE_LADDER_WIDTH = 50;
 
 
 // Boundaries
-NumericalOption* OptionsAPI::canvasWidth = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 10, Utils::INFTY, 100, true);
-NumericalOption* OptionsAPI::canvasHeight = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 10, Utils::INFTY, 100, true);
+NumericalOption* OptionsAPI::canvasWidth = new NumericalOption("width", "General", "Width of canvas", INIT_WIDTH, 300, Utils::INFTY, 100, true);
+NumericalOption* OptionsAPI::canvasHeight = new NumericalOption("height", "General", "Height of canvas", INIT_HEIGHT, 300, Utils::INFTY, 100, true);
 NumericalOption* OptionsAPI::division1 = new NumericalOption("division1", "General", "Relative position of the tree/taxa boundary", 0, 0, 1, 0.1, true);
 NumericalOption* OptionsAPI::division2 = new NumericalOption("division2", "General", "Relative position of the taxa/alignment boundary", 0.2, 0, 1, 0.1, true);
 
@@ -62,9 +62,9 @@ BooleanOption* OptionsAPI::transmissionTree = new BooleanOption("transmissionTre
 NumericalOption* OptionsAPI::annotationFontSize = new NumericalOption("annotationFontSize", "Phylogeny", "Tree annotation font size", 8, 0, 14, 1, true);
 NumericalOption* OptionsAPI::annotationRounding = new NumericalOption("annotationRounding", "Phylogeny", "Tree annotation sf", 3, 1, 8, 1, true);
 ColourOption* OptionsAPI::branchColouring = new ColourOption("branchColouring", "Phylogeny", "Tree branch colour");
-DiscreteOption* OptionsAPI::colourBranchesBy;
+DiscreteOption* OptionsAPI::colourBranchesBy = new DiscreteOption("colourBranchesBy", "Phylogeny", "Colour branches by");
 ColourOption* OptionsAPI::nodeColouring = new ColourOption("nodeColouring", "Phylogeny", "Node colour");
-DiscreteOption* OptionsAPI::colourNodesBy;
+DiscreteOption* OptionsAPI::colourNodesBy = new DiscreteOption("colourNodesBy", "Phylogeny", "Colour nodes by");
 
 
 
@@ -76,7 +76,7 @@ NumericalOption* OptionsAPI::taxaSpacing = new NumericalOption("taxaSpacing", "S
 BooleanOption* OptionsAPI::showTaxonNumbers = new BooleanOption("showTaxonNumbers", "Samples", "Show sample numbers", false);
 BooleanOption* OptionsAPI::focusOnTaxa = new BooleanOption("focusOnTaxa", "Samples", "Show only selected samples", false, true);
 BooleanOption* OptionsAPI::focusOnClade = new BooleanOption("focusOnClade", "Samples", "Show only clade of selected samples", false, true);
-DiscreteOption* OptionsAPI::sampleNameAnnotation;
+DiscreteOption* OptionsAPI::sampleNameAnnotation = new DiscreteOption("sampleNameAnnotation", "Samples", "Sample labels");
 
 
 
@@ -84,13 +84,13 @@ DiscreteOption* OptionsAPI::sampleNameAnnotation;
 BooleanOption* OptionsAPI::variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show segregating sites only", true);
 BooleanOption* OptionsAPI::displayMissingPercentage = new BooleanOption("displayMissingPercentage", "Alignment", "Show percentage of missing data beside sample names", false);
 DiscreteOption* OptionsAPI::siteColourType;
-DiscreteOption* OptionsAPI::colourings;
+DiscreteOption* OptionsAPI::colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme");
 
 
 // Epidemiology
-DiscreteOption* OptionsAPI::epiSampleDate;
-DiscreteOption* OptionsAPI::epiSymptomDate;
-DiscreteOption* OptionsAPI::epiIsolationDate;
+DiscreteOption* OptionsAPI::epiSampleDate = new DiscreteOption("epiSampleDate", "Epidemiology", "Sample date");
+DiscreteOption* OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date");
+DiscreteOption* OptionsAPI::epiIsolationDate = new DiscreteOption("epiIsolationDate", "Epidemiology", "Isolation date");
 NumericalOption* OptionsAPI::infectiousPeriodBefore = new NumericalOption("infectiousPeriodBefore", "Epidemiology", "Number of days infectious before symptom onset", 2, 0, 28, 1);
 NumericalOption* OptionsAPI::infectiousPeriodAfter = new NumericalOption("infectiousPeriodAfter", "Epidemiology", "Number of days infectious after symptom onset", 5, 0, 28, 1);
 DiscreteOption* OptionsAPI::dateFormat;
@@ -118,12 +118,8 @@ void OptionsAPI::init(){
 	//OptionsAPI::internalNodeLabels = nullptr;
 	//OptionsAPI::leafNodeLabels = nullptr;
 
-	OptionsAPI::colourBranchesBy = nullptr;
-	OptionsAPI::colourNodesBy = nullptr;
 
 
-	OptionsAPI::epiSymptomDate = nullptr;
-	OptionsAPI::epiIsolationDate = nullptr;
 
 	OptionsAPI::treeMethods = new DiscreteOption("treeMethods", "Phylogeny", "Method for phylogenetic tree estimation", ClusterTree::getDefaultLinkType(), ClusterTree::getDomain(), true);
 
@@ -185,6 +181,103 @@ void OptionsAPI::init(){
 
 	
 }
+
+
+/*
+ * Set option to value
+ */
+void OptionsAPI::setOption(string id, string value){
+	
+
+	// Find the option
+	Option* option = nullptr;
+	for (Option* o : OptionsAPI::getOptionList()) {
+		if (o->getName() == id) {
+			option = o;
+			break;
+		}
+	}
+
+
+	
+
+	if (option == nullptr) {
+		cout << "Cannot find option " << id << endl;
+	}
+
+	else {
+
+		// instanceof
+		if (NumericalOption* v = dynamic_cast<NumericalOption*>(option)) {
+
+			double val = stod(value);
+
+
+
+			// Special case: scroll bar positions should be normalised
+			if (option == OptionsAPI::scrollX) {
+				//val = val - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal();
+				//val = val / (OptionsAPI::canvasWidth->getVal() - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal());
+			}
+
+			if (option == OptionsAPI::scrollY) {
+				cout << "scrolly " << val << endl;
+				//val = val / OptionsAPI::canvasHeight->getVal(); // - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE);
+			}
+
+
+
+			v->setVal(val);
+		}
+
+		else if (BooleanOption* v = dynamic_cast<BooleanOption*>(option)) {
+
+			bool val = value == "true" || value == "1";
+
+			// Special case: if focusOnClade is enabled, then enable focusOnTaxa too
+			if (option == OptionsAPI::focusOnClade && val == true) {
+				OptionsAPI::setFocusingOnTaxa(true);
+			}
+
+			// If focusOnTaxa is enabled, then set focusOnClade to false
+			if (option == OptionsAPI::focusOnTaxa && val == true) {
+				OptionsAPI::setFocusOnClade(false);
+			}
+
+			if (option == OptionsAPI::focusOnClade || option == OptionsAPI::focusOnTaxa) {
+				OptionsAPI::resetScroll();
+				AlignmentAPI::setSelectionToDirty();
+				AlignmentAPI::resetHighlighting();
+			}
+
+
+			// If 'displayIncompatibleTranmissions' becomes true, set 'transmissionTree' to true
+			if (option == OptionsAPI::displayIncompatibleTranmissions && val == true){
+				OptionsAPI::transmissionTree->setVal(true);
+				reorderTree();
+			}
+			
+
+
+			//cout << "setting " << option->getName() << " to " << val << "|" << value << endl;
+
+			v->setVal(val);
+		}
+
+		else if (DiscreteOption* v = dynamic_cast<DiscreteOption*>(option)) {
+			v->setVal(value);
+		}
+
+		else if (ColourOption* v = dynamic_cast<ColourOption*>(option)) {
+			v->setVal(value);
+		}
+
+
+	}
+
+	
+}
+
 
 jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
@@ -744,25 +837,15 @@ void OptionsAPI::prepareEpiAnnotations() {
 
 
 	// Sample date
-	if (OptionsAPI::epiSampleDate == nullptr){
-		OptionsAPI::epiSampleDate = new DiscreteOption("epiSampleDate", "Epidemiology", "Sample date", vals.at(0), vals);
-	}else{
-		OptionsAPI::epiSampleDate->setValAndDomain(vals.at(0), vals);
-	}
+	OptionsAPI::epiSampleDate->setValAndDomain(vals.at(0), vals);
 
 	// Symptom date
-	if (OptionsAPI::epiSymptomDate == nullptr){
-		OptionsAPI::epiSymptomDate = new DiscreteOption("epiSymptomDate", "Epidemiology", "Symptom onset date", vals.at(0), vals);
-	}else{
-		OptionsAPI::epiSymptomDate->setValAndDomain(vals.at(0), vals);
-	}
+	OptionsAPI::epiSymptomDate->setValAndDomain(vals.at(0), vals);
+	
 
 	// Isolation date
-	if (OptionsAPI::epiIsolationDate == nullptr){
-		OptionsAPI::epiIsolationDate = new DiscreteOption("epiIsolationDate", "Epidemiology", "Isolation date", vals.at(0), vals);
-	}else{
-		OptionsAPI::epiIsolationDate->setValAndDomain(vals.at(0), vals);
-	}
+	OptionsAPI::epiIsolationDate->setValAndDomain(vals.at(0), vals);
+	
 
 
 
@@ -914,11 +997,8 @@ void OptionsAPI::prepareColourings() {
 	}
 
 
-	if (OptionsAPI::colourings == nullptr){
-		OptionsAPI::colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme", colourClassNames.at(0), colourClassNames);
-	}else{
-		OptionsAPI::colourings->setValAndDomain(colourClassNames.at(0), colourClassNames);
-	}
+	OptionsAPI::colourings->setValAndDomain(colourClassNames.at(0), colourClassNames);
+	
 
 
 }
@@ -972,28 +1052,19 @@ void OptionsAPI::prepareTreeAnnotationOptions(){
 
 
 	// Sample names
-	if (sampleNameAnnotation == nullptr){
-		sampleNameAnnotation = new DiscreteOption("sampleNameAnnotation", "Samples", "Sample labels", annotations.at(0), annotations);
-	}else{
-		sampleNameAnnotation->setValAndDomain(annotations.at(0), annotations);
-	}
+	sampleNameAnnotation->setValAndDomain(annotations.at(0), annotations);
+	
 	
 
 
 	// Node colourings
-	if (colourNodesBy == nullptr){
-		colourNodesBy = new DiscreteOption("colourNodesBy", "Phylogeny", "Colour nodes by", annotations.at(0), annotations);
-	}else{
-		colourNodesBy->setValAndDomain(annotations.at(0), annotations);
-	}
+	colourNodesBy->setValAndDomain(annotations.at(0), annotations);
+	
 
 
 	// Branch colourings
-	if (colourBranchesBy == nullptr){
-		colourBranchesBy = new DiscreteOption("colourBranchesBy", "Phylogeny", "Colour branches by", annotations.at(0), annotations);
-	}else{
-		colourBranchesBy->setValAndDomain(annotations.at(0), annotations);
-	}
+	colourBranchesBy->setValAndDomain(annotations.at(0), annotations);
+	
 
 
 

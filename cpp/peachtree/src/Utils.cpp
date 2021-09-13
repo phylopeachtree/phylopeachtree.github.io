@@ -533,10 +533,11 @@ string Utils::toSVG(double width, double height, jsonObject json){
 		while ((pos = eleAType.find("\"")) != std::string::npos) eleAType = eleAType.replace(pos, 1, "");
 		
 		stringstream ele;
-		string value = "";
+		stringstream value_stream;
 		if (obj["value"] != nullptr) {
-			value = to_string(obj["value"]);
+			string value = to_string(obj["value"]);
 			while ((pos = value.find("\"")) != std::string::npos) value = value.replace(pos, 1, "");
+			value_stream << value;
 		}
 		
 		int layer = 1;
@@ -549,22 +550,33 @@ string Utils::toSVG(double width, double height, jsonObject json){
 			string val = to_string(it.value());
 			
 			if (key == "ele" || key == "layer" || key == "value") continue;
-			//key = key
-			
-			
-			// Replace all _ with -
-			while ((pos = key.find("_")) != std::string::npos) key = key.replace(pos, 1, "-");
 			
 			// Remove ""
 			while ((pos = val.find("\"")) != std::string::npos) val = val.replace(pos, 1, "");
 			
+			if (key == "title"){
+				
+				
+				vector<string> lines = Utils::split(val, "\n");
+				
+				value_stream << "<title>" << endl;
+				for (string line : lines) value_stream << line << endl;
+
+				value_stream << "</title>";
+				
+				
+			}else{
 			
-			ele << key << "='" << val << "' ";
+				// Replace all _ with -
+				while ((pos = key.find("_")) != std::string::npos) key = key.replace(pos, 1, "-");
+				ele << key << "='" << val << "' ";
+			}
 					
 			
 		}
 		 
 		//string valStr = value.str();
+		string value = value_stream.str();
 		if (!value.empty()) ele << ">" << value << "</" << eleAType << ">" << endl;
 		else ele << "/>" << endl;
 		
@@ -578,71 +590,25 @@ string Utils::toSVG(double width, double height, jsonObject json){
 	
 	svg << "<?xml version='1.0' standalone='no'?>" << endl;
 	svg << "<svg style='font-family: \"Courier New\"; dominant-baseline: middle; height: " << height << "px; width: " << width << "px;' xmlns='http://www.w3.org/2000/svg'>" << endl;
+	
+	// css
+	svg << "<defs>" << endl;
+    svg << "<style type='text/css'><![CDATA[" << endl;
+			svg << ".taxon.selected  {" << endl;
+			svg << "fill:red;" << endl;
+			svg << "font-weight:bold;" << endl;
+			svg << "}" << endl;
+    svg << "]]></style>" << endl;
+	svg << "</defs>" << endl;
+	
+	
 	svg << "<g>" << btmG.str() << "</g>" << endl;
 	svg << "<g>" << midG.str() << "</g>" << endl;
 	svg << "<g>" << topG.str() << "</g>" << endl;
 	svg << "</svg>" << endl;
 	
 	return svg.str();
-	
-	/*
-		
-		string ele = "<" + obj["ele"];
-		int layer = 1;
-		
-		
-			
-			
-			
-			if (a == "ele") continue;
-		if (a == "layer") continue;
-		else if (a == "value") newObj.innerHTML += object[a];
-		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
-		//else if (a == "col") newObj.setAttribute("color", object[a]);
-		else if (a == "title") {
-			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
-			title.innerHTML += object[a];
-			newObj.append(title);
-		}
-		
-		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
-		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
-		//else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
-		else newObj.setAttribute(a.replace("_", "-"), object[a]);
-			
-			
-			
-			std::cout << item.key() << "\n";
-			std::cout << "  " << item.value()["Name"].get<std::string>() << "\n";
-			
-			ele += 
-			
-		}
-		
-	// Set attributes
-	for (var a in object){
-		if (a == "ele") continue;
-		if (a == "layer") continue;
-		else if (a == "value") newObj.innerHTML += object[a];
-		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
-		//else if (a == "col") newObj.setAttribute("color", object[a]);
-		else if (a == "title") {
-			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
-			title.innerHTML += object[a];
-			newObj.append(title);
-		}
-		
-		//if (a == "text_anchor") newObj.setAttribute("text-anchor", attr[a]);
-		//else if (a == "alignment_baseline") newObj.setAttribute("alignment-baseline", attr[a]);
-		//else if (a == "stroke_dasharray") newObj.setAttribute("stroke-dasharray", attr[a]);
-		else newObj.setAttribute(a.replace("_", "-"), object[a]);
-	}
 
-
-		
-	}
-	*/
-	
 	
 }
 

@@ -204,94 +204,9 @@ extern "C" {
 
 
 		string id(charID);
-
-
-		// Find the option
-		Option* option = nullptr;
-		for (Option* o : OptionsAPI::getOptionList()) {
-			if (o->getName() == id) {
-				option = o;
-				break;
-			}
-		}
-
-
 		string value(charVal);
-
-		if (option == nullptr) {
-			cout << "Cannot find option " << id << endl;
-		}
-
-		else {
-
-			// instanceof
-			if (NumericalOption* v = dynamic_cast<NumericalOption*>(option)) {
-
-				double val = stod(value);
-
-
-
-				// Special case: scroll bar positions should be normalised
-				if (option == OptionsAPI::scrollX) {
-					//val = val - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal();
-					//val = val / (OptionsAPI::canvasWidth->getVal() - (OptionsAPI::canvasWidth->getVal())*OptionsAPI::division2->getVal());
-				}
-
-				if (option == OptionsAPI::scrollY) {
-					cout << "scrolly " << val << endl;
-					//val = val / OptionsAPI::canvasHeight->getVal(); // - OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE);
-				}
-
-
-
-				v->setVal(val);
-			}
-
-			else if (BooleanOption* v = dynamic_cast<BooleanOption*>(option)) {
-
-				bool val = value == "true" || value == "1";
-
-				// Special case: if focusOnClade is enabled, then enable focusOnTaxa too
-				if (option == OptionsAPI::focusOnClade && val == true) {
-					OptionsAPI::setFocusingOnTaxa(true);
-				}
-
-				// If focusOnTaxa is enabled, then set focusOnClade to false
-				if (option == OptionsAPI::focusOnTaxa && val == true) {
-					OptionsAPI::setFocusOnClade(false);
-				}
-
-				if (option == OptionsAPI::focusOnClade || option == OptionsAPI::focusOnTaxa) {
-					OptionsAPI::resetScroll();
-					AlignmentAPI::setSelectionToDirty();
-					AlignmentAPI::resetHighlighting();
-				}
-
-
-				// If 'displayIncompatibleTranmissions' becomes true, set 'transmissionTree' to true
-				if (option == OptionsAPI::displayIncompatibleTranmissions && val == true){
-					OptionsAPI::transmissionTree->setVal(true);
-					reorderTree();
-				}
-				
-
-
-				//cout << "setting " << option->getName() << " to " << val << "|" << value << endl;
-
-				v->setVal(val);
-			}
-
-			else if (DiscreteOption* v = dynamic_cast<DiscreteOption*>(option)) {
-				v->setVal(value);
-			}
-
-			else if (ColourOption* v = dynamic_cast<ColourOption*>(option)) {
-				v->setVal(value);
-			}
-
-
-		}
-
+		
+		OptionsAPI::setOption(id, value);
 
 		WasmAPI::messageFromWasmToJS("");
 

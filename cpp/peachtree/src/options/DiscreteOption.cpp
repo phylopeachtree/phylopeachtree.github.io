@@ -9,6 +9,17 @@
 #include "../error/Error.h"
 
 
+
+DiscreteOption::DiscreteOption(string name, string section, string title){
+	this->name = name;
+	this->section = section;
+	this->title = title;
+	this->longTitle = title;
+	this->hidden = false;
+}
+
+
+
 DiscreteOption::DiscreteOption(string name, string section, string title, string value, vector<string> domain){
 	this->name = name;
 	this->domain = domain;

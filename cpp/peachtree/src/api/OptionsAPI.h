@@ -105,6 +105,7 @@ public:
 	static void setFocusOnClade(bool val);
 	static void prepareEpiAnnotations();
 	static void reorderTree();
+	static void setOption(string id, string value);
 
 
 

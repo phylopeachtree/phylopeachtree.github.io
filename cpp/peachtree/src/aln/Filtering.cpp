@@ -135,7 +135,7 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 
 
 
-	if (numSites == 0) this->variantSitesOnly = false;
+	//if (numSites == 0) this->variantSitesOnly = false;
 
 	if (!this->variantSitesOnly) {
 		numSites = alignment->getLength();

@@ -74,6 +74,7 @@ public:
 	void selectTaxon(int taxonNum, bool setTo);
 	void clearSelection();
 	void clearHighlighting();
+	void recalculateTaxonIndices();
 
 	Taxon* getTaxon(string label);
 	Taxon* getTaxon(int i);

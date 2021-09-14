@@ -300,6 +300,10 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	// Bounds
 	double xdivide1 = OptionsAPI::division1->getVal();
 	double xdivide2 = OptionsAPI::division2->getVal();
+	
+	
+	// Scrolly 
+	double scrolly = OptionsAPI::scrollY->getVal();
 
 
 	// Hide alignment?
@@ -355,6 +359,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	if (download){
 		//width = xdivide2*width + fullAlnWidth;
 		height = fullHeight;
+		scrolly = 0;
 	}
 
 
@@ -363,11 +368,11 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	if (height < fullHeight) {
 		Scaling* scaling = new Scaling(0, 0, OptionsAPI::TOP_MARGIN + OptionsAPI::MARGIN_SIZE, height);
 		scaling->setRowHeight(ntHeight);
-		scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+		scaling->setScroll(0, scrolly, 0, fullHeight);
 
 
 		// Scroll to a taxon?
-		if (OptionsAPI::focalTaxon != nullptr) {
+		if (!download && OptionsAPI::focalTaxon != nullptr) {
 
 
 
@@ -379,7 +384,8 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 				scaling->setScroll(0, 0, 0, fullHeight);
 				double ypos = scaling->scaleY(rowNum) - OptionsAPI::TOP_MARGIN - OptionsAPI::MARGIN_SIZE; // + height / 2;
 				OptionsAPI::scrollY->setVal(ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE));
-				scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+				scrolly = OptionsAPI::scrollY->getVal();
+				scaling->setScroll(0, scrolly, 0, fullHeight);
 
 				cout << "Setting scrolly to " << (ypos / (fullHeight-OptionsAPI::TOP_MARGIN-OptionsAPI::MARGIN_SIZE)) << " to see " << OptionsAPI::focalTaxon->getName() << endl;
 			}
@@ -390,7 +396,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 		//if (OptionsAPI::scrollY->getVal()*height + scaling->getScrollYLength() > height) {
 			//OptionsAPI::scrollY->setVal((height - scaling->getScrollYLength()) / height);
 		//}
-		scrolls["scrollY"] = OptionsAPI::scrollY->getVal()*(height - scaling->getScrollYLength());
+		scrolls["scrollY"] = scrolly*(height - scaling->getScrollYLength());
 		scrolls["scrollYLength"] = scaling->getScrollYLength();
 
 		scaling->cleanup();
@@ -540,7 +546,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 		}
 									
 		treeScaling->setRowHeight(ntHeight);
-		treeScaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+		treeScaling->setScroll(0, scrolly, 0, fullHeight);
 
 	
 
@@ -571,7 +577,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 			// Scaling
 			Scaling* scaling = new Scaling(x0, xdivide2*width, OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height);
 			scaling->setRowHeight(ntHeight);
-			scaling->setScroll(0, OptionsAPI::scrollY->getVal(), 0, fullHeight);
+			scaling->setScroll(0, scrolly, 0, fullHeight);
 
 			// Font size
 			double labelFontSize = std::min(ntHeight, zoomScaleLog * OptionsAPI::FONT_SIZE_TAXA);
@@ -622,7 +628,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 			Scaling* scaling = new Scaling(xdivide2*width, width - remainder /*xdivide2*width + minWidth*nsitesInView*/,
 											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, nsitesInViewInt);
 			scaling->setRowHeight(ntHeight);
-			scaling->setScroll(OptionsAPI::scrollX->getVal(), OptionsAPI::scrollY->getVal(), fullAlnWidth, fullHeight);
+			scaling->setScroll(OptionsAPI::scrollX->getVal(), scrolly, fullAlnWidth, fullHeight);
 
 
 			//cout << "nsitesInViewInt " << nsitesInViewInt << " nsitesInView " << nsitesInView << " remainder " << remainder << endl;

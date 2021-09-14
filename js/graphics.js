@@ -528,6 +528,23 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = functio
 		CANCEL_GRAPHICS = false;
 		return;
 	}
+	
+	
+	/*
+	callWasmFunction("getGraphicsSVG", [], function(objects){
+		
+		
+		if (objects.svg != null){
+			
+			
+			
+		}
+		
+	});
+	
+	
+	return;
+*/
 
 	callWasmFunction("getGraphics", [], function(objects){
 	//cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){

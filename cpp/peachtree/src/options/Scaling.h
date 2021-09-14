@@ -35,6 +35,9 @@ public:
 	bool isAboveRangeX(double x);
 	bool isAboveRangeX(double x, double margin);
 	double scaleX(double x);
+	
+	bool isLineInRangeY(double y1, double y2);
+	
 	void cleanup();
 
 	double getXmax();

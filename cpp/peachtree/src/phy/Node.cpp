@@ -555,8 +555,9 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	double y = Utils::INFTY;
 	int nValidChildren = 0;
 	if (this->isLeaf()) {
-		if (!filtering->includeTaxon(this->getTaxon())) return Utils::INFTY;
+		//if (!filtering->includeTaxon(this->getTaxon())) return Utils::INFTY;
 		y = this->getFilteredNr() + 0.5;
+		if (!filtering->includeTaxon(this->getTaxon())) return y;
 	}
 
 
@@ -589,6 +590,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	double yscaled = scaling->scaleY(y);
 	yscaled += yshift;
 	bool inrangeY = scaling->inRangeY(y);
+	bool shoulderInRange = scaling->isLineInRangeY(minY, maxY);
 
 
 	// Colours
@@ -621,25 +623,20 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 	// Shoulder
-	if (!this->isLeaf() && nValidChildren > 1) {
+	if (shoulderInRange && !this->isLeaf() && nValidChildren > 1) {
 
 
-		// Only draw if this node is in y-range
-		if (scaling->inRangeY(minY) || scaling->inRangeY(maxY) || inrangeY) {
+		jsonObject shoulder_json;
+		shoulder_json["ele"] = "line";
+		shoulder_json["x1"] = x2Scaled;
+		shoulder_json["x2"] = x2Scaled;
+		shoulder_json["y1"] = scaling->scaleY(minY) + yshift;
+		shoulder_json["y2"] = scaling->scaleY(maxY) + yshift;
+		shoulder_json["stroke_width"] = branchWidth;
+		shoulder_json["stroke"] = bcol;
+		shoulder_json["stroke_linecap"] = "round";
+		objs.push_back(shoulder_json);
 
-
-			jsonObject shoulder_json;
-			shoulder_json["ele"] = "line";
-			shoulder_json["x1"] = x2Scaled;
-			shoulder_json["x2"] = x2Scaled;
-			shoulder_json["y1"] = scaling->scaleY(minY) + yshift;
-			shoulder_json["y2"] = scaling->scaleY(maxY) + yshift;
-			shoulder_json["stroke_width"] = branchWidth;
-			shoulder_json["stroke"] = bcol;
-			shoulder_json["stroke_linecap"] = "round";
-			objs.push_back(shoulder_json);
-
-		}
 
 
 	}

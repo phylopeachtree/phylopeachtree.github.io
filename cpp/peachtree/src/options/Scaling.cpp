@@ -177,6 +177,37 @@ bool Scaling::isAboveRangeX(double x){
 }
 
 
+/*
+ * Check whether line (y1,y2) is in the canvas
+ */
+bool Scaling::isLineInRangeY(double y1, double y2){
+	double top = this->scaleY(y1);
+	double btm = this->scaleY(y2);
+	
+	if (top > btm){
+		double tmp = top;
+		top = btm;
+		btm = tmp;
+	}
+	
+	// One end is visible
+	if (top >= this->canvasMinY && top <= this->canvasMaxY) return true;
+	if (btm >= this->canvasMinY && btm <= this->canvasMaxY) return true;
+	
+	
+	// Both ends are invisible, but middle is visible
+	if (top < this->canvasMinY && btm > this->canvasMaxY) return true;
+	
+	
+	// Both ends and the connecting segment are invisible
+	return false;
+	
+	
+	
+}
+
+
+
 /**
  * Checks whether the xpos, plus or minus a margin, is too far above the range
  * @param rowPos

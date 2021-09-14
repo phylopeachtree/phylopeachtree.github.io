@@ -448,28 +448,29 @@ function renderOptions(){
 					else if (opt.type == "DiscreteOption"){
 						
 						
-						
-						
-						// Dropdown html
-						let optionsHTML = `
-						<div class="optionsBox"  title="` + opt.longTitle + `">
+						if (opt.domain != null) {
 							
-							<div class="dropdown">
-								  <select onChange="setOptionFromEle(this)" var="` + opt.name + `">
-									</select>
-							</div>
-							` + opt.title + `
-						</div>`;
-						div.children("div").children("div").append(optionsHTML);
+							// Dropdown html
+							let optionsHTML = `
+							<div class="optionsBox"  title="` + opt.longTitle + `">
+								
+								<div class="dropdown">
+									  <select onChange="setOptionFromEle(this)" var="` + opt.name + `">
+										</select>
+								</div>
+								` + opt.title + `
+							</div>`;
+							div.children("div").children("div").append(optionsHTML);
+							
+							
+							
+							for (let j = 0; j < opt.domain.length; j ++){
+								let dropdownOptionsHTML = `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
+								div.find(`select[var="` + opt.name + `"]`).append(dropdownOptionsHTML);
+								if (opt.domain[j] == opt.value) div.find(`select[var="` + opt.name + `"]`).val(opt.domain[j]);
+							}
 						
-						
-						
-						for (let j = 0; j < opt.domain.length; j ++){
-							let dropdownOptionsHTML = `<option value="` + opt.domain[j] + `">` + opt.domain[j] + `</option>`;
-							div.find(`select[var="` + opt.name + `"]`).append(dropdownOptionsHTML);
-							if (opt.domain[j] == opt.value) div.find(`select[var="` + opt.name + `"]`).val(opt.domain[j]);
 						}
-						
 						
 						
 					}

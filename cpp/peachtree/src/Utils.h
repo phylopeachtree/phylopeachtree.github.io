@@ -49,6 +49,7 @@ public:
 	static string getHexCode(int red, int green, int blue);
 	static double roundToSF(double N, int n);
 	static double log10(double val);
+	static string toSVG(jsonObject json);
 	static string toSVG(double width, double height, jsonObject json);
 	
 	static string openFile(string fileName);

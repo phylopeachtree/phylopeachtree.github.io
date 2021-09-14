@@ -387,17 +387,30 @@ void Alignment::sortByTree(Tree* tree){
 		int oldIndex = newOrdering.at(newIndex);
 		Sequence* s = this->getSequence(oldIndex);
 		sequencesNew.push_back(s);
-		s->getTaxon()->setID(newIndex);
 	}
 
 
 	// Point to the new array
 	this->sequences = sequencesNew;
+	
+	this->recalculateTaxonIndices();
 
 	// Reinitialise
 	this->patterns.clear();
 
 
+}
+
+
+
+/*
+ * Reorder taxon indices for fast access
+ */
+void Alignment::recalculateTaxonIndices(){
+	for (int index = 0; index < this->getNtaxa(); index ++) {
+		Sequence* s = this->getSequence(index);
+		s->getTaxon()->setID(index);
+	}
 }
 
 

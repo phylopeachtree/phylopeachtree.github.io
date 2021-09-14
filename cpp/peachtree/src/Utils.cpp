@@ -496,27 +496,11 @@ string Utils::openFile(string fileName){
 
 
 
-string Utils::toSVG(double width, double height, jsonObject json){
+string Utils::toSVG(jsonObject json){
 	
 	
-	//<?xml version="1.0" standalone="no"?>
-	//<svg id="downloadSVG" style="font-family: &quot;Courier New&quot;; dominant-baseline: middle; height: 9464.53px; width: 1487px;" xmlns="http://www.w3.org/2000/svg">
-	
-	
-	
-	//cout << json.dump(0) << endl;
 	
 	stringstream svg;
-	
-	/*
-	for (const auto& item : json.items()) {
-        std::cout << item.key() << "\n";
-        for (const auto& val : item.value().items())
-        {
-            cout << "  " << val.key() << ": " << val.value() << "\n";
-        }
-    }
-	*/
 	
 	stringstream btmG;
 	stringstream midG;
@@ -557,7 +541,7 @@ string Utils::toSVG(double width, double height, jsonObject json){
 			if (key == "title"){
 				
 				
-				vector<string> lines = Utils::split(val, "\n");
+				vector<string> lines = Utils::split(val, "\\n");
 				
 				value_stream << "<title>" << endl;
 				for (string line : lines) value_stream << line << endl;
@@ -588,8 +572,31 @@ string Utils::toSVG(double width, double height, jsonObject json){
 		
 	}
 	
+	
+	svg << "<g>" << btmG.str() << "</g>" << endl;
+	svg << "<g>" << midG.str() << "</g>" << endl;
+	svg << "<g>" << topG.str() << "</g>" << endl;
+	
+	return svg.str();
+	
+}
+
+
+
+string Utils::toSVG(double width, double height, jsonObject json){
+	
+	
+	//<?xml version="1.0" standalone="no"?>
+	//<svg id="downloadSVG" style="font-family: &quot;Courier New&quot;; dominant-baseline: middle; height: 9464.53px; width: 1487px;" xmlns="http://www.w3.org/2000/svg">
+	
+	
+	
+	//cout << json.dump(0) << endl;
+	
+	stringstream svg;
+	
 	svg << "<?xml version='1.0' standalone='no'?>" << endl;
-	svg << "<svg style='font-family: \"Courier New\"; dominant-baseline: middle; height: " << height << "px; width: " << width << "px;' xmlns='http://www.w3.org/2000/svg'>" << endl;
+	svg << "<svg style='font-family: \"Courier New\"; dominant-baseline: middle; height: " << height << "px; width: " << width << "px;' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 " << width << " " << height << "'>" << endl;
 	
 	// css
 	svg << "<defs>" << endl;
@@ -601,10 +608,8 @@ string Utils::toSVG(double width, double height, jsonObject json){
     svg << "]]></style>" << endl;
 	svg << "</defs>" << endl;
 	
+	svg << Utils::toSVG(json);
 	
-	svg << "<g>" << btmG.str() << "</g>" << endl;
-	svg << "<g>" << midG.str() << "</g>" << endl;
-	svg << "<g>" << topG.str() << "</g>" << endl;
 	svg << "</svg>" << endl;
 	
 	return svg.str();

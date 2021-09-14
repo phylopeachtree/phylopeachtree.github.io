@@ -92,8 +92,7 @@ extern "C" {
 		EpiAPI::addAnnotationsToTree(PhylogenyAPI::THE_TREE);
 		
 		
-		
-		
+
 		
 		// Prepare tree annotation options
 		OptionsAPI::prepareTreeAnnotationOptions();
@@ -132,6 +131,8 @@ extern "C" {
 			PhylogenyAPI::THE_TREE->flipSubtree(index);
 			PhylogenyAPI::orderingIsDirty = true;
 			PhylogenyAPI::infectionCountIsDirty = true;
+			AlignmentAPI::THE_ALIGNMENT->recalculateTaxonIndices();
+			//PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 		}
 		WasmAPI::messageFromWasmToJS("{}");
 

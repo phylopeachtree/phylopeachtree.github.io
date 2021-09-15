@@ -80,18 +80,24 @@ public:
 	Taxon* getTaxon(int i);
 	int getTaxonIndex(Taxon* taxon);
 	
+	bool isConstantSite(int siteNum);
+	
 
 
 private:
 
 
 	void initPatterns();
+	void initConstantSites();
 	void parseSequence(string acc, string seq, int seqID);
 
 	static std::map<string, int> nt_chars;
 	static vector<string> nt_ids;
 	static std::map<string, int> alpha_chars;
 	static vector<string> alpha_ids;
+	
+	
+	vector<bool> constantSites;
 
 	vector<Sequence*> sequences;
 	bool isNucleotide;

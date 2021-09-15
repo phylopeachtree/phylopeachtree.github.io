@@ -221,6 +221,39 @@ void Alignment::annotateTaxa(Tree* tree){
 
 
 
+/*
+ * Find variant/invariant sites
+ */
+void Alignment::initConstantSites(){
+	
+	this->constantSites.clear();
+	this->constantSites.resize(this->getLength());
+	
+	for (int siteNum = 0; siteNum < this->getLength(); siteNum ++) {
+
+
+		// Is the column variable?
+		bool variableSite = false;
+		int uniqueSymbol = -1;
+		for (int taxonNum = 0; taxonNum < this->getNtaxa(); taxonNum++) {
+			Sequence* sequence = this->getSequence(taxonNum);
+			int symbol = sequence->getSymbolInt(siteNum);
+			if (Alignment::isAmbiguousOrGap(symbol, sequence->getIsNucleotide())) continue;
+			if (uniqueSymbol == -1) {
+				uniqueSymbol = symbol;
+			}else if (uniqueSymbol != symbol) {
+				variableSite = true;
+				break;
+			}
+		}
+		this->constantSites.at(siteNum) = !variableSite;
+		
+	}
+	
+	
+}
+
+
 /**
  * Initialise site patterns
  */
@@ -229,8 +262,9 @@ void Alignment::initPatterns(){
 
 	this->patterns.clear();
 	this->patternWeights.clear();
+	
 
-
+	// Get patterns
 	vector<int> site(this->getNtaxa());
 	for (int siteNum = 0; siteNum < this->getLength(); siteNum ++) {
 
@@ -241,7 +275,23 @@ void Alignment::initPatterns(){
 			Sequence* sequence = this->getSequence(taxonNum);
 			site[taxonNum] = sequence->getSymbolInt(siteNum);
 		}
-
+		
+		
+		// Is the column variable?
+		bool variableSite = false;
+		int uniqueSymbol = -1;
+		for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
+			Sequence* sequence = this->getSequence(taxonNum);
+			int symbol = site[taxonNum];
+			if (uniqueSymbol == -1) {
+				uniqueSymbol = symbol;
+			}else if (uniqueSymbol != symbol) {
+				variableSite = true;
+				break;
+			}
+		}
+		this->constantSites.at(siteNum) = !variableSite;
+		
 
 		// Check if it is unique
 		int patternMatch = -1;
@@ -282,12 +332,24 @@ void Alignment::initPatterns(){
 		}
 
 	}
+	
+	
+	
 
 
 	cout << "There are " << this->patterns.size() << " patterns" << endl;
 
 }
 
+/*
+ * Is the site constant?
+ */
+bool Alignment::isConstantSite(int siteNum){
+	if (this->constantSites.size() == 0) this->initConstantSites();
+	if (siteNum < 0 || siteNum >= this->getLength()) return false;
+	return this->constantSites.at(siteNum);
+	
+}
 
 
 

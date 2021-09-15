@@ -33,11 +33,12 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 	this->taxaIDsToInclude.clear();
 
 
-
 	// Use the tree to find taxa
 	if (tree != nullptr) {
 
 		this->tree = tree;
+
+
 
 		// Find selected taxa
 		vector<Taxon*> selected;
@@ -49,13 +50,16 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 
 		
 
+
 		// Find their mrca and take the full clade
-		selected = tree->getClade(selected);
+		vector<Taxon*> selectedClade = tree->getClade(selected);
+		
 		this->subtree = tree->getMRCA(selected);
+		
 		
 
 		// Select the ones to include
-		for (Taxon* taxon : selected) {
+		for (Taxon* taxon : selectedClade) {
 			taxon->setIsSelected(true);
 		}
 		
@@ -89,9 +93,14 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 
 
 
+
+
 	// Which sites to include?
 	if (this->variantSitesOnly) {
 		for (int site = 0; site < alignment->getLength(); site ++) {
+			
+			
+			if (alignment->isConstantSite(site)) continue;
 
 			bool includeSite = false;
 			int uniqueSymbol = -1;

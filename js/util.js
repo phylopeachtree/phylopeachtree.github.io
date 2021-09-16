@@ -41,6 +41,7 @@ function initUtil(){
 			
 			addLoader($("#aln_upload_title"));
 			$("#aln_upload .usermsg").html("");
+			$("#aln_upload .usermsg").hide(0);
 			
 			return function(e) {
 				
@@ -113,6 +114,7 @@ function initUtil(){
 			
 			addLoader($("#phy_upload_title"));
 			$("#phy_upload .usermsg").html("");
+			$("#phy_upload .usermsg").hide(0);
 			
 			return function(e) {
 				
@@ -177,6 +179,7 @@ function initUtil(){
 			
 			addLoader($("#epi_upload_title"));
 			$("#epi_upload .usermsg").html("");
+			$("#epi_upload .usermsg").hide(0);
 
 			
 			return function(e) {
@@ -258,6 +261,7 @@ function reupload(){
 function plotUploadErrorMsg(err, uploadSelector){
 	console.log("caught", err);
 	$(uploadSelector + " .usermsg").html("<b>Error: </b>" + err.message);
+	$(uploadSelector + " .usermsg").show(0);
 	removeLoader($(uploadSelector + "_title"));
 	return false;
 }
@@ -275,9 +279,10 @@ function plotUploadSuccessMsg(filename, time, uploadSelector){
 		html = filename + " successfully parsed in " + Math.round(time*10)/10 + "s!";
 	}
 
-	html += "<span selector='" + uploadSelector + "'' onclick='removeUpload(this)' class='removeUploadBtn' title='Remove uploaded file'> &#10005; </span>"
+html += "<span selector='" + uploadSelector + "'' onclick='removeUpload(this)' class='removeUploadBtn' title='Remove uploaded file'> (&#9249;)</span>"
 
 	$(uploadSelector + " .usermsg").html(html);
+	$(uploadSelector + " .usermsg").show(0);
 
 	
 	updateRenderBtn();
@@ -295,6 +300,7 @@ function removeUpload(ele){
 
 	var resolve = function(x){
 		$(id + " .usermsg").html("");
+		$(id + " .usermsg").hide(0);
 		updateRenderBtn();
 	}
 
@@ -663,6 +669,7 @@ function buildTree(){
 	$(btnID).addClass("disabled");
 	addLoader($("#ctrl_loading_div"));
 	$(btnID).parent().find(".usermsg").html("");
+	$(btnID).parent().find(".usermsg").hide(0);
 	
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {
@@ -671,6 +678,7 @@ function buildTree(){
 			removeLoader($("#ctrl_loading_div"));
 			$(btnID).removeClass("disabled");
 			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();
+			$(btnID).parent().find(".usermsg").show(0);
 			BUILDING_TREE = false;
 			
 			renderGraphics();
@@ -695,6 +703,7 @@ function reorderTree(){
 	$(btnID).addClass("disabled");
 	addLoader($("#ctrl_loading_div"));
 	$(btnID).parent().find(".usermsg").html("");
+	$(btnID).parent().find(".usermsg").hide(0);
 	
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {

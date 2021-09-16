@@ -701,7 +701,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 		// Compatible?
-		if (displayIncompatibleTransmissions && !this->isCompatibleTransmissionEvent && timeline != nullptr && timeline->isReady()){
+		if (displayIncompatibleTransmissions && !this->isCompatibleTransmissionEvent && timeline != nullptr && timeline->isReady() && timeline->getInfectiousPeriodsAreReady()){
 
 			double const tickLen = nodeRadius*1.618;
 

@@ -16,6 +16,7 @@ const int Timeline::MAX_NDATES = 24;
 
 Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVariable, string dateFormat) {
 
+	this->infectiousPeriodsAreReady = false;
 	this->epidemiology = epidemiology;
 	this->setSampleDateVariable(sampleDateVariable, dateFormat);
 	this->sampleSubtree = nullptr;
@@ -28,6 +29,11 @@ Timeline::Timeline(Tree* tree, Epidemiology* epidemiology, string sampleDateVari
 		this->meanTipHeight_tree += leaf->getHeight() / tree->getLeafNodeCount();
 	}
 
+}
+
+
+bool Timeline::getInfectiousPeriodsAreReady(){
+	return infectiousPeriodsAreReady;
 }
 
 
@@ -52,7 +58,7 @@ void Timeline::prepareNodeSampleHeights(Node* subtree, string symptomDateVar, in
 
 	// Determine which internal nodes (with at least 1 leaf child) are compatible based on infectious period
 	vector<string> annots = this->epidemiology->getAnnotations();
-
+	this->infectiousPeriodsAreReady = false;
 	if (std::count(annots.begin(), annots.end(), symptomDateVar) > 0) {
 
 
@@ -69,6 +75,8 @@ void Timeline::prepareNodeSampleHeights(Node* subtree, string symptomDateVar, in
 				//cout << "Warning: could not parse symptom date '" << val << "' from " << dateFormatCanonical << endl;
 				continue;
 			}
+			
+			this->infectiousPeriodsAreReady = true;
 
 
 			// Get x coords

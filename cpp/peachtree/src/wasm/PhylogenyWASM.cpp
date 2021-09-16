@@ -131,6 +131,7 @@ extern "C" {
 			PhylogenyAPI::THE_TREE->flipSubtree(index);
 			//PhylogenyAPI::orderingIsDirty = true;
 			PhylogenyAPI::infectionCountIsDirty = true;
+			EpiAPI::setEpiAccessionsToDirty();
 			//AlignmentAPI::THE_ALIGNMENT->recalculateTaxonIndices();
 			//PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 			PhylogenyAPI::sortTaxaByTree(PhylogenyAPI::THE_TREE, AlignmentAPI::getAlignment());

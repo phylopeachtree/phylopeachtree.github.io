@@ -39,7 +39,7 @@ public:
 			int infectiousDaysBefore, int infectiousDaysAfter, string isolationDateVar, double branchWidth);
 	void prepareNodeSampleHeights(Node* subtree, string symptomDateVar, int infectiousDaysBefore, int infectiousDaysAfter);
 	double getDateAsTime(string val);
-
+	bool getInfectiousPeriodsAreReady();
 
 	tm getLatestDate();
 	tm getEarliestDate();
@@ -67,7 +67,7 @@ private:
 
 	double meanTipHeight_cases;
 	double meanTipHeight_tree;
-
+	bool infectiousPeriodsAreReady;
 
 	void resetNodeSampleTimes(Node* node);
 

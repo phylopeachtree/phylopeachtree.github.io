@@ -507,6 +507,8 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 		if (AlignmentAPI::getFiltering()->getSubtreeRoot() != nullptr) {
 			treeHeight = AlignmentAPI::getFiltering()->getSubtreeRoot()->getHeight(EpiAPI::getTimeline());
 			treeMin = AlignmentAPI::getFiltering()->getSubtreeRoot()->getYoungestChildHeight(EpiAPI::getTimeline());
+			
+			if (treeMin == treeHeight) treeHeight = treeMin + 1;
 		}
 
 

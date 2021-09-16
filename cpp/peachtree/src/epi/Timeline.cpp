@@ -626,12 +626,12 @@ jsonObject Timeline::getTimelineGraphics(Node* subtree, Scaling* scaling, double
 			string label = labels.at(t);
 
 
-			// A background rectangle under the text. Assuming Courier new font with a width height ratio of 0.56
+			// A background rectangle under the text. Assuming Courier new font with a width height ratio of 0.6
 			jsonObject bg_json;
 			bg_json["ele"] = "rect";
 			bg_json["x"] = x_scaled + AXIS_MARGIN;
 			bg_json["y"] = scaling->getCanvasMaxY() - AXIS_MARGIN - axisFontSize/2.0;
-			bg_json["width"] = axisFontSize*0.56*label.size();
+			bg_json["width"] = axisFontSize*0.6*label.size();
 			bg_json["height"] = axisFontSize;
 			bg_json["fill"] = "#ffffffdd";
 			bg_json["layer"] = 2;

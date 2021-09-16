@@ -12,25 +12,27 @@
 #include "Taxon.h"
 #include <vector>
 
-Filtering::Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree) {
-	this->init(variantSitesOnly, focus, alignment, tree);
+Filtering::Filtering(bool variantSitesOnly, bool focus,  bool focusOnClade, Alignment* alignment, Tree* tree) {
+	this->init(variantSitesOnly, focus, focusOnClade, alignment, tree);
 }
 
-void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree) {
+void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alignment* alignment, Tree* tree) {
 	
 	this->cleanup();
+
+	
 
 	cout << "...preparing filtering..." << endl;
 	this->alignment = alignment;
 	this->focusing = focus;
+	this->focusingOnClade = focusOnClade;
 	this->variantSitesOnly = variantSitesOnly;
 	this->variantSitesOnly_parsed = variantSitesOnly;
 	this->isNucleotide = alignment->getIsNucleotide();
 	this->subtree = nullptr;
 	this->numUniqueSeqs = -1;
 
-	// Use unique taxa ids
-	this->taxaIDsToInclude.clear();
+
 
 
 	// Use the tree to find taxa
@@ -49,22 +51,48 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 		
 
 		
-
-
-		// Find their mrca and take the full clade
-		vector<Taxon*> selectedClade = tree->getClade(selected);
-		
-		this->subtree = tree->getMRCA(selected);
 		
 		
+		
+		if (focusOnClade) {
+			
+			this->subtree = tree->getMRCA(selected);
+			
+			// Find their mrca and take the full clade
+			vector<Taxon*> selectedClade = tree->getClade(selected);
 
-		// Select the ones to include
-		for (Taxon* taxon : selectedClade) {
-			taxon->setIsSelected(true);
+			// Select the ones to include
+			for (Taxon* taxon : selectedClade) {
+				taxon->setIsSelected(true);
+			}
+		
+		}else if (focusing){
+			
+			
+			this->subtree = tree->getSubtree(selected);
+			
+			vector<Node*> allNodes = Tree::listNodes(subtree);
+			
+			int nr = 0;
+			for (int i = 0; i < subtree->getLeafNodeCount(); i ++){
+
+				Node* leaf = allNodes.at(i);
+
+				// Maintain a separate numbering system where filtered-out leaves are omitted
+				if (this->includeTaxon(leaf->getTaxon())) {
+					leaf->setFilteredNr(nr);
+					nr ++;
+				}else {
+					leaf->setFilteredNr(-1);
+				}
+			}
+			
 		}
-		
+			
 
 	}
+	
+	
 
 
 
@@ -87,11 +115,8 @@ void Filtering::init(bool variantSitesOnly, bool focus, Alignment* alignment, Tr
 		}
 		numTaxa = taxaIDsToInclude.size();
 	}
-
-	this->majors.clear();
-
-
-
+	
+		
 
 
 
@@ -173,6 +198,8 @@ bool Filtering::includeTaxon(Taxon* taxon){
 }
 
 
+
+
 /**
  * Return the root of the subsetted subtree, if applicable
  * @return
@@ -205,6 +232,10 @@ Tree* Filtering::getTree(){
  */
 bool Filtering::getFocusing(){
 	return this->focusing;
+}
+
+bool Filtering::getFocusingOnClade(){
+	return this->focusingOnClade;
 }
 
 

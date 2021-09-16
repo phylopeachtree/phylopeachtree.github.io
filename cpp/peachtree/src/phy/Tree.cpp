@@ -264,7 +264,7 @@ Tree* Tree::copy(){
  * Post-order traversal
  */
 void Tree::initArray(){
-	this->nodes = this->listNodes(this->root);
+	this->nodes = Tree::listNodes(this->root);
 	for (int i = 0; i < this->nodes.size(); i ++) {
 		this->nodes.at(i)->setNr(i);
 	}
@@ -478,6 +478,7 @@ jsonObject Tree::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, d
 	}
 	Node* subtree = filtering->getSubtreeRoot() != nullptr ? filtering->getSubtreeRoot() : this->root;
 
+
 	// Colourings? Get min and max and draw legend
 	vector<double> minMaxNode({Utils::INFTY, -Utils::INFTY});
 	vector<double> minMaxBranch({Utils::INFTY, -Utils::INFTY});
@@ -625,6 +626,23 @@ vector<Taxon*> Tree::getClade(vector<Taxon*> taxa){
 	for (Node* leaf : leaves) clade.push_back(leaf->getTaxon());
 	return clade;
 
+}
+
+
+
+/*
+ * Get the subtree of a list of taxa
+ */
+Node* Tree::getSubtree(vector<Taxon*> taxa){
+	
+	// Find the mrca
+	Node* root = getMRCA(taxa)->copy();
+	
+	root->getSubtree(taxa);
+
+	
+	return root;
+	
 }
 
 

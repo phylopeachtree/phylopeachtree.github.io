@@ -33,8 +33,8 @@ class Filtering {
 
 public:
 
-	Filtering(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree);
-	void init(bool variantSitesOnly, bool focus, Alignment* alignment, Tree* tree);
+	Filtering(bool variantSitesOnly, bool focus, bool focusOnClade, Alignment* alignment,  Tree* tree);
+	void init(bool variantSitesOnly, bool focus, bool focusOnClade, Alignment* alignment, Tree* tree);
 
 	bool includeTaxon(Taxon* taxon);
 	Node* getSubtreeRoot();
@@ -42,6 +42,7 @@ public:
 	bool variantSitesOnlyParsed();
 	Tree* getTree();
 	bool getFocusing();
+	bool getFocusingOnClade();
 	bool includeSite(int site);
 	vector<int> getSites();
 	int getNumSites();
@@ -53,7 +54,6 @@ public:
 	void prepareMajorAlleles(Alignment* alignment);
 	void cleanup();
 
-
 private:
 
 	bool isMajorOrMinorAllele(string character, int siteNum, bool isMajor);
@@ -62,12 +62,12 @@ private:
 	bool variantSitesOnly;
 	bool variantSitesOnly_parsed; // Value parsed in construction
 	bool focusing;
+	bool focusingOnClade;
 	std::map<int, bool> taxaIDsToInclude;
 	std::map<int, bool> sitesToIncludeMap;
 	vector<int> sitesToIncludeList;
 	Alignment* alignment;
 	int numUniqueSeqs;
-
 
 	// Major characters at each site
 	std::map<int, int> majors;

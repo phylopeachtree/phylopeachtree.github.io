@@ -469,6 +469,7 @@ void Alignment::sortByTree(Tree* tree){
  * Reorder taxon indices for fast access
  */
 void Alignment::recalculateTaxonIndices(){
+	if (true) return;
 	for (int index = 0; index < this->getNtaxa(); index ++) {
 		Sequence* s = this->getSequence(index);
 		s->getTaxon()->setID(index);
@@ -484,6 +485,29 @@ int Alignment::getTaxonIndex(Taxon* taxon){
 	for (int i = 0; i < this->sequences.size(); i++){
 		Sequence* seq = this->sequences.at(i);
 		if (seq->getTaxon() == taxon) return i;
+	}
+	return -1;
+
+}
+
+
+/*
+ * Get taxon by index
+ */
+Taxon* Alignment::getTaxonFromIndex(int index){
+	if (index < 0 || index > this->getNtaxa()) return nullptr;
+	return this->sequences.at(index)->getTaxon();
+}
+
+
+/*
+ * Get index of taxon by ID
+ */
+int Alignment::getTaxonIndex(int taxonNum){
+
+	for (int i = 0; i < this->sequences.size(); i++){
+		Sequence* seq = this->sequences.at(i);
+		if (seq->getTaxon()->getID() == taxonNum) return i;
 	}
 	return -1;
 
@@ -749,12 +773,12 @@ double Alignment::getPatternWeight(int i){
  */
 bool Alignment::selectTaxon(int taxonNum){
 	
-	
+	int index = this->getTaxonIndex(taxonNum);
 	//cout << "selecting " << taxonNum << "/" << this->sequences.at(taxonNum)->getTaxon()->getID() << endl;
 	
-	this->sequences.at(taxonNum)->getTaxon()->toggleSelection();
-	this->sequences.at(taxonNum)->getTaxon()->toggleHighlighting();
-	return this->sequences.at(taxonNum)->getTaxon()->getIsSelected();
+	this->sequences.at(index)->getTaxon()->toggleSelection();
+	this->sequences.at(index)->getTaxon()->toggleHighlighting();
+	return this->sequences.at(index)->getTaxon()->getIsSelected();
 }
 
 
@@ -762,7 +786,8 @@ bool Alignment::selectTaxon(int taxonNum){
  * Check if the taxon is selected
  */
 bool Alignment::taxonIsSelected(int taxonNum){
-	return this->sequences.at(taxonNum)->getTaxon()->getIsSelected();
+	int index = this->getTaxonIndex(taxonNum);
+	return this->sequences.at(index)->getTaxon()->getIsSelected();
 }
 
 
@@ -770,8 +795,9 @@ bool Alignment::taxonIsSelected(int taxonNum){
  * Select/deselect taxon
  */
 void Alignment::selectTaxon(int taxonNum, bool setTo){
-	this->sequences.at(taxonNum)->getTaxon()->setIsSelected(setTo);
-	if (setTo) this->sequences.at(taxonNum)->getTaxon()->setIsHighlighted(setTo);
+	int index = this->getTaxonIndex(taxonNum);
+	this->sequences.at(index)->getTaxon()->setIsSelected(setTo);
+	if (setTo) this->sequences.at(index)->getTaxon()->setIsHighlighted(setTo);
 }
 
 
@@ -808,7 +834,8 @@ Taxon* Alignment::getTaxon(string label){
 }
 
 Taxon* Alignment::getTaxon(int i){
-	return this->sequences.at(i)->getTaxon();
+	int index = this->getTaxonIndex(i);
+	return this->sequences.at(index)->getTaxon();
 }
 
 

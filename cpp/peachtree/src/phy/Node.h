@@ -80,6 +80,7 @@ public:
 	void resetInfections();
 	void normaliseInfections(int numTrees);
 	Node* getFirstLeaf();
+	bool getSubtree(vector<Taxon*> taxa);
 
 
 private:

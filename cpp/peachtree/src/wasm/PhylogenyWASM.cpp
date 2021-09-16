@@ -129,10 +129,11 @@ extern "C" {
 
 		if (PhylogenyAPI::THE_TREE != nullptr) {
 			PhylogenyAPI::THE_TREE->flipSubtree(index);
-			PhylogenyAPI::orderingIsDirty = true;
+			//PhylogenyAPI::orderingIsDirty = true;
 			PhylogenyAPI::infectionCountIsDirty = true;
-			AlignmentAPI::THE_ALIGNMENT->recalculateTaxonIndices();
+			//AlignmentAPI::THE_ALIGNMENT->recalculateTaxonIndices();
 			//PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
+			PhylogenyAPI::sortTaxaByTree(PhylogenyAPI::THE_TREE, AlignmentAPI::getAlignment());
 		}
 		WasmAPI::messageFromWasmToJS("{}");
 

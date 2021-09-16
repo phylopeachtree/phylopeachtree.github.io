@@ -54,7 +54,7 @@ int AlignmentAPI::getTaxonRowNum(Taxon* taxon){
 /*
  * Initialise filtering object
  */
-void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
+void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, bool focusOnClade, Tree* tree){
 
 	if (AlignmentAPI::THE_ALIGNMENT == nullptr) return;
 
@@ -70,22 +70,26 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, Tree* tree){
 	// Default filtering
 	if (initRequired) {
 		
+		
+		//cout << "initRequired: " << selectionIsDirty << "," << filtering->getFocusing() << "," << orderingIsDirty << "," << (filtering->getTree() != tree) << endl;
+		
 		// Cleanup
 		if (filtering == nullptr) {
-			filtering = new Filtering(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+			filtering = new Filtering(variantSitesOnly, focus, focusOnClade, THE_ALIGNMENT, tree);
 			
 		}else{
-			filtering->init(variantSitesOnly, focus, THE_ALIGNMENT, tree);
+			filtering->init(variantSitesOnly, focus, focusOnClade, THE_ALIGNMENT, tree);
 		}
+
 		
-		
-		selectionIsDirty = false;
-		orderingIsDirty = false;
 		if (focus || tree != nullptr){
 			AlignmentAPI::THE_ALIGNMENT->clearSelection();
 			AlignmentAPI::THE_ALIGNMENT->clearHighlighting();
 		}
 	}
+	
+	selectionIsDirty = false;
+	orderingIsDirty = false;
 
 }
 
@@ -197,6 +201,7 @@ bool AlignmentAPI::isMock(){
 }
 
 void AlignmentAPI::setSelectionToDirty(){
+	cout << "setSelectionToDirty" << endl;
 	AlignmentAPI::selectionIsDirty = true;
 }
 

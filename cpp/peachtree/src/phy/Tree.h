@@ -43,7 +43,7 @@ public:
 	string toNewick();
 	string toNewick(Filtering* filtering);
 	string toString();
-	vector<Node*> listNodes(Node* theRoot);
+	static vector<Node*> listNodes(Node* theRoot);
 	static int getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos);
 	
 	jsonObject getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
@@ -54,6 +54,7 @@ public:
 	vector<Taxon*> getClade(vector<Taxon*> taxa);
 	Node* getMRCA(vector<Taxon*> taxa);
 	Node* getNode(Taxon* taxon);
+	Node* getSubtree(vector<Taxon*> taxa);
 	Node* getMRCA(Node* node1, Node* node2);
 	vector<string> getAllAnnotations();
 	void flipSubtree(int index);

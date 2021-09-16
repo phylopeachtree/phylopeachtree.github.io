@@ -31,7 +31,7 @@ public:
 	static void setAlignment(Alignment* aln);
 
 	static bool isReady();
-	static void initFiltering(bool variantSitesOnly, bool focus, Tree* tree);
+	static void initFiltering(bool variantSitesOnly, bool focus, bool focusOnClade, Tree* tree);
 	static int getNsites();
 	static int getNsitesDisplayed();
 	static int getNtaxa();

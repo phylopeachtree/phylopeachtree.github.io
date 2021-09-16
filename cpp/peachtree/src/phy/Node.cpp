@@ -165,8 +165,13 @@ vector<Node*> Node::getChildren(){
  */
 Node* Node::copy(){
 	Node* clone = new Node(this->getNr());
+	
+
+	clone->filteredNodeNr = this->filteredNodeNr;
 	clone->acc = this->acc;
 	clone->height = this->height;
+	clone->sampleTime = this->sampleTime;
+	clone->isCompatibleTransmissionEvent = this->isCompatibleTransmissionEvent;
 	for (const auto &pair : this->annotations) {
 		string key = pair.first;
 		clone->annotations[key] = this->annotations[key];
@@ -177,6 +182,9 @@ Node* Node::copy(){
 	clone->taxon = this->taxon;
 	return clone;
 }
+
+
+
 
 /*
  * Size of subtree
@@ -1197,6 +1205,69 @@ void Node::normaliseInfections(int numTrees){
 		}
 	}
 }
+
+
+
+
+/*
+ * Build a subtree containing only the mentioned taxa
+ */
+bool Node::getSubtree(vector<Taxon*> taxa){
+	
+	if (this->isLeaf()){
+		
+		
+		// Return true if this leaf should be included
+		for (Taxon* taxon : taxa){
+			if (this->getTaxon()->getID() == taxon->getID()) return true;
+		}
+		
+		return false;
+		
+	}else{
+		
+		// Return true if this node has leaves that should be included
+		vector<Node*> newChildren;
+		for (Node* child : this->getChildren()){
+			
+			if (child->getSubtree(taxa)){
+				newChildren.push_back(child);
+			}else{
+				child->cleanup();
+				delete child;
+			}
+			
+		}
+		
+		
+		
+		// Keep this node
+		if (this->children.size() == newChildren.size()){
+			return true;
+		}
+		
+		this->children.clear();
+		for (Node* child : newChildren){
+			this->addChild(child);
+		}
+		
+
+		// Delete this subtree
+		if (newChildren.size() == 0){
+			return false;
+		}
+		
+		
+		// Keep
+		return true;
+
+		
+	}
+		
+		
+	
+}
+
 
 
 

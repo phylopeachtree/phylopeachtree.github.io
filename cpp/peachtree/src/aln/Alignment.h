@@ -78,7 +78,9 @@ public:
 
 	Taxon* getTaxon(string label);
 	Taxon* getTaxon(int i);
+	Taxon* getTaxonFromIndex(int index);
 	int getTaxonIndex(Taxon* taxon);
+	int getTaxonIndex(int taxonNum);
 	
 	bool isConstantSite(int siteNum);
 	

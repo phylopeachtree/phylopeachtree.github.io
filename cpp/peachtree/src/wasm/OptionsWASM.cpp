@@ -81,19 +81,47 @@ extern "C" {
 	*/
 	void EMSCRIPTEN_KEEPALIVE getGraphicsSVG() {
 		
-
-		
-		jsonObject small;
-
+		jsonObject small = json::array();
 		if (OptionsAPI::graphicalObjects == nullptr || OptionsAPI::graphicalObjects.size() == 0) {
 			WasmAPI::messageFromWasmToJS(small.dump(0));
 			return;
 		}
 		
+		jsonObject subsetOfGraphics = json::array();
 		
 		
-		small["svg"] = Utils::toSVG(OptionsAPI::graphicalObjects);
 		
+		for (int i = 0; i < OptionsAPI::CHUNK_SIZE_SVG; i ++){
+			if (i >= OptionsAPI::graphicalObjects.size()) break;
+			subsetOfGraphics.push_back(OptionsAPI::graphicalObjects.at(i));
+		}
+
+		if (subsetOfGraphics.size() > 0) OptionsAPI::graphicalObjects.erase(OptionsAPI::graphicalObjects.begin(), OptionsAPI::graphicalObjects.begin() + subsetOfGraphics.size());
+		
+
+
+		
+		
+		
+		vector<vector<string>> x = Utils::toSVGVectors(subsetOfGraphics);
+		for (int g = 0; g < x.size(); g ++){
+			
+			
+			jsonObject inner = json::array();
+			vector<string> group = x.at(g);
+			for (int i = 0; i < group.size(); i++){
+				inner.push_back(group.at(i));
+			}
+			
+
+			
+			small.push_back(inner);
+			
+			
+		}
+		
+		
+
 		
 		WasmAPI::messageFromWasmToJS(small.dump(0));
 		

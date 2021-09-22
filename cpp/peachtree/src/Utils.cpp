@@ -496,16 +496,17 @@ string Utils::openFile(string fileName){
 
 
 
-string Utils::toSVG(jsonObject json){
+/*
+ * Convert json to a vector of svg elements
+ * Each vector refers to a single group
+ */
+vector<vector<string>> Utils::toSVGVectors(jsonObject json){
 	
 	
+	vector<string> btmG;
+	vector<string> midG;
+	vector<string> topG;
 	
-	stringstream svg;
-	
-	stringstream btmG;
-	stringstream midG;
-	stringstream topG;
-
 	size_t pos;
 	for (int i = 0; i < json.size(); i ++){
 		
@@ -553,7 +554,7 @@ string Utils::toSVG(jsonObject json){
 			
 				// Replace all _ with -
 				while ((pos = key.find("_")) != std::string::npos) key = key.replace(pos, 1, "-");
-				ele << key << "='" << val << "' ";
+				ele << key << "=\"" << val << "\" ";
 			}
 					
 			
@@ -561,21 +562,61 @@ string Utils::toSVG(jsonObject json){
 		 
 		//string valStr = value.str();
 		string value = value_stream.str();
-		if (!value.empty()) ele << ">" << value << "</" << eleAType << ">" << endl;
-		else ele << "/>" << endl;
+		if (!value.empty()) ele << ">" << value << "</" << eleAType << ">";
+		else ele << "/>";
 		
 		
-		if (layer == 0) btmG << ele.str();
-		else if (layer == 1) midG << ele.str();
-		else topG << ele.str();
+		
+		string eleStr = ele.str();
+		//while ((pos = eleStr.find("\\\"")) != std::string::npos) eleStr = eleStr.replace(pos, 1, "'");
+
+		//cout << eleStr << endl;
+		if (layer == 0) btmG.push_back(eleStr);
+		else if (layer == 1) midG.push_back(eleStr);
+		else topG.push_back(eleStr);
         
 		
 	}
 	
 	
-	svg << "<g>" << btmG.str() << "</g>" << endl;
-	svg << "<g>" << midG.str() << "</g>" << endl;
-	svg << "<g>" << topG.str() << "</g>" << endl;
+	
+	// Build 2D vector
+	vector<vector<string>> allGroups;
+	allGroups.push_back(btmG);
+	allGroups.push_back(midG);
+	allGroups.push_back(topG);
+	return allGroups;
+	
+}
+
+
+
+
+
+/*
+ * Convert json to a string of svg elements
+ */
+string Utils::toSVG(jsonObject json){
+	
+	
+	
+	stringstream svg;
+	
+
+	// Build strings
+	vector<vector<string>> allGroups = Utils::toSVGVectors(json);
+	
+	for (int g = 0; g < allGroups.size(); g ++){
+		
+		svg << "<g>";
+		vector<string> groupElements = allGroups.at(g);
+		for (int i = 0; i < groupElements.size(); i++){
+			svg << groupElements.at(i) << endl;
+		}
+		svg << "</g>" << endl;
+		
+	}
+	
 	
 	return svg.str();
 	

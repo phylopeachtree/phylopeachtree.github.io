@@ -28,7 +28,7 @@ messageFromWasmToJS = function(msg = null, msgID = null){
             //console.log("msg", msg);
 
             // Convert the message into a string that can be parsed directly by JSON
-            msg = msg.replace(/'/g, '\"').replace(/'/g, "\\'").replace(/"\[/g, "[").replace(/\]"/g, "]");
+            msg = msg.replace(/"/g, '\"').replace(/'/g, "\\'").replace(/"\[/g, "[").replace(/\]"/g, "]");
 
             //console.log("msg", msgID, msg);
 

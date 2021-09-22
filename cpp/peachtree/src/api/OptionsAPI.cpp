@@ -20,6 +20,7 @@
 
 
 const long OptionsAPI::CHUNK_SIZE = 30000;
+const long OptionsAPI::CHUNK_SIZE_SVG = 3000;
 const double OptionsAPI::LEFT_MARGIN = 0; // Left hand margin
 double OptionsAPI::TOP_MARGIN = 16; // Top margin
 const double OptionsAPI::MARGIN_SIZE = 16;
@@ -279,6 +280,8 @@ void OptionsAPI::setOption(string id, string value){
 
 
 jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
+
+	cout << "initGraphics" << endl;
 
 	jsonObject json;
 

@@ -51,6 +51,7 @@ public:
 	static double log10(double val);
 	static string toSVG(jsonObject json);
 	static string toSVG(double width, double height, jsonObject json);
+	static vector<vector<string>> toSVGVectors(jsonObject json);
 	
 	static string openFile(string fileName);
 	

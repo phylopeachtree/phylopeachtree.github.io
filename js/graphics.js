@@ -3,7 +3,7 @@
 
 CANCEL_GRAPHICS = false;
 DOWNLOADING = false;
-
+const SVGNS = "http://www.w3.org/2000/svg";
 
 function initGraphics(){
 	
@@ -125,6 +125,9 @@ function initGraphics(){
 function renderGraphics(resolve = function() {}){
 	
 
+
+
+
 	if (DOWNLOADING) return;
 
 	isReadyToRender(function(ready){
@@ -167,6 +170,9 @@ function renderGraphics(resolve = function() {}){
 			SCROLLING = false;
 			CANCEL_GRAPHICS = false;
 			$("body").css("overflow", "hidden");
+			
+			
+			var drawCanvas = false;
 
 			
 			//var initialVal = JSON.parse(initialVal);
@@ -192,8 +198,7 @@ function renderGraphics(resolve = function() {}){
 				// Async
 				setTimeout(function() {
 
-					// Prepare svg width/height
-					var svg = $("#svg");
+
 					const padding = 0;
 
 
@@ -208,23 +213,60 @@ function renderGraphics(resolve = function() {}){
 					}
 
 
-					svg.html("");
-					svg.height(height);
-					svg.width(width);
+					// Prepare svg width/height
+					var svg = $("#svg");
+					var canvas = $("#canvas");
+					var svgToDrawOn;
+					var eleToDrawOn;
+					
+					// Clear canvas
+					//const context = document.getElementById("canvas").getContext('2d');
+					//context.clearRect(0, 0, canvas.width(), canvas.height());
+					
+					if (drawCanvas) {
+						svgToDrawOn = document.createElementNS(SVGNS, "svg");
+						var divID = "tmpSVG_DIV";
+						var svgID = "tmpSVG";
+						$("#" + divID).remove();
+						$("body").append(`<div id="` + divID + `" style="display:none"> <svg id="` + svgID + `" style="font-family:'Courier New';dominant-baseline:middle;" xmlns="` + SVGNS + `"></svg></div>`);
+						svgToDrawOn = $("#" + svgID);
+						eleToDrawOn = canvas
+						
+						svgToDrawOn.height(height);
+						svgToDrawOn.width(width);
+						
+						svg.hide(0);
+
+						
+					}else{
+						svgToDrawOn = svg;
+						eleToDrawOn = svg;
+						svg.html("");
+						svg.show(0);
+					}
+					
+					
+					
+					
+					
+
+					// The thing to draw on
+					eleToDrawOn.height(height);
+					eleToDrawOn.width(width);
 
 					svg.parent().height(height + padding);
 					svg.parent().width(width + padding);
 					$("#graphics_div").width(width + padding);
 
 
-					var group1 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-					var group2 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-					var group3 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-					var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
-					svg.append(group1);
-					svg.append(group2);
-					svg.append(group3);
-					svg.append(topGroup);
+					var group1 = document.createElementNS(SVGNS, "g");
+					var group2 = document.createElementNS(SVGNS, "g");
+					var group3 = document.createElementNS(SVGNS, "g");
+					var topGroup = document.createElementNS(SVGNS, "g");
+					svgToDrawOn.append(group1);
+					svgToDrawOn.append(group2);
+					svgToDrawOn.append(group3);
+					svgToDrawOn.append(topGroup);
 
 
 					//console.log(initialVal);
@@ -236,14 +278,14 @@ function renderGraphics(resolve = function() {}){
 						var id = initialVal.xboundaries[xboundary]["id"]; 
 						var contained = id != "width";
 						//console.log("xb", id, val);
-						createDraggableStick(svg, val, id, true, contained);
+						createDraggableStick(eleToDrawOn, val, id, true, contained);
 					}
 					for (var yboundary in initialVal.yboundaries){
 						
 						var val = initialVal.yboundaries[yboundary]["val"];
 						var id = initialVal.yboundaries[yboundary]["id"]; 
 						var contained = id != "height";
-						createDraggableStick(svg, val, id, false, contained);
+						createDraggableStick(eleToDrawOn, val, id, false, contained);
 					}
 					
 					
@@ -252,12 +294,12 @@ function renderGraphics(resolve = function() {}){
 						if (initialVal.scrolls.scrollY != null){
 							let pos = initialVal.scrolls.scrollY;
 							let len = initialVal.scrolls.scrollYLength;
-							createScrollbar(svg, pos, len, "scrollY", true);
+							createScrollbar(eleToDrawOn, pos, len, "scrollY", true);
 						}
 						if (initialVal.scrolls.scrollX != null){
 							let pos = initialVal.scrolls.scrollX;
 							let len = initialVal.scrolls.scrollXLength;
-							createScrollbar(svg, pos, len, "scrollX", false);
+							createScrollbar(eleToDrawOn, pos, len, "scrollX", false);
 						}
 					}
 
@@ -288,7 +330,7 @@ function renderGraphics(resolve = function() {}){
 
 
 					// Plot json objects 1 chunk at a time
-					plotNextObject(group1, group2, group3, 0, resolve);
+					plotNextObject(group1, group2, group3, 0, drawCanvas, resolve);
 
 
 					
@@ -505,24 +547,8 @@ function createDraggableStick(svg, pos, id, xAxis, contained){
 
 
 
-/*
-function makeDraggable(evt) {
-	var svg = evt.target;
-	svg.addEventListener('mousedown', startDrag);
-	svg.addEventListener('mousemove', drag);
-	svg.addEventListener('mouseup', endDrag);
-	svg.addEventListener('mouseleave', endDrag);
-	function startDrag(evt) {
-	}
-	function drag(evt) {
-	}
-	function endDrag(evt) {
-	}
-}
-*/
 
-
-function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = function() { } ){
+function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, drawCanvas, resolve = function() { } ){
 
 	if (CANCEL_GRAPHICS){
 		CANCEL_GRAPHICS = false;
@@ -530,35 +556,20 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = functio
 	}
 	
 	
-	/*
-	callWasmFunction("getGraphicsSVG", [], function(objects){
-		
-		
-		if (objects.svg != null){
-			
-			
-			
-		}
-		
-	});
+	// Comparing methods for runtime
+	var useSVG = true;
 	
 	
-	return;
-*/
-
-	callWasmFunction("getGraphics", [], function(objects){
-	//cjCall("peachtree.options.OptionsAPI", "getGraphics").then(function(val){
-								
-
-
-
-			//console.log("graphics", cjStringJavaToJs(val));
-			//var objects = JSON.parse(cjStringJavaToJs(val));
-			//console.log("iteration", iteration, "graphics", objects);
-
-
+	if (useSVG) {
+		
+		callWasmFunction("getGraphicsSVG", [], function(objects){
+			
+			
+			//console.log(objects);
+			
+			
 			if (objects.length == 0){
-				
+			
 				removeLoader($("#ctrl_loading_div"));
 				$("#svg").removeClass("resizing");
 				
@@ -589,43 +600,277 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, resolve = functio
 
 				return;
 				
+			}
+			
+			
+			// Repeat
+			plotNextObject(svgBtm, svgMid, svgTop, iteration + 1, drawCanvas, resolve)
+
+
+
+			// Render bottom
+			if (objects[0] != null){ 
+				var eles = objects[0].join(" ");
+				$(svgBtm)[0].innerHTML += eles;
+				//for (var i = 0; i < eles.length; i ++){
+					//var o = eles[i];
+					//addSVGobj(svgBtm, o);
+				//}
+			}
+			
+			// Render middle
+			if (objects[1] != null){ 
+				var eles = objects[1].join(" ");
+				$(svgMid)[0].innerHTML += eles;
+				//$(svgMid).append(eles);
+			}
+			
+			
+			// Render top
+			if (objects[2] != null){ 
+				var eles = objects[2].join(" ");
+				$(svgTop)[0].innerHTML += eles;
+			}
+			
+		});
+
+	}
+	
+	else {
+
+
+		callWasmFunction("getGraphics", [], function(objects){
+			
+			
+
+		
+			//console.log("iteration", iteration, "graphics", objects);
+
+
+			if (objects.length == 0){
+				
+				removeLoader($("#ctrl_loading_div"));
+				$("#svg").removeClass("resizing");
+				
+				// Taxon selection
+				$(svgBtm).parent().find(".taxon").click(function(){
+
+					if (SHIFT_KEY_IS_DOWN){
+						selectUpToTaxon($(this));
+					}else{
+						toggleTaxon($(this));
+					}
+
+					
+				});
+
+
+				// Node selection
+				$(svgBtm).parent().find(".node").click(function(){
+					flipSubtree($(this));
+				});
+				
+
+				updateSelectionCSS();
+
+				// Draw canvas?
+				if (drawCanvas){
+
+					var svgText = $(svgBtm).parent().parent().html();
+					//var svgText = $(svgBtm).parent()[1];
+					//var svgText = document.getElementById("tmpSVG");
+					
+					// Draw canvas
+					var canvas = document.getElementById("canvas");
+					drawInlineSVG(canvas, svgText, function(x){
+						//console.log(canvas.toDataURL());
+						$(svgBtm).parent().parent().remove();
+						resolve();
+					});
+	
+				}else{
+					resolve();
+				}
+				
+				console.log("done");
+
+
+				return;
+				
 			}else{
 
+				
 				// Repeat
-				plotNextObject(svgBtm, svgMid, svgTop, iteration + 1, resolve)
+				plotNextObject(svgBtm, svgMid, svgTop, iteration + 1, drawCanvas, resolve);
+				
+				var btmChunk = document.createElementNS(SVGNS, "g");
+				var midChunk = document.createElementNS(SVGNS, "g");
+				var topChunk = document.createElementNS(SVGNS, "g");
+				
+				
+	
+
 
 				// And render thes objects asynchronously...
 				for (var i = 0; i < objects.length; i ++){
 					var o = objects[i];
-					drawSVGobj(svgBtm, svgMid, svgTop, o);
+					drawSVGobj(btmChunk, midChunk, topChunk, o);
+
+					
+					//drawSVGobj(svgBtm, svgMid, svgTop, o);
 				}
+				
+		
+				// Add to the DOM at the very end
+				svgBtm.append(btmChunk);
+				svgMid.append(midChunk);
+				svgTop.append(topChunk);
+				
 
 			}
 			
 			
-			
-	
+				
+		
 		});
+
+	}
 
 }
 
 
+/*
+ * Convert an svg to a canvas
+ */
+function drawInlineSVG(canvas, rawSVG, resolve) {
+	
+	var ctx = canvas.getContext("2d");
+	/*
+	//console.log("drawing", rawSVG);
+	
+	let _settings = {
+        svg: null,
+        // Usually all SVG have transparency, so PNG is the way to go by default
+        mimetype: "image/png",
+        quality: 0.92,
+        width: "auto",
+        height: "auto",
+        outputFormat: "base64"
+    };
+	//for (let key in settings) { _settings[key] = settings[key]; }
+	
+	
+	
+	
+	 let svgXml = new XMLSerializer().serializeToString(svgNode);
+        let svgBase64 = "data:image/svg+xml;base64," + btoa(svgXml);
+
+        const image = new Image();
+
+        image.onload = function(){
+            
+
+            // Define the canvas intrinsic size
+            //canvas.width = finalWidth;
+            //canvas.height = finalHeight;
+
+            // Render image in the canvas
+            ctx.drawImage(this, 0, 0, canvas.width, canvas.height);
+
+            if(_settings.outputFormat == "blob"){
+                // Fullfil and Return the Blob image
+                canvas.toBlob(function(blob){
+                    resolve(blob);
+                }, _settings.mimetype, _settings.quality);
+            }else{
+                // Fullfil and Return the Base64 image
+                resolve(canvas.toDataURL(_settings.mimetype, _settings.quality));
+            }
+        };
+
+        // Load the SVG in Base64 to the image
+        image.src = svgBase64;
+	
+	
+	
+	*/
+
+    var svg = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"}),
+        domURL = self.URL || self.webkitURL || self,
+		url = domURL.createObjectURL(svg);
+		
+	//url = "http://upload.wikimedia.org/wikipedia/commons/d/d2/Svg_example_square.svg";
+		
+	var img = new Image();
 
 
+    img.onload = function () {
+        ctx.drawImage(this, 0, 0, 100, 100);     
+        domURL.revokeObjectURL(url);
+        resolve(this);
+    };
 
+	console.log(url);
+
+    img.src = url;
+	
+}
+
+
+/*
+ * Add an svg element to the page from its string
+ */
+function addSVGobj(svg, object){
+	//console.log("appending", object);
+	//var o = '<line stroke="black" stroke-dasharray="4,7" stroke-linecap="round" stroke-width="1.0" x1="355.0" x2="199.7600134313499" y1="188.5" y2="188.5" />';
+	//svg.append(object);
+	
+	//document.getElementById("svg").innerHTML = o;
+	
+}
+
+
+/*
+ * Add an svg element to the page from its json
+ */ 
 function drawSVGobj(svgBtm, svgMid, svgTop, object){
 
-
-	//console.log("drawing", object);
 
 	var type = object.ele;
 	if (type == null) return;
 
 
-	var svg = object.layer == null || object.layer == 1 ? svgMid : object.layer == 0 ? svgBtm : svgTop;
+	/*
+	// Build string
+	var str = "<" + type + " ";
+	var value = "";
+	
+	// Set attributes
+	for (var a in object){
+		if (a == "ele") continue;
+		if (a == "layer") continue;
+		else if (a == "value") value += object[a];
+		else if (a == "title") value += "<title>" + object[a] + "</title>";
 
-	//console.log("attr", attr);
-	var newObj = document.createElementNS('http://www.w3.org/2000/svg', type);
+		else str += (a.replace("_", "-")) + "='" + object[a] + "' ";
+	}
+	
+	str += ">" + value + "</" + type + ">";
+	
+	var layer = object.layer == null || object.layer == 1 ? 1 : object.layer == 0 ? 0 : 2;
+	
+	result[layer] += str;
+
+
+	//var svg = object.layer == null || object.layer == 1 ? svgMid : object.layer == 0 ? svgBtm : svgTop;
+	//svg = $(svg)[0];
+	
+	
+	//svg.innerHTML += str;
+*/
+
+
+	var newObj = document.createElementNS(SVGNS, type);
 
 
 	// Set attributes
@@ -636,7 +881,7 @@ function drawSVGobj(svgBtm, svgMid, svgTop, object){
 		//else if (a == "bg") newObj.setAttribute("fill", object[a]);
 		//else if (a == "col") newObj.setAttribute("color", object[a]);
 		else if (a == "title") {
-			var title = document.createElementNS('http://www.w3.org/2000/svg', "title");
+			var title = document.createElementNS(SVGNS, "title");
 			title.innerHTML += object[a];
 			newObj.append(title);
 		}
@@ -649,17 +894,10 @@ function drawSVGobj(svgBtm, svgMid, svgTop, object){
 
 
 
-
-	// Set some of the styles as attributes because safari and IE do not like styles for svgs
-	//var styles = getComputedStyle(newObj);
-	//if (styles.stroke != null) newObj.setAttribute("stroke", styles.stroke);
-	//if (styles["stroke-width"] != null) newObj.setAttribute("stroke-width", styles["stroke-width"]);
-
+	var svg = object.layer == null || object.layer == 1 ? svgMid : object.layer == 0 ? svgBtm : svgTop;
 	svg.append(newObj);
 	
 
-	
-	return newObj;
 
 }	
 
@@ -780,6 +1018,7 @@ function downloadImage(){
 			}else{
 
 
+				var drawCanvas = true;
 
 
 				// Prepare svg width/height
@@ -803,10 +1042,10 @@ function downloadImage(){
 				svg.width(width);
 
 				// Create top layer
-				var group1 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				var group2 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				var group3 = document.createElementNS('http://www.w3.org/2000/svg', "g");
-				var topGroup = document.createElementNS('http://www.w3.org/2000/svg', "g");
+				var group1 = document.createElementNS(SVGNS, "g");
+				var group2 = document.createElementNS(SVGNS, "g");
+				var group3 = document.createElementNS(SVGNS, "g");
+				var topGroup = document.createElementNS(SVGNS, "g");
 				svg.append(group1);
 				svg.append(group2);
 				svg.append(group3);
@@ -818,12 +1057,12 @@ function downloadImage(){
 				// Plot top level objects
 				for (var i = 0; i < initialVal.objects.length; i ++){
 					var o = initialVal.objects[i];
-					drawSVGobj(group1, group2, group3, o);
+					drawSVGobj(group1, group2, group3, o, []);
 				}
 
 
 				// Plot json objects 1 chunk at a time
-				plotNextObject(group1, group2, group3, 0, resolve);
+				plotNextObject(group1, group2, group3, 0, drawCanvas, resolve);
 
 				
 			}
@@ -847,7 +1086,7 @@ function saveSvg(svgEl, name) {
 
 	console.log("saving as", name);
 
-	svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+	svgEl.setAttribute("xmlns", SVGNS);
 	var svgData = svgEl.outerHTML;
 	var preface = '<?xml version="1.0" standalone="no"?>\r\n';
 	var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});

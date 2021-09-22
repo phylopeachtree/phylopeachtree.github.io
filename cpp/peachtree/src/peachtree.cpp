@@ -325,6 +325,7 @@ int main(int argc, char *argv[]) {
 		// Highlight
 		for (string acc : toHighlight){
 			Taxon* taxon = aln->getTaxon(acc);
+			cout << "Highlighting " << acc << endl;
 			aln->selectTaxon(taxon->getID());
 		}
 		

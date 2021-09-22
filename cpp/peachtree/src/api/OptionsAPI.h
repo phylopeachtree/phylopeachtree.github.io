@@ -111,6 +111,7 @@ public:
 
 	// Constants
 	static const long CHUNK_SIZE;
+	static const long CHUNK_SIZE_SVG;
 	static const double LEFT_MARGIN; // Left hand margin
 	static double TOP_MARGIN; // Top margin
 	static const double MARGIN_SIZE; // Left/top margin with background

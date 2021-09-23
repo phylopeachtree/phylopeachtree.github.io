@@ -987,6 +987,13 @@ input:checked + .sliderboolean:before {
 	margin-bottom:0.5em;
 }
 
-
+#about_div .code{
+	font-family:'Courier New';
+	background-color:white;
+	padding:0.5em;
+	width: 80%;
+	margin: 0.5em;
+	
+}
 
 

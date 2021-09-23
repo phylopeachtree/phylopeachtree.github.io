@@ -963,6 +963,10 @@ function searchForTaxon(){
 
 
 
-
-
+/*
+	Redirect to documentation page
+*/
+function goToDocumentation(){
+	window.location.href = '/about';
+}
 

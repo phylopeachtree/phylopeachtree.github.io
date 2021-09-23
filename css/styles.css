@@ -297,6 +297,12 @@ body.loading{
 }
 
 
+.button.small{
+	font-size:90%;
+	padding: 0.2em;
+}
+
+
 .dropbtn{
 	transition: all 0.1s ease 0s;
 	font-size:110%;
@@ -862,4 +868,125 @@ input:checked + .sliderboolean:before {
   position: absolute;
   width: 1px;
 }
+
+
+
+#about_div{
+	text-align:center;
+	margin-left:15%;
+	margin-top:2em;
+	width:70%;
+}
+
+
+#about_div .section{
+	
+	background-color:#FFDAB955;
+	border-style:solid;
+	border-color:#FFDAB9; 
+	border-width:1.5px;
+	border-radius:1px;
+	padding:0.5em;
+	margin:2em;
+	min-width:600px;
+	
+}
+
+
+#about_div .section .heading{
+	
+	width:50%;
+	margin-left:25%;
+	border-style:solid;
+	border-color:#FFDAB9; 
+	border-width:1.5px;
+	border-radius:1px;
+	background-color:white;
+	padding:0.5em;
+	font-weight:bold;
+	
+}
+
+
+
+#about_div .section .desc{
+	
+
+	padding:0.5em;
+	
+}
+
+
+#about_div ul{
+	text-align:center;
+	list-style-type: none;
+	list-style-position: inside;
+	vertical-align:middle;
+	
+}
+
+ul li:before {
+
+  content: '';
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  background-size: 20px;
+  background-image: url(../img/icon.png);
+  background-repeat: no-repeat;
+  margin-right: 5px;
+}
+
+
+#about_div ul li{
+	font-size:18px;
+	margin:1em;
+	%list-style-image: url(../img/iconSmall.png);
+	%background-image: url(../img/icon.png) no-repeat;
+	
+}
+
+
+#about_div .sectionDiv{
+	padding:0.8em;
+	text-align:left;
+	
+}
+
+#about_div .desc{
+	text-align:left;
+	
+}
+
+
+
+
+#about_div .sectionDiv .parameterName{
+	font-family:"Courier New";
+}
+
+#about_div .sectionDiv .parameterType{
+	color:#5ca904;
+	font-weight:bold;
+}
+
+
+#about_div .sectionHeader{
+	font-weight:bold;
+	
+}
+
+
+#about_div .optionDiv{
+	margin-top:0.25em;
+	margin-bottom:0.25em;
+}
+
+#about_div .optionBtnDiv{
+	margin-top:0.5em;
+	margin-bottom:0.5em;
+}
+
+
+
 

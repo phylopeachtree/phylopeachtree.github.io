@@ -68,7 +68,7 @@ public:
 	// Alignment
 	//static NumericalOption* ntWidth;
 	//static NumericalOption* fontSizeAln;
-	static BooleanOption* variantSitesOnly;
+	static BooleanOption* segregatingSitesOnly;
 	static BooleanOption* displayMissingPercentage;
 	static DiscreteOption* siteColourType;
 	static DiscreteOption* colourings;

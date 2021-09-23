@@ -3,17 +3,15 @@
   <head>
     <meta charset="utf-8">
     <title>PEACHTree</title>
-	<link rel="stylesheet" href="css/styles.css">
-    <script defer src="cpp/peachtree/peachtree.js"></script>
+	<link rel="stylesheet" href="../css/styles.css">
+	<link rel="icon" href="../img/icon.png">
+    <script defer src="../cpp/peachtree/peachtree.js"></script>
 
   	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/jquery-1.12.4.js"></script>
   	<script language='JavaScript' type='text/JavaScript' src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
 
-	<script language='JavaScript' type='text/JavaScript' src="js/WW_controller.js"></script>
-	<script language='JavaScript' type='text/JavaScript' src="js/util.js"></script>
-	<script language='JavaScript' type='text/JavaScript' src="js/graphics.js"></script>
-	<script language='JavaScript' type='text/JavaScript' src="js/lib/dropzone.js"></script>
+	<script language='JavaScript' type='text/JavaScript' src="../js/WW_controller.js"></script>
 	
 		
   </head>
@@ -28,23 +26,72 @@
 
 
 
-			addLoader($("#main"), true);
+			//addLoader($("#main"), true);
 
 			register_WebWorker(function(){
 
 				callWasmFunction("init", [], function(){
 
-					console.log("done");
+					// Render options
+					callWasmFunction("getOptions", [], function(options){
+					
+					
+						// Get the unique list of sections
+						var sections = [];
+						for (var i = 0; i < options.length; i ++){
+							let opt = options[i];
+							if (opt.hide) continue;
+							let s = opt.section;
+							if (!sections.includes(s)) sections.push(s);
 
-					initGraphics();
-					initUtil();
+						}
+						
+						
+	
+						
+						// Render options
+						//console.log(options);
+						for (let i = 0; i < sections.length; i++){
+						
+							let s = sections[i];
+						
+							// Create div for each section
+							let id = "sect_" + s;
+							let optHTML = `<div class="sectionDiv" id="` + id + `">
+												<div class="sectionHeader">`
+													+ s + 
+												`</div>
+											</div>`;
+							$("#displayOptions").append(optHTML);
+						
+						
+							// Get the options of this section
+							for (let o = 0; o < options.length; o ++){
+								let opt = options[o];
+								if (opt.hide) continue;
+								if (opt.section == s){
+								
+									var type = opt.type;
+									var val = opt.value + "";
+									if (val != "" && val != null) val = " <i>Default: " + val + "</i>";
+									else val = "";
+									console.log(s, opt);
+									$("#" + id).append(`<div class="optionDiv"> <span class="parameterName"><span class="parameterType">` + type + `</span> ` + opt.name + `:</span> ` + opt.longTitle + val + `<br>`);
+								
+								
+								}
+									
+							}
 
-					removeLoader($("#main"));
+						}
+					
+					});
 
+					
 				});
 
 
-			})
+			}, "../cpp/peachtree/WW_model.js")
 
 			
 	  
@@ -65,161 +112,176 @@
 
 		
 		
-		<div id="upload_div" style="display:none">
+		<div id="about_div">
 		
 		
-
-			<table cellpadding="0">
-
-				<tr>
-
-					<td colspan="2">
-
+			<h1>PEACH Tree Documentation</h1>
+			
+			
+			
 					
-						<div id="aln_upload" class="uploader top"  title="Accepted format: fasta">
-							<div id="aln_upload_title">Drag and drop a multiple sequence alignment (.fasta)</div>
-							<div class="usermsg mediumfont"></div>
-							<!--<div class="smallfont">(And we will make a tree for you!)</div>-->
-							
-						</div>
-
-					</td>
-
-				</tr>
-				<tr>
 				
+				<ul>
 				
-					<td style="width:50%">
+					<li>Upload a multiple sequence alignment of biological sequences</li>
+					
+					<li>Upload a phylogenetic tree, or press 
+						<span style="margin:auto;" id="buildTreeBtn" class="button small" title="Build a neighbour-joining tree">Build tree</span>
+						and we will build the neighbour-joining tree from the alignment </li>
+						
+	
+					<li> Only the segregating sites are shown, so that you are not overwhelmed with information </li>
+					
+					
+					<li> Samples can be filtered and the the segregating sites are recalculated  </li>
+					
+					
+					<li> Sample dates and symptom onset dates can be displayed on the transmission tree  </li>
 				
-						<div id="phy_upload" class="uploader left side" title="Accepted formats: nexus, newick">
-							<div id="phy_upload_title">Drag and drop a phylogenetic tree (.newick or .nexus) </div>
-							<div class="usermsg mediumfont"></div>
-						</div>
+				</ul>
 
-					</td> 
-
-
-					<td style="width:50%">
-
-						<div id="epi_upload" class="uploader right side" title="Accepted formats: csv, tsv">
-							<div id="epi_upload_title">Drag and drop epidemiological annotations (.csv or .tsv) </div>
-							<div class="usermsg mediumfont"></div>
-						</div>
-
-					</td> 
-
-				</tr>
-				
-			</table>
-
-			<br><br>Upload an alignment and/or tree to begin
-			<br><br>
-			
-				<span id="renderBtn" onclick="renderGraphics();" class="button large disabled" title="Upload an alignment and/or tree to begin">Display</span>
-
-				<span id="upload_loading_div">
-				
-				</span>
-
-
-				
-								
-			
 
 
 				<div id="softwareDescDiv">
-					<b>PEACH Tree</b> is a high-performance web tool for visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogenic surveillance. 
+					<b>PEACH Tree</b> is a high-performance web tool for visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogen surveillance. 
 					By default, only segregating alignment sites (i.e. sites which vary among the samples) are displayed, making the program suitable for viewing full genomic data.
 					A phylogenetic tree can be generated from the alignment or uploaded separately.
 					Epidemiological annotations can be uploaded (such as symptom onset date) and viewed alongside the rest of the data.
 					PEACH Tree is an effort to combine genomic and epidemiological modelling into a unified framework.
 					<br><br>
-
-				</div>
-				
-
-		</div>
-
-
+					
 		
-		
-
-			<div id="control_panel_div">
-			
-				
-				<div class="alignmentSummary"> Showing <span id="ntaxadisplayed_span"></span> of <span id="ntaxa_span"></span> samples </div>
-				<div class="alignmentSummary"> Showing <span id="nsitesdisplayed_span"></span> of <span id="nsites_span"></span> sites </div>
-				<div class="alignmentSummary" title="Number of unique sequences. Ambiguous characters do not increase the count."> <span id="nuniqueseqs_span"></span> unique sequences </div>
-				
-				<div> <b>Taxon selection: </b>
-					<span id="btn_focus" onClick="focusSelection()" class="button selectBtn" title="Focus on taxa selection (click on a label below to select)">Focus</span>
-					<span id="btn_clade" onClick="cladeSelection()" class="button selectBtn" title="Focus on selected clade (only applicable if a tree is uploaded)">Clade</span>
-					<span id="btn_clear" onClick="clearSelection()" class="button selectBtn" title="Clear selection">Clear</span> 
 				</div>
 				
 				
-				<div> 
-					<label for="taxon_search_input"><b>Search:</b></label>
-					<input id="taxon_search_input">
+		
+			
+			<!-- Subsetting tree -->
+			<div class="section">
+			
+			
+				<div class="heading">
+					Filtering samples
+				
 				</div>
 				
 				
+				<div class="desc">
+					
+
+					To filter samples out of the display, samples must be selected first.
+					These can be selected (or deselected) by clicking on their accession names or by searching for their accessions in the searchbar.
+					Use shift+click to select multiple consecutive samples.
+					When samples are filtered out of the display, the segregating sites are recalculated.
+					To control sample filtering: <br><br>
+					
+					<div class="optionBtnDiv">
+						<span id="btn_focus" class="button small" title="Focus on taxa selection (click on a label below to select)">Focus</span>: 
+								filter out all unselected samples. 
+					</div>
+					
+					<div class="optionBtnDiv">
+						<span id="btn_clade" class="button small" title="Focus on selected subtree/clade (only applicable if a tree is uploaded)">Subtree</span>: 
+								filter out all samples which are not monophyletic (i.e., form a <a href="https://en.wikipedia.org/wiki/Clade" target="_blank">clade</a>) with the selected samples. Requires a tree. 
+					</div>
+					
+					<div class="optionBtnDiv">
+						<span id="btn_clear" class="button small" title="Clear selection">Clear</span>: 
+								clear the selection and display all samples. 
+					</div>
+
+					
+					
+					
+					
+					
+				
+				</div>
+				
+
 			
-				<div>
-					<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a neighbour-joining tree">Build tree</span>
-					<span class="usermsg mediumfont"></span>
-				</div>
-
-
-				<div>
-					<span style="margin:auto;" id="buildTreeBtn" onclick="reupload();" class="button" title="Go back to the upload screen">Back</span>
-					<span class="usermsg mediumfont"></span>
-				</div>
-
-
-				<div>
-					<span style="margin:auto;" id="downloadBtn" onclick="download();" class="button" title="Download the image in SVG format">Download</span>
-					<span class="usermsg mediumfont"></span>
+			</div>
+			
+			
+			
+			
+			<!-- Displaying epi info -->
+			<div class="section">
+			
+			
+				<div class="heading">
+					Displaying epidemiological information
+				
 				</div>
 				
 				
-				<span id="ctrl_loading_div"> </span>
+				<div class="desc">
+					
+
+					Epidemiological information can be displayed on the tree or in place of sequence accession names.
+					Metadata must be uploaded first - ensuring that one of the columns is named "accession".
+					If there is a tree, open the "Epidemiology" tab and set the "Sample date" to the appropriate date variable, and a calendar will be added to the tree. 
+					This method requires at least 2 unique dates.  
+					Afterwards, the symptom onset dates of cases can be displayed on the transmission tree (plus and minus a time period to reflect infectious period).
+					
+					
+					
+					<br><br>
+					
+
+					
+					
+					
+					
 				
-				<br>
+				</div>
+				
 
 			
+			</div>
 			
 			
 			
-		</div>
-		
-		
+			
+			<!-- Display all options here -->
+			<div class="section">
+			
+			
+				<div class="heading">
+					Display Options
+				
+				</div>
+				
+				<div id="displayOptions" class="desc">
+					
+				
+				</div>
 
-		
-		<div id="graphics_div" style="display:none"/>
-		
-			<hr>
-			<div id="svgouter">
-				<svg id="svg">
+			
+			</div>
 			
 			
+			<!-- Command line -->
+			<div class="section">
 			
-				</svg>
+			
+				<div class="heading">
+					Download
+				
+				</div>
+				
+				
+				<div class="desc">
+					
+				
+				</div>
+				
+
+			
 			</div>
 
 
 
-
-			
-			<div id="options_div"/>
-
-				<ul id="options_tabs" class="tabs">
-
-				</ul>
-				
-			
-			</div>
-		
 		</div>
 
 

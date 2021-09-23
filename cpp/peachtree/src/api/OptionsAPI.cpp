@@ -20,7 +20,7 @@
 
 
 const long OptionsAPI::CHUNK_SIZE = 30000;
-const long OptionsAPI::CHUNK_SIZE_SVG = 3000;
+const long OptionsAPI::CHUNK_SIZE_SVG = 300;
 const double OptionsAPI::LEFT_MARGIN = 0; // Left hand margin
 double OptionsAPI::TOP_MARGIN = 16; // Top margin
 const double OptionsAPI::MARGIN_SIZE = 16;
@@ -59,7 +59,7 @@ NumericalOption* OptionsAPI::branchwidth = new NumericalOption("branchWidth", "P
 NumericalOption* OptionsAPI::nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 3, 0, 20, 0.5);
 NumericalOption* OptionsAPI::treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 BooleanOption* OptionsAPI::showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
-BooleanOption* OptionsAPI::transmissionTree = new BooleanOption("transmissionTree", "Phylogeny", "Display as a transmission tree", false);
+BooleanOption* OptionsAPI::transmissionTree = new BooleanOption("transmissionTree", "Phylogeny", "Display as a transmission tree", true);
 //DiscreteOption* OptionsAPI::internalNodeLabels;
 //DiscreteOption* OptionsAPI::leafNodeLabels;
 NumericalOption* OptionsAPI::annotationFontSize = new NumericalOption("annotationFontSize", "Phylogeny", "Tree annotation font size", 8, 0, 14, 1, true);
@@ -84,7 +84,7 @@ DiscreteOption* OptionsAPI::sampleNameAnnotation = new DiscreteOption("sampleNam
 
 
 // Alignment
-BooleanOption* OptionsAPI::variantSitesOnly = new BooleanOption("variantSitesOnly", "Alignment", "Show segregating sites only", true);
+BooleanOption* OptionsAPI::segregatingSitesOnly = new BooleanOption("segregatingSitesOnly", "Alignment", "Show segregating sites only", true);
 BooleanOption* OptionsAPI::displayMissingPercentage = new BooleanOption("displayMissingPercentage", "Alignment", "Show percentage of missing data beside sample names", false);
 DiscreteOption* OptionsAPI::siteColourType;
 DiscreteOption* OptionsAPI::colourings = new DiscreteOption("colourings", "Alignment", "Alignment colour scheme");
@@ -136,13 +136,15 @@ void OptionsAPI::init(){
 
 
 	// Taxa
-	//OptionsAPI::fontSizeTaxa->setLongTitle("Font size of sample labels.");
+	OptionsAPI::taxaSpacing->setLongTitle("Horizontal padding before sample names.");
 	OptionsAPI::showTaxonNumbers->setLongTitle("Enable this setting to display a numeric index before each sample label.");
+	OptionsAPI::sampleNameAnnotation->setLongTitle("Specify an uploaded metadata variable to display in place of sequence accessions.");
+	
 
 	// Alignment
-	OptionsAPI::variantSitesOnly->setLongTitle("Enable this setting to only display segregating sites in the alignment i.e., sites which have more than one unique character (excluding ambiguous sites).");
+	OptionsAPI::segregatingSitesOnly->setLongTitle("Enable this setting to only display segregating sites in the alignment i.e., sites which have more than one unique character (excluding ambiguous sites).");
 	OptionsAPI::siteColourType->setLongTitle("Select whether to colour major allelles only, or minor alleles only, or all sites.");
-	OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment.");
+	OptionsAPI::colourings->setLongTitle("Select a colour scheme for the alignment. Colour schemes vary between nucleotide and amino acid alignments.");
 
 	
 
@@ -167,6 +169,9 @@ void OptionsAPI::init(){
 	OptionsAPI::infectiousPeriodAfter->setLongTitle("The number of days after symptom onset that a person is assumed to be infectious.");
 	OptionsAPI::timelineFontSize->setLongTitle("Font size of dates on the timeline.");
 	OptionsAPI::displayIncompatibleTranmissions->setLongTitle("Enable this setting to display the phylogenetic tree as a transmission tree, and print a red cross on any internal nodes which are outside the infecious period of the infector. You can click on an internal node to switch the child ordering.");
+	OptionsAPI::reportNumberOfInfections->setLongTitle("Enable this option to display the number of infections cases by this case (assuming the tree is a transmission tree).");
+
+
 
 
 	
@@ -330,7 +335,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
 
 	// Initialise filterings if necessary
-	AlignmentAPI::initFiltering(OptionsAPI::variantSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), OptionsAPI::focusOnClade->getVal(), PhylogenyAPI::getTree());
+	AlignmentAPI::initFiltering(OptionsAPI::segregatingSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), OptionsAPI::focusOnClade->getVal(), PhylogenyAPI::getTree());
 	// Prepare tree-alignment labellings if necessary
 	PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 
@@ -787,7 +792,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	
 
 	// Alignment
-	options.push_back(variantSitesOnly);
+	options.push_back(segregatingSitesOnly);
 	options.push_back(displayMissingPercentage);
 	options.push_back(siteColourType);
 	options.push_back(colourings);
@@ -963,7 +968,7 @@ bool OptionsAPI::getFocusOnClade () {
  * Are variant sites only being displayed
  */
 bool OptionsAPI::getVariantSitesOnly() {
-	return OptionsAPI::variantSitesOnly->getVal();
+	return OptionsAPI::segregatingSitesOnly->getVal();
 }
 
 

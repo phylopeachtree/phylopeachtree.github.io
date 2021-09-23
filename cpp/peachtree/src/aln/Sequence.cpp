@@ -339,23 +339,29 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 
 
 		// Background colour
-		nt_bg["ele"] = "rect";
-		nt_bg["x"] = xc;
-		nt_bg["y"] = yc_rect_scaled;
-		nt_bg["width"] = ntWidth+1;
-		nt_bg["height"] = heightScaled;
-
 		if (colouring != nullptr) {
 			colour = colouring->getColour(symbol, site);
-			nt_bg["fill"] = colour;
-			nt_bg["stroke"] = colour;
+			if (colour != "white") {
+			
+				nt_bg["ele"] = "rect";
+				nt_bg["x"] = xc;
+				nt_bg["y"] = yc_rect_scaled;
+				nt_bg["width"] = ntWidth+1;
+				nt_bg["height"] = heightScaled;
+				nt_bg["fill"] = colour;
+				nt_bg["stroke"] = colour;
+
+				arr.push_back(nt_bg);
+			 
+			}
+			 
 		}
 		//nt_bg.put("fill", "#008cba");
 		//nt_bg.put("color", "white");
 
 
 
-		arr.push_back(nt_bg);
+		
 
 
 		// Text

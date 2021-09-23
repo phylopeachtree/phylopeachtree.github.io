@@ -232,6 +232,9 @@ function renderGraphics(resolve = function() {}){
 						svgToDrawOn = $("#" + svgID);
 						eleToDrawOn = canvas
 						
+						
+						
+						
 						svgToDrawOn.height(height);
 						svgToDrawOn.width(width);
 						
@@ -256,6 +259,10 @@ function renderGraphics(resolve = function() {}){
 
 					svg.parent().height(height + padding);
 					svg.parent().width(width + padding);
+					
+					
+					eleToDrawOn.attr("viewBox", "0 0 " + width + " " + height);
+					
 					$("#graphics_div").width(width + padding);
 
 
@@ -612,17 +619,14 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, drawCanvas, resol
 			if (objects[0] != null){ 
 				var eles = objects[0].join(" ");
 				$(svgBtm)[0].innerHTML += eles;
-				//for (var i = 0; i < eles.length; i ++){
-					//var o = eles[i];
-					//addSVGobj(svgBtm, o);
-				//}
+				
 			}
 			
 			// Render middle
 			if (objects[1] != null){ 
 				var eles = objects[1].join(" ");
 				$(svgMid)[0].innerHTML += eles;
-				//$(svgMid).append(eles);
+				
 			}
 			
 			
@@ -630,6 +634,7 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, drawCanvas, resol
 			if (objects[2] != null){ 
 				var eles = objects[2].join(" ");
 				$(svgTop)[0].innerHTML += eles;
+
 			}
 			
 		});

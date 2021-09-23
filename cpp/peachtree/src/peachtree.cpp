@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
 		}
 		
 		// Initialise filtering
-		AlignmentAPI::initFiltering(OptionsAPI::variantSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), OptionsAPI::focusOnClade->getVal(), PhylogenyAPI::getTree());
+		AlignmentAPI::initFiltering(OptionsAPI::segregatingSitesOnly->getVal(), OptionsAPI::focusOnTaxa->getVal(), OptionsAPI::focusOnClade->getVal(), PhylogenyAPI::getTree());
 		
 		
 		// Highlight

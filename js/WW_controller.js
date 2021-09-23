@@ -6,7 +6,7 @@
 
 MESSAGE_LISTENER = {};
 
-function register_WebWorker(resolve = function() { }){
+function register_WebWorker(resolve = function() { }, dir = "cpp/peachtree/WW_model.js"){
 
 
 	WEB_WORKER_WASM = null;
@@ -16,7 +16,7 @@ function register_WebWorker(resolve = function() { }){
 
 
 			 	// Setup webworker for webassembly
-			    WEB_WORKER_WASM = new Worker("cpp/peachtree/WW_model.js");
+			    WEB_WORKER_WASM = new Worker(dir);
 
 
 

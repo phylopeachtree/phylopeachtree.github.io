@@ -261,7 +261,7 @@ function renderGraphics(resolve = function() {}){
 					svg.parent().width(width + padding);
 					
 					
-					eleToDrawOn.attr("viewBox", "0 0 " + width + " " + height);
+					
 					
 					$("#graphics_div").width(width + padding);
 
@@ -1045,6 +1045,8 @@ function downloadImage(){
 				svg.html("");
 				svg.height(height);
 				svg.width(width);
+				document.getElementById(svgID).setAttribute("viewBox", "0 0 " + width + " " + height);
+				
 
 				// Create top layer
 				var group1 = document.createElementNS(SVGNS, "g");

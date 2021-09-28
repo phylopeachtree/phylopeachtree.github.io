@@ -238,7 +238,8 @@ void Alignment::initConstantSites(){
 		for (int taxonNum = 0; taxonNum < this->getNtaxa(); taxonNum++) {
 			Sequence* sequence = this->getSequence(taxonNum);
 			int symbol = sequence->getSymbolInt(siteNum);
-			if (Alignment::isAmbiguousOrGap(symbol, sequence->getIsNucleotide())) continue;
+			//if (Alignment::isAmbiguousOrGap(symbol, sequence->getIsNucleotide())) continue;
+			if (Alignment::isAmbiguous(symbol, sequence->getIsNucleotide())) continue;
 			if (uniqueSymbol == -1) {
 				uniqueSymbol = symbol;
 			}else if (uniqueSymbol != symbol) {

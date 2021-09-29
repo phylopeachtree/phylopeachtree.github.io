@@ -57,12 +57,42 @@ int printHelp(){
 	
 	cout << "-----PeachTree options-----" << endl;
 	
+	cout << "\t-v. Print version number (optional)" << endl;
 	cout << "\t-svg <out.svg>. Output svg file (required)" << endl;
 	cout << "\t-aln <alignment.fasta>. The alignment (optional)" << endl;
 	cout << "\t-tree <tree.nexus>. The tree (optional)" << endl;
 	cout << "\t-epi <metadata.tsv>. Epidemiological metadata (optional)" << endl;
 	cout << "\t-subtree <acc1,acc2,...>. List of comma-seperated accessions to focus on clade for (optional)" << endl;
 	cout << "\t-highlight <acc1,acc2,...>. List of comma-seperated accessions to highlight (optional)" << endl;
+	
+	// Options
+	cout << endl << "\tDisplay options:" << endl;
+	for (Option* option : OptionsAPI::getOptionList()){
+		
+		if (option->getHidden()) continue;
+		
+		cout << "\t\t-" << option->getName() << " <value>. " << option->getLongTitle();
+		
+		// Numerical
+		if (NumericalOption* v = dynamic_cast<NumericalOption*>(option)) {
+			cout << " Default: " << v->getVal() << ", min:" << v->getMin() << ", max:" << v->getMax();
+		}else if (BooleanOption* v = dynamic_cast<BooleanOption*>(option)) {
+			cout << " Default: " << (v->getVal() ? "true" : "false");
+		}else if (ColourOption* v = dynamic_cast<ColourOption*>(option)) {
+			cout << " Default: " << v->getVal();
+		}else if (DiscreteOption* v = dynamic_cast<DiscreteOption*>(option)) {
+			if (v->getDomain().size() > 1){
+				cout << " Default: " << v->getVal() << ", domain: {";
+				for (string o : v->getDomain()){
+					cout << o << " ";
+				}
+				cout << "}";
+			}
+			
+		}
+		cout << endl;
+	}
+	
 	
 	
 	cout << "---------------------------" << endl;
@@ -119,8 +149,14 @@ int main(int argc, char *argv[]) {
 			string arg = string(argv[i]);
 			
 			
+			
+			// Version number
+			if (arg == "-v" || arg == "--v") {
+				cout << "Running PEACH Tree version " << OptionsAPI::VERSION_NUMBER << endl;
+			}
+			
 			// Help
-			if (arg == "-h" || arg == "--h") return printHelp();
+			else if (arg == "-h" || arg == "--h") return printHelp();
 				
 			
 			

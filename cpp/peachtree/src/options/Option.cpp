@@ -27,6 +27,10 @@ void Option::hide() {
 	this->hidden = true;
 }
 
+bool Option::getHidden(){
+	return this->hidden;
+}
+
 
 jsonObject Option::toJSON(){
 	jsonObject j;

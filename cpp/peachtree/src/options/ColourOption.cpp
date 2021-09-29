@@ -99,6 +99,7 @@ string ColourOption::getVal() {
 
 void ColourOption::setVal(string value) {
 	value = Utils::toLower(value);
+	
 	for (int i = 0; i < this->colours.size(); i ++){
 		string col = Utils::toLower(this->colours.at(i));
 		if (col == value){
@@ -106,7 +107,7 @@ void ColourOption::setVal(string value) {
 			return;
 		}
 	}
-	this->value = this->colours.at(0);
+	// this->value = this->colours.at(0);
 }
 
 

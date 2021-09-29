@@ -20,6 +20,7 @@ public:
 	virtual ~Option();
 	virtual jsonObject toJSON();
 	string getName() ;
+	bool getHidden() ;
 	string getSection();
 	string getTitle();
 	string getLongTitle();

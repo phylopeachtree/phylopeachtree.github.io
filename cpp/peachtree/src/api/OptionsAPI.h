@@ -26,6 +26,9 @@ using namespace std;
 class OptionsAPI {
 public:
 
+
+	static const double VERSION_NUMBER;
+
 	// Boundaries
 	static NumericalOption* canvasWidth;
 	static NumericalOption* canvasHeight;

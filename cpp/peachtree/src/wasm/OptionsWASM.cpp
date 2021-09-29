@@ -32,6 +32,18 @@ extern "C" {
 		WasmAPI::messageFromWasmToJS("done");
 
 	}
+	
+	
+	/**
+	 * Build a tree from the alignment
+	 */
+	void EMSCRIPTEN_KEEPALIVE getVersionNumber() {
+
+		jsonObject j;
+		j["version"] = OptionsAPI::VERSION_NUMBER;
+		WasmAPI::messageFromWasmToJS(j.dump(0));
+
+	}
 
 
 

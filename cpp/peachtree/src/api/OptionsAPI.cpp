@@ -19,6 +19,9 @@
 #include "../epi/Timeline.h"
 
 
+
+const double OptionsAPI::VERSION_NUMBER = 0.1;
+
 const long OptionsAPI::CHUNK_SIZE = 30000;
 const long OptionsAPI::CHUNK_SIZE_SVG = 300;
 const double OptionsAPI::LEFT_MARGIN = 0; // Left hand margin

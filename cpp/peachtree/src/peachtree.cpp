@@ -69,7 +69,7 @@ int printHelp(){
 	cout << endl << "\tDisplay options:" << endl;
 	for (Option* option : OptionsAPI::getOptionList()){
 		
-		if (option->getHidden()) continue;
+		//if (option->getHidden()) continue;
 		
 		cout << "\t\t-" << option->getName() << " <value>. " << option->getLongTitle();
 		
@@ -344,12 +344,27 @@ int main(int argc, char *argv[]) {
 			OptionsAPI::setFocusingOnTaxa(true);
 			OptionsAPI::setFocusOnClade(true);
 			for (string acc : subtreeAccessions){
-				Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(acc);
-				if (taxon == nullptr){
-					cout << "Error: cannot select taxon " << acc << endl;
+				vector<Taxon*> taxa;
+				Taxon* taxon = aln->getTaxon(acc);
+				if (taxon == nullptr) {
+					taxa = aln->getTaxon(acc, OptionsAPI::sampleNameAnnotation->getVal());
+				}else{
+					taxa.push_back(taxon);
+				}
+				
+			
+				
+				
+				if (taxa.size() == 0){
+					cout << "Error: cannot select sample " << acc << endl;
 					return 0;
 				}
-				AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxon->getID());
+				
+				
+				for (Taxon* taxon2 : taxa){
+					cout << "Highlighting " << taxon2->getName() << endl;
+					AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxon2->getID());
+				}
 			}
 			
 		}
@@ -360,9 +375,26 @@ int main(int argc, char *argv[]) {
 		
 		// Highlight
 		for (string acc : toHighlight){
+			vector<Taxon*> taxa;
 			Taxon* taxon = aln->getTaxon(acc);
-			cout << "Highlighting " << acc << endl;
-			aln->selectTaxon(taxon->getID());
+			if (taxon == nullptr) {
+				taxa = aln->getTaxon(acc, OptionsAPI::sampleNameAnnotation->getVal());
+			}else{
+				taxa.push_back(taxon);
+			}
+			
+			
+			if (taxa.size() == 0){
+				cout << "Error: cannot highlight sample " << acc << endl;
+				return 0;
+			}
+			
+			
+			for (Taxon* taxon2 : taxa){
+				cout << "Highlighting " << taxon2->getName() << endl;
+				aln->selectTaxon(taxon2->getID());
+			}
+			
 		}
 		
 		

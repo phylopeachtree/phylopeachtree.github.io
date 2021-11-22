@@ -65,9 +65,8 @@ void Sequence::prepareArray(){
 	this->missingDataProportion = 0;
 	
 
-	//System.out.println("prepare array " + this.isNucleotide + " length " + this.sequence.length() + "/" + this.seqLen);
-	//System.out.println("'" + this.sequence + "'");
-	this->sequenceArr.resize(this->seqLen);
+	//this->sequenceArr.resize(this->seqLen);
+	this->sequenceArr = (char*)malloc(this->seqLen + 1);
 	for (int i = 0; i < this->seqLen; i ++) {
 		string site = this->sequence.substr(i, 1);
 		int val;
@@ -95,8 +94,8 @@ void Sequence::prepareArray(){
 			Error::throwError(str1);
 			return;
 		}
-		this->sequenceArr.at(i) = val;
-		
+		//this->sequenceArr.at(i) = val;
+		this->sequenceArr[i] = (char)val;
 		
 		// Count ungapped position
 		if (isGap){
@@ -403,7 +402,8 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 
 
 int Sequence::getSymbolInt(int site){
-	return this->sequenceArr.at(site);
+	//return this->sequenceArr.at(site);
+	return this->sequenceArr[site];
 }
 
 
@@ -428,7 +428,8 @@ string Sequence::getSymbol(int site){
  * Change the site
  */
 void Sequence::editSiteInt(int siteNum, int newSymbol){
-	this->sequenceArr.at(siteNum) = newSymbol;
+	//this->sequenceArr.at(siteNum) = newSymbol;
+	this->sequenceArr[siteNum] = (char)newSymbol;
 }
 
 

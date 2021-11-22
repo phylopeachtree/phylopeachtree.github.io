@@ -52,6 +52,8 @@ Alignment::Alignment(string& fasta) {
 
 	string seq;
 	const string opening = ">";
+	
+
 	for (string line : lines) {
 
 		//cout << line << endl;
@@ -87,7 +89,7 @@ Alignment::Alignment(string& fasta) {
 
 
 	}
-
+	
 
 	// Parse the last sequence
 	if (seq.length() > 0) {
@@ -492,6 +494,8 @@ int Alignment::getTaxonIndex(Taxon* taxon){
 }
 
 
+
+
 /*
  * Get taxon by index
  */
@@ -833,6 +837,26 @@ Taxon* Alignment::getTaxon(string label){
 	}
 	return nullptr;
 }
+
+
+
+/*
+ * Find the samples with this annotation value
+ */
+vector<Taxon*> Alignment::getTaxon(string value, string annotation){
+	vector<Taxon*> matches;
+	//cout << "Looking for taxon with " << annotation << " = " << value << endl;
+	for (Sequence* seq : this->getSequences()) {
+		Taxon* taxon = seq->getTaxon();
+		if (taxon->getValue(annotation) == value) {
+			matches.push_back(taxon);
+		}
+		
+	}
+	return matches;
+}
+
+
 
 Taxon* Alignment::getTaxon(int i){
 	int index = this->getTaxonIndex(i);

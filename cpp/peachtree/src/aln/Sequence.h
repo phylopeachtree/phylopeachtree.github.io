@@ -55,10 +55,11 @@ private:
 
 	Taxon* taxon;
 	string sequence;
-	vector<int> sequenceArr;
+	//vector<short> sequenceArr;
+	char* sequenceArr;
 	int seqLen;
 	bool isNucleotide;
-	vector<int> ungappedPos;
+	vector<short> ungappedPos;
 	double missingDataProportion;
 
 };

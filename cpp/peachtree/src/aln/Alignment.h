@@ -77,6 +77,7 @@ public:
 	void recalculateTaxonIndices();
 
 	Taxon* getTaxon(string label);
+	vector<Taxon*> getTaxon(string value, string annotation);
 	Taxon* getTaxon(int i);
 	Taxon* getTaxonFromIndex(int index);
 	int getTaxonIndex(Taxon* taxon);

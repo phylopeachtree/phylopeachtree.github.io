@@ -134,7 +134,7 @@ void PhylogenyAPI::prepareLabelling(Alignment* alignment) {
 jsonObject PhylogenyAPI::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, bool showTaxaOnTree, double nodeRadius,
 									string branchColourBy, string nodeColourBy, double fontSize, int rounding,
 									bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
-									string branchCol, string nodeCol){
+									ColourOption* branchCol, ColourOption* nodeCol){
 
 	return PhylogenyAPI::THE_TREE->getTreeGraphics(scalingTree, scalingLadder, branchWidth, AlignmentAPI::getFiltering(), showTaxaOnTree,
 				nodeRadius, branchColourBy, nodeColourBy, fontSize, rounding, transmissionTree, timeline, displayIncompatibleTransmissions,

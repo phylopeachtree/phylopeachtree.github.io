@@ -25,12 +25,14 @@ public:
 	double getMax();
 	void setVal(double val);
 	double getStepSize();
+	void resetToDefault();
 
 private:
 	double value;
 	double min;
 	double max;
 	double stepSize;
+	double defaultVal;
 };
 
 #endif /* OPTIONS_NUMERICALOPTION_H_ */

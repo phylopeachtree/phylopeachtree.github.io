@@ -42,7 +42,7 @@ extern "C" {
 		EpiAPI::setEpiAccessionsToDirty();
 
 		OptionsAPI::resetScroll();
-		OptionsAPI::resetWindowSize();
+		OptionsAPI::resetWindowSize(true, true);
 
 		WasmAPI::messageFromWasmToJS("");
 
@@ -80,7 +80,7 @@ extern "C" {
 		
 		AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);
 		OptionsAPI::resetScroll();
-		OptionsAPI::resetWindowSize();
+		OptionsAPI::resetWindowSize(true, true);
 
 
 		auto finish = high_resolution_clock::now();
@@ -263,7 +263,7 @@ extern "C" {
 		AlignmentAPI::mostRecentlySelectedTaxon=-1;
 		OptionsAPI::setFocusingOnTaxa(false);
 		OptionsAPI::setFocusOnClade(false);
-		OptionsAPI::resetWindowSize();
+		OptionsAPI::resetWindowSize(true, true);
 		AlignmentAPI::setSelectionToDirty();
 		WasmAPI::messageFromWasmToJS("{}");
 	}

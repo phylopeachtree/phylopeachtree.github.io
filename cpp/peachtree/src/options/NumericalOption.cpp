@@ -18,6 +18,7 @@ NumericalOption::NumericalOption(string name, string section, string title, doub
 	this->longTitle = title;
 	this->stepSize = stepSize;
 	this->hidden = false;
+	this->defaultVal = val;
 }
 
 
@@ -31,6 +32,7 @@ NumericalOption::NumericalOption(string name, string section, string title, doub
 	this->longTitle = title;
 	this->stepSize = stepSize;
 	this->hidden = hidden;
+	this->defaultVal = val;
 }
 
 
@@ -46,6 +48,10 @@ jsonObject NumericalOption::toJSON() {
 	return json;
 }
 
+
+void NumericalOption::resetToDefault(){
+	this->setVal(this->defaultVal);
+}
 
 double NumericalOption::getStepSize(){
 	return this->stepSize;

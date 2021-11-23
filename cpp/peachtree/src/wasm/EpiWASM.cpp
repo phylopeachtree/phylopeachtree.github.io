@@ -31,7 +31,7 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE removeEpiUpload(){
 		EpiAPI::cleanup();
 		OptionsAPI::resetScroll();
-		OptionsAPI::resetWindowSize();
+		OptionsAPI::resetWindowSize(true, true);
 		OptionsAPI::prepareEpiAnnotations();
 		OptionsAPI::prepareTreeAnnotationOptions();
 		WasmAPI::messageFromWasmToJS("");

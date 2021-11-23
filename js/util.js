@@ -526,6 +526,8 @@ function renderOptions(){
 		
 		callWasmFunction("treeIsReady", [], function(result){
 			
+			
+			// Tree ready to show?
 			if (result.ready) {
 				$("#btn_clade").show(100);
 				$("#downloadTreeBtn").show(100);
@@ -535,23 +537,37 @@ function renderOptions(){
 				$("#downloadTreeBtn").hide(0);
 			}
 			
+			
+			// Is there a real alignment there?
+			callWasmFunction("alignmentIsMock", [], function(result2){
+			
+				if (!result2.mock) {
+					$("#downloadAlignmentBtn").show(0);
+				}
+				else {
+					$("#downloadAlignmentBtn").hide(0);
+				}
+				
+				if (result.ready || result2.mock){
+					$("#buildTreeBtn").hide(0);
+				}else{
+					$("#buildTreeBtn").show(100);
+				}
+			
+			
+				
+			
+			
+			
+			});
+			
+			
+
+			
 		});
 		
 		
-		callWasmFunction("alignmentIsMock", [], function(result){
-			
-			if (!result.mock) {
-				$("#buildTreeBtn").show(100);
-				$("#downloadAlignmentBtn").show(0);
-			}
-			else {
-				$("#buildTreeBtn").hide(0);
-				$("#downloadAlignmentBtn").hide(0);
-			}
-			
-			
-			
-		});
+		
 		
 		
 				
@@ -854,8 +870,10 @@ function clearSelection(){
 	updateSelectionCSS();
 	addLoader($("#ctrl_loading_div"));
 	callWasmFunction("clearSelection", [], function(val) {
-		renderGraphics();
-		removeLoader($("#ctrl_loading_div"));
+		renderGraphics(function(){
+			removeLoader($("#ctrl_loading_div"));
+		});
+		
 	});
 	
 	

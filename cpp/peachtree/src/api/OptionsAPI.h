@@ -98,7 +98,7 @@ public:
 	static bool getVariantSitesOnly();
 	static void prepareColourings();
 	static void resetScroll();
-	static void resetWindowSize();
+	static void resetWindowSize(bool resetSize, bool resetDiv);
 	static vector<Option*> getOptionList();
 	static Colouring* getSelectedColouring();
 	static void prepareTreeAnnotationOptions();
@@ -122,6 +122,7 @@ public:
 	static const double INIT_HEIGHT;
 	static const double INIT_DIV1;
 	static const double INIT_DIV2;
+	static const double DIV1_NOALN;
 	static const double SCROLL_Y_NROWS;
 	static const int SITE_NUMBERING_EVERY;
 	

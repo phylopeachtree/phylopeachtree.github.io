@@ -38,7 +38,7 @@ extern "C" {
 		//OptionsAPI::prepareColourings();
 
 		OptionsAPI::resetScroll();
-		OptionsAPI::resetWindowSize();
+		OptionsAPI::resetWindowSize(true, true);
 		OptionsAPI::prepareTreeAnnotationOptions();
 		
 		if (AlignmentAPI::isMock()) AlignmentAPI::cleanup();

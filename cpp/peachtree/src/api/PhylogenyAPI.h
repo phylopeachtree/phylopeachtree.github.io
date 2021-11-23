@@ -10,6 +10,7 @@
 #include "../phy/Tree.h"
 #include "../phy/ClusterTree.h"
 #include "../epi/Timeline.h"
+#include "../options/ColourOption.h"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ public:
 	static double getHeight();
 	static jsonObject getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, bool showTaxaOnTree, double nodeRadius,
 			string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
-			string branchCol, string nodeCol);
+			ColourOption* branchCol, ColourOption* nodeCol);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
 	static void cleanup();
 	static void setOrderingToDirty();

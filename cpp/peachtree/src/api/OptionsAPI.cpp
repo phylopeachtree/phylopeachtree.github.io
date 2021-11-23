@@ -31,6 +31,7 @@ const double OptionsAPI::INIT_WIDTH = 1200;
 const double OptionsAPI::INIT_HEIGHT = INIT_WIDTH*0.618;
 const double OptionsAPI::INIT_DIV1 = 0.3;
 const double OptionsAPI::INIT_DIV2 = 0.5;
+const double OptionsAPI::DIV1_NOALN = 0.8;
 const double OptionsAPI::SCROLL_Y_NROWS = 7;
 const int OptionsAPI::SITE_NUMBERING_EVERY = 10;
 
@@ -59,7 +60,7 @@ NumericalOption* OptionsAPI::scrollX  = new NumericalOption("scrollX", "General"
 // Phylogeny
 DiscreteOption* OptionsAPI::treeMethods;
 NumericalOption* OptionsAPI::branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
-NumericalOption* OptionsAPI::nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 3, 0, 20, 0.5);
+NumericalOption* OptionsAPI::nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 4, 0, 20, 0.5);
 NumericalOption* OptionsAPI::treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 BooleanOption* OptionsAPI::showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);
 BooleanOption* OptionsAPI::transmissionTree = new BooleanOption("transmissionTree", "Phylogeny", "Display as a transmission tree", true);
@@ -546,7 +547,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 			
 			
 			// Yes ladder
-			treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing + OptionsAPI::TREE_LADDER_WIDTH,  xdivide1*width - spacing,
+			treeScaling = new Scaling(	OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE + spacing + OptionsAPI::TREE_LADDER_WIDTH*2,  xdivide1*width - spacing,
 										OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, treeHeight, treeMin);
 										
 			ladderScaling = new Scaling(OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE, OptionsAPI::LEFT_MARGIN+OptionsAPI::MARGIN_SIZE+OptionsAPI::TREE_LADDER_WIDTH,
@@ -565,7 +566,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 		bool displayIncompat = OptionsAPI::transmissionTree->getVal() && OptionsAPI::displayIncompatibleTranmissions->getVal();
 		jsonObject tree = PhylogenyAPI::getTreeGraphics(treeScaling, ladderScaling, branchW, OptionsAPI::showTaxaOnTree->getVal(), nodeRad,
 				branchColourBy, nodeColourBy, fontSize, rounding, OptionsAPI::transmissionTree->getVal(), EpiAPI::getTimeline(), displayIncompat,
-				OptionsAPI::branchColouring->getVal(), OptionsAPI::nodeColouring->getVal());
+				OptionsAPI::branchColouring, OptionsAPI::nodeColouring);
 		objs.insert(objs.end(), tree.begin(), tree.end());
 
 
@@ -986,11 +987,41 @@ void OptionsAPI::resetScroll() {
 
 
 /*
- * Reset window width/height
+ * Reset window dimensions
 */
-void OptionsAPI::resetWindowSize () {
-	OptionsAPI::canvasWidth->setVal(OptionsAPI::INIT_WIDTH);
-	OptionsAPI::canvasHeight->setVal(OptionsAPI::INIT_HEIGHT);
+void OptionsAPI::resetWindowSize(bool resetSize, bool resetDiv) {
+	
+	if (resetSize) {
+		OptionsAPI::canvasWidth->setVal(OptionsAPI::INIT_WIDTH);
+		OptionsAPI::canvasHeight->setVal(OptionsAPI::INIT_HEIGHT);
+	}
+
+	if (resetDiv) {
+		if (INIT_DIV1 > division2->getVal() || division2->getVal() >= 1) {
+			division2->setVal(INIT_DIV2);
+		}
+		
+		
+		if (AlignmentAPI::isMock()){
+			division1->setVal(DIV1_NOALN);
+			division2->setVal(1.0);
+		}
+		
+		else{
+		
+		
+			if (PhylogenyAPI::isReady()){
+				//cout << "setting div1 to " << INIT_DIV1 << endl;
+				division1->setVal(INIT_DIV1);
+			}else{
+				//cout << "tree not rdy setting div1 to " << 0 << endl;
+				division1->setVal(0);
+			}
+		
+		}
+	}
+	
+	
 }
 
 
@@ -1041,15 +1072,10 @@ Colouring* OptionsAPI::getSelectedColouring(){
  * Prepares all node annotations
  */
 void OptionsAPI::prepareTreeAnnotationOptions(){
+	
+	
+	OptionsAPI::resetWindowSize(false, true);
 
-	if (INIT_DIV1 > division2->getVal()) {
-		division2->setVal(INIT_DIV2);
-	}
-	if (PhylogenyAPI::isReady()){
-		division1->setVal(INIT_DIV1);
-	}else{
-		division1->setVal(0);
-	}
 
 
 	vector<string> annotations;

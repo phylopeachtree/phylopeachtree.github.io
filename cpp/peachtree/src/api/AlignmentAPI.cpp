@@ -242,7 +242,7 @@ void AlignmentAPI::makeMockAlignment(Tree* tree){
 
 	EpiAPI::setEpiAccessionsToDirty();
 	EpiAPI::validateAccessions(AlignmentAPI::THE_ALIGNMENT);
-	OptionsAPI::resetWindowSize();
+	OptionsAPI::resetWindowSize(true, false);
 	
 	AlignmentAPI::annotateTaxa(tree);
 	AlignmentAPI::annotateTaxa(EpiAPI::EPIDEMIOLOGY);

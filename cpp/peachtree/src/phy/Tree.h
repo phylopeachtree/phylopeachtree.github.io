@@ -17,6 +17,7 @@
 #include "../aln/Alignment.h"
 #include "../aln/Taxon.h"
 #include "../options/Scaling.h"
+#include "../options/ColourOption.h"
 
 
 using namespace std;
@@ -48,7 +49,7 @@ public:
 	
 	jsonObject getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
 								double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree,
-								Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol);
+								Timeline* timeline, bool displayIncompatibleTransmissions, ColourOption* branchCol, ColourOption* nodeCol);
 	double getHeight();
 	void applyFiltering(Filtering* filtering);
 	vector<Taxon*> getClade(vector<Taxon*> taxa);
@@ -71,7 +72,7 @@ protected:
 	vector<Node*> nodes;
 	Alignment* alignment;
 	bool parsedFromFile;
-	jsonObject getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, string maxCol);
+	jsonObject getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, vector<string> palette);
 };
 
 #endif /* PHY_TREE_H_ */

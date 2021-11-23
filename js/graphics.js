@@ -158,7 +158,7 @@ function renderGraphics(resolve = function() {}){
 
 
 		// Get width and height
-		var maxH = $( window ).height() - $("#mainHeader").offset().top - 250;
+		var maxH = $( window ).height() - $("#mainHeader").offset().top - 300;
 		var maxW = $("#main").offset().left + $("#main").width();
 		//console.log("bottomY", maxH, maxW);
 	

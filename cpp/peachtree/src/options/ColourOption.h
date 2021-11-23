@@ -24,10 +24,13 @@ public:
 	virtual jsonObject toJSON() override;
 	string getVal();
 	void setVal(string val);
+	vector<string> getPalette();
 
 private:
+	int currentIndex;
 	string value;
 	vector<string> colours;
+	vector<vector<string>> colourPalettes;
 	void initCols();
 };
 

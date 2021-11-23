@@ -490,9 +490,9 @@ string Node::getAnnotationValue(string var){
 /**
  * Get hex code for this value
  */
-string Node::getAnnotationColour(double val, double min, double max, string colourMax){
+string Node::getAnnotationColour(double val, double min, double max, vector<string> palette){
 
-
+	/*
 	// Get RGB
 	int red = Utils::getRed(colourMax);
 	int green = Utils::getGreen(colourMax);
@@ -503,12 +503,18 @@ string Node::getAnnotationColour(double val, double min, double max, string colo
 	int red_ = 255 - red;
 	int green_ = 255 - green;
 	int blue_ = 255 - blue;
+	*/
 
 
-	// Scale rgb
+	// Scale
 	double scale = (val - min) / (max - min);
 	if (scale < 0) scale = 0;
 	if (scale > 1) scale = 1;
+	int index = scale*(palette.size()-1);
+	return palette.at(index);
+	
+	
+	/*
 	int redVal = (red - red_)*scale + red_;
 	int greenVal = (green - green_)*scale + green_;
 	int blueVal = (blue - blue_)*scale + blue_;
@@ -519,11 +525,13 @@ string Node::getAnnotationColour(double val, double min, double max, string colo
 
 	// Convert to hex
 	string colourHex = Utils::getHexCode(redVal, greenVal, blueVal);
+	
+	return colourHex;
 
 	//cout << "colourHex: " << colourHex << endl;
+	*/
 
-
-	return colourHex;
+	
 
 }
 
@@ -531,7 +539,7 @@ string Node::getAnnotationColour(double val, double min, double max, string colo
 /**
  * Get hex code for this annotation
  */
-string Node::getAnnotationColour(string var, double min, double max, string colourMax){
+string Node::getAnnotationColour(string var, double min, double max, vector<string> palette){
 
 	string val = this->getAnnotationValue(var);
 	//cout << var << "=" << val << "|" << min << "," << max << endl;
@@ -539,7 +547,7 @@ string Node::getAnnotationColour(string var, double min, double max, string colo
 	double val_d = 0;
 	if (Utils::is_number(val)) val_d = stof(val);
 
-	return this->getAnnotationColour(val_d, min, max, colourMax);
+	return this->getAnnotationColour(val_d, min, max, palette);
 }
 
 
@@ -548,7 +556,7 @@ string Node::getAnnotationColour(string var, double min, double max, string colo
  */
 double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Scaling* scaling, double branchWidth,
 		bool showTaxaOnTree, double yshift, double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding,
-		bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol,
+		bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions, ColourOption* branchCol, ColourOption* nodeCol,
 		vector<double>& minMaxNode, vector<double>& minMaxBranch){
 
 
@@ -602,10 +610,10 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 
 
 	// Colours
-	string bcol = branchCol;
-	string ncol = nodeCol;
-	if (branchColourBy != "") bcol = getAnnotationColour(branchColourBy, minMaxBranch.at(0), minMaxBranch.at(1), branchCol);
-	if (nodeColourBy != "") ncol = getAnnotationColour(nodeColourBy, minMaxNode.at(0), minMaxNode.at(1), nodeCol);
+	string bcol = branchCol->getVal();
+	string ncol = nodeCol->getVal();
+	if (branchColourBy != "") bcol = getAnnotationColour(branchColourBy, minMaxBranch.at(0), minMaxBranch.at(1), branchCol->getPalette());
+	if (nodeColourBy != "") ncol = getAnnotationColour(nodeColourBy, minMaxNode.at(0), minMaxNode.at(1), nodeCol->getPalette());
 
 	// Dashed line to taxa
 	if (this->isLeaf() && showTaxaOnTree && this->getHeight(timeline) > 0) {

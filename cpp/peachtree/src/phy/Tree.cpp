@@ -383,7 +383,7 @@ int Tree::getNodesPostOrder(Node* node, vector<Node*>* nodes, int pos){
 /*
  * Get graphics for a colour ladder
  */
-jsonObject Tree::getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, string maxCol){
+jsonObject Tree::getLadderGraphics(string label, double top, double left, double stepHeight, double stepWidth, int ladderSize, double min, double max, Node* subtree, vector<string> palette){
 
 	json arr = json::array();
 
@@ -394,8 +394,8 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
 	// Plot a legend for node colouring
 	for (int step = 0; step < ladderSize; step ++){
 
-		double val = (stepHeight-step) * (max - min) / ladderSize + min;
-		string col = subtree->getAnnotationColour(val, min, max, maxCol);
+		double val = 1.0*step / (ladderSize-1) * (max - min) + min;
+		string col = subtree->getAnnotationColour(val, min, max, palette);
 
 
 		// Background colour
@@ -460,7 +460,7 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
  */
 jsonObject Tree::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, double branchWidth, Filtering* filtering, bool showTaxaOnTree,
 						double nodeRadius, string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree,
-						Timeline* timeline, bool displayIncompatibleTransmissions, string branchCol, string nodeCol){
+						Timeline* timeline, bool displayIncompatibleTransmissions, ColourOption* branchCol, ColourOption* nodeCol){
 
 
 	jsonObject objs = json::array();
@@ -524,27 +524,33 @@ jsonObject Tree::getTreeGraphics(Scaling* scalingTree, Scaling* scalingLadder, d
 		
 		
 		// Draw colour legends
-		const int ladderSize = 10;
+		int ladderSize = 0;
 		const double ladderMargin = 4;
 		const double ladderHeight = 11;
 		const double ladderWidth = scalingLadder->getCanvasMaxX() - scalingLadder->getCanvasMinX() - 2*ladderMargin - 2*ladderHeight; 
 		
 		if (nodeColourBy != ""){
 			
+			vector<string> palette = nodeCol->getPalette();
+			ladderSize = palette.size();
+			
 
 			double top = scalingLadder->getCanvasMinY() + ladderMargin;
 			double left = scalingLadder->getCanvasMinX() + ladderMargin;
-			jsonObject ladder = getLadderGraphics("Node " + nodeColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxNode.at(0), minMaxNode.at(1),  subtree, nodeCol);
+			jsonObject ladder = getLadderGraphics("Node " + nodeColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxNode.at(0), minMaxNode.at(1),  subtree, palette);
 			objs.insert(objs.end(), ladder.begin(), ladder.end());
 		}
 		if (branchColourBy != ""){
 
 
+			vector<string> palette = branchCol->getPalette();
 
 			double top = scalingLadder->getCanvasMinY() + ladderMargin;
 			if (nodeColourBy != "") top = scalingLadder->getCanvasMaxY() - ladderMargin - ladderHeight*(ladderSize+2);
+			ladderSize = palette.size();
+			
 			double left = scalingLadder->getCanvasMinX() + ladderMargin;
-			jsonObject ladder = getLadderGraphics("Branch " + branchColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxBranch.at(0), minMaxBranch.at(1),  subtree, branchCol);
+			jsonObject ladder = getLadderGraphics("Branch " + branchColourBy, top, left, ladderHeight, ladderWidth, ladderSize, minMaxBranch.at(0), minMaxBranch.at(1), subtree, palette);
 			objs.insert(objs.end(), ladder.begin(), ladder.end());
 		}
 

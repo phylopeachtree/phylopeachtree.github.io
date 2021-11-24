@@ -1179,7 +1179,7 @@ function savePng(svgEl, name){
     }.bind(this);
 
     // btoa — binary string to ASCII (Base64-encoded)
-    image.src = 'data:image/svg+xml;base64,' + btoa(svgStr); 
+    image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr))); 
 	
 
 	

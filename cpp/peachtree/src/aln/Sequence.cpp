@@ -345,10 +345,9 @@ json Sequence::getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth,
 				nt_bg["ele"] = "rect";
 				nt_bg["x"] = xc;
 				nt_bg["y"] = yc_rect_scaled;
-				nt_bg["width"] = ntWidth+1;
+				nt_bg["width"] = ntWidth;
 				nt_bg["height"] = heightScaled;
 				nt_bg["fill"] = colour;
-				nt_bg["stroke"] = colour;
 
 				arr.push_back(nt_bg);
 			 

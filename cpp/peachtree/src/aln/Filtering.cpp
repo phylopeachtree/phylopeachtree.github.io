@@ -485,16 +485,18 @@ void Filtering::prepareMajorAlleles(Alignment* alignment){
 		freqs.clear();
 		for (const auto &pair : this->taxaIDsToInclude) {
 
-			int taxonNum = pair.first;
+			int taxonID = pair.first;
+			int taxonIndex = alignment->getTaxonIndex(taxonID);
 
 			// Count
-			character = alignment->getSequence(taxonNum)->getSymbolInt(siteNum);
+			character = alignment->getSequence(taxonIndex)->getSymbolInt(siteNum);
 			if (character == -1) continue;
 			if (freqs.count(character) > 0) {
 				count = freqs[character] + 1;
 			}else {
 				count = 1;
 			}
+			
 			freqs[character] = count;
 
 		}
@@ -506,12 +508,14 @@ void Filtering::prepareMajorAlleles(Alignment* alignment){
 		for (const auto &pair : freqs) {
 			int c = pair.first;
 			count = freqs[c];
+			//cout << "site " << siteNum << ": count of " << c << " is " << count << endl;
 			if (count > maxCount) {
 				maxCount = count;
 				major = c;
 			}
 		}
 
+		//cout << "major at " << siteNum << " is " << major << " with count " << maxCount << endl;
 		this->majors[siteNum] = major;
 
 	}

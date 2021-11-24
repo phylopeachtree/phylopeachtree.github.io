@@ -82,6 +82,7 @@
 		</div>
 
 
+
 		
 		
 		<div id="upload_div" style="display:none">
@@ -241,7 +242,8 @@
 					<span class="dropdown">
 					<button class="dropbtn">Download &#x25BC;</button>
 					  <div class="dropdown-content">
-						<a id="downloadImageBtn" onclick="downloadImage()" title="Download the image in svg format">Image (.svg)</a>
+						<a id="downloadImageSVGBtn" onclick="downloadImage('svg')" title="Download the image in svg format">Image (.svg)</a>
+						<a id="downloadImagePNGBtn" onclick="downloadImage('png')" title="Download the image in png format">Image (.png)</a>
 						<a id="downloadSamplesBtn" onclick="downloadSamples()" title="Download the displayed samples and any metadata they display">Samples (.csv)</a>
 						<a id="downloadAlignmentBtn" onclick="downloadAlignment()" title="Download the displayed samples and sites in fasta format">Alignment (.fasta)</a>
 						<a id="downloadTreeBtn" onclick="downloadTree()" title="Download the displayed tree in nexus format">Tree (.nexus)</a>

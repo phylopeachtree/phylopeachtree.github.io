@@ -294,7 +294,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
 	jsonObject json;
 
-	bool download = downloadInt == 1;
+	bool download = downloadInt > 0;
 
 	if (!OptionsAPI::isReady()) {
 		return json;
@@ -327,6 +327,8 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	
 	double width = OptionsAPI::canvasWidth->getVal();
 	double height = OptionsAPI::canvasHeight->getVal();
+	
+
 
 
 	// Ensure the svg fits in the page
@@ -706,33 +708,35 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 	}
 
 
-
+	jsonObject topObjs; // = new JSONArray();
 
 	// Top and left margin backgrounds
-	jsonObject top;
-	top["ele"] = "rect";
-	top["x"] = 0;
-	top["y"] = 0;
-	top["width"] = width;
-	top["height"] = OptionsAPI::MARGIN_SIZE;
-	top["fill"] = "#FFDAB9";
-	top["layer"] = 2;
+	if (!download){
+		jsonObject top;
+		top["ele"] = "rect";
+		top["x"] = 0;
+		top["y"] = 0;
+		top["width"] = width;
+		top["height"] = OptionsAPI::MARGIN_SIZE;
+		top["fill"] = "#FFDAB9";
+		top["layer"] = 2;
 
-	jsonObject left;
-	left["ele"] = "rect";
-	left["x"] = 0;
-	left["y"] = 0;
-	left["width"] = OptionsAPI::MARGIN_SIZE;
-	left["height"] = height;
-	left["fill"] = "#FFDAB9";
-	left["layer"] = 2;
+		jsonObject left;
+		left["ele"] = "rect";
+		left["x"] = 0;
+		left["y"] = 0;
+		left["width"] = OptionsAPI::MARGIN_SIZE;
+		left["height"] = height;
+		left["fill"] = "#FFDAB9";
+		left["layer"] = 2;
 
 
-	// Add top layer objects
-	jsonObject topObjs; // = new JSONArray();
-	topObjs.push_back(top);
-	topObjs.push_back(left);
-	json["objects"] = topObjs;
+		// Add top layer objects
+		topObjs.push_back(top);
+		topObjs.push_back(left);
+		json["objects"] = topObjs;
+		
+	}
 	
 	
 	

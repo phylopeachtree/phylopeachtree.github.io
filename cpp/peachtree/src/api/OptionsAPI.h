@@ -28,6 +28,7 @@ public:
 
 
 	static const double VERSION_NUMBER;
+	
 
 	// Boundaries
 	static NumericalOption* canvasWidth;

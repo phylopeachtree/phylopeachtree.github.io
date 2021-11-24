@@ -986,7 +986,7 @@ function downloadTree(){
 /*
 	Download the svg
 */
-function downloadImage(){
+function downloadImage(format = "svg"){
 
 
 	isReadyToRender(function(ready){
@@ -1001,7 +1001,14 @@ function downloadImage(){
 
 
 		var resolve = function(){
-			saveSvg(document.getElementById(svgID), "peachtree.svg");
+			if (format == "svg"){
+				saveSvg(document.getElementById(svgID), "peachtree");
+			}
+			
+			else if (format == "png"){
+				savePng(document.getElementById(svgID), "peachtree");
+			}
+			
 			DOWNLOADING = false;
 			removeLoader($("#ctrl_loading_div"));
 		};
@@ -1090,8 +1097,11 @@ function downloadImage(){
 	Save the svg
 */
 function saveSvg(svgEl, name) {
+	
+	
+	name = name + ".svg";
 
-	console.log("saving as", name);
+	console.log("saving svg as", name);
 
 	svgEl.setAttribute("xmlns", SVGNS);
 	var svgData = svgEl.outerHTML;
@@ -1104,6 +1114,75 @@ function saveSvg(svgEl, name) {
 	document.body.appendChild(downloadLink);
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
+}
+
+
+
+/*
+	Save the svg as png
+*/
+function savePng(svgEl, name){
+	
+	
+	const SCALE_BY = 4;
+	svgEl = $(svgEl);
+	
+	name = name + ".png";
+	
+	console.log("saving png as", name);
+	
+
+	// Scale width and heigght. Apsect ratio will be preserved by viewBox
+	svgEl.attr("xmlns", "http://www.w3.org/2000/svg");
+	const w = parseFloat(svgEl.css("width"))*SCALE_BY;
+	const h = parseFloat(svgEl.css("height"))*SCALE_BY;
+	svgEl.attr("width", w);
+	svgEl.attr("height", h);
+	svgEl.removeClass("width");
+	svgEl.removeClass("height");
+	
+	// Generate blob for png
+	var svgStr = $(svgEl).prop('outerHTML');
+
+
+	
+	// Create canvas
+	var canvas = document.createElement("canvas"); // create <canvas> element
+    canvas.width = w;
+    canvas.height = h;
+	
+    var context = canvas.getContext("2d");
+	
+    let image = new Image; // create <img> element
+	
+	
+	// Download
+	image.onload = function () {
+		
+		// White bg
+		context.fillStyle = "white";
+		context.fillRect(0, 0, w, h); 
+		
+		// Figure
+		context.drawImage(image, 0, 0);
+		
+		var url = canvas.toDataURL("image/png");
+		//console.log(url);
+		var downloadLink = document.createElement("a");
+		downloadLink.href = url;
+		downloadLink.download = name;
+		document.body.appendChild(downloadLink);
+		downloadLink.click();
+		document.body.removeChild(downloadLink);
+		
+        
+    }.bind(this);
+
+    // btoa — binary string to ASCII (Base64-encoded)
+    image.src = 'data:image/svg+xml;base64,' + btoa(svgStr); 
+	
+
+	
 }
 
 

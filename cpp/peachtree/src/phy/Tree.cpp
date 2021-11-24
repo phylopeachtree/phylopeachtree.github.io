@@ -394,7 +394,7 @@ jsonObject Tree::getLadderGraphics(string label, double top, double left, double
 	// Plot a legend for node colouring
 	for (int step = 0; step < ladderSize; step ++){
 
-		double val = 1.0*step / (ladderSize-1) * (max - min) + min;
+		double val = (1.0*ladderSize-step-1) / (ladderSize-1) * (max - min) + min;
 		string col = subtree->getAnnotationColour(val, min, max, palette);
 
 

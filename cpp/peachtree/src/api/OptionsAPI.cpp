@@ -426,10 +426,21 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
 	// Shrink width?
 	if (width*(1-xdivide2) > fullAlnWidth) {
+		
+		
+		double xdivide1Abs = xdivide1 * width;
+		
+		
 		OptionsAPI::canvasWidth->setVal(width*xdivide2 + fullAlnWidth);
 		width = OptionsAPI::canvasWidth->getVal();
 		OptionsAPI::division2->setVal((width-fullAlnWidth)/width);
 		xdivide2 = OptionsAPI::division2->getVal();
+		
+		// Keep div1 absolute value constant
+		OptionsAPI::division1->setVal(xdivide1Abs / width);
+		xdivide1 = OptionsAPI::division1->getVal();
+		
+		
 	}
 
 

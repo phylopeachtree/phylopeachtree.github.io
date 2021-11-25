@@ -1142,6 +1142,8 @@ string Alignment::downloadSamples(Filtering* filtering, string sampleNameAnnotat
 	if (reportInfections) csv+= ",numInfections";
 	csv += "\n";
 	
+	
+	
 	// Body
 	for (int seqNum = 0; seqNum < this->sequences.size(); seqNum++) {
 		Sequence* sequence = this->getSequence(seqNum);
@@ -1168,6 +1170,13 @@ string Alignment::downloadSamples(Filtering* filtering, string sampleNameAnnotat
 	
 	return csv;
 	
+	
 }
+
+
+
+
+
+
 
 

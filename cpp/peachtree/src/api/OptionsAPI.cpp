@@ -870,7 +870,7 @@ void OptionsAPI::prepareEpiAnnotations() {
 	
 
 
-
+	/*
 	// Smart matching by string match
 	for (string var : vals){
 
@@ -906,6 +906,7 @@ void OptionsAPI::prepareEpiAnnotations() {
 		}
 
 	}
+	*/
 
 
 }

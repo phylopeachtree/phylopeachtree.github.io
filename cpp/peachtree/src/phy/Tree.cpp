@@ -109,7 +109,7 @@ vector<Tree*> Tree::parseTrees(string nexus){
 			// Remove " from start and end if there are spaces in the label
 			if (splt.size() > 2) {
 				if (label.substr(0, 1) == "\"" && label.substr(label.length()-1, label.length()) == "\"") {
-					label = label.substr(1, label.length()-1);
+					label = label.substr(1, label.length()-2);
 				}
 			}
 
@@ -120,6 +120,8 @@ vector<Tree*> Tree::parseTrees(string nexus){
 				return trees;
 			}
 			translateMap[id] = label;
+			
+			//cout << id << "=" << label << endl;
 
 		}
 

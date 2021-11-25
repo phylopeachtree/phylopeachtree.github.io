@@ -261,7 +261,7 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData, vector<stri
 	string buf;
 	
 	bool isStart = false;
-	if (maxNodeInClade == -1) {
+	if (maxNodeInClade < 0) {
 		maxNodeInClade = 0;
 		isStart = true;
 	}
@@ -286,7 +286,7 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData, vector<stri
                     buf.append(child1);
                     buf.append(",");
                     buf.append(child2);
-                    maxNodeInClade = child1Index;
+                    maxNodeInClade = child2Index;
                 }
             } else {
                 buf.append(child1);
@@ -328,10 +328,14 @@ string Node::toSortedNewick(int& maxNodeInClade, bool printMetaData, vector<stri
         //maxNodeInClade = nodeNr;
 		if (labels != nullptr) labels->push_back(this->getAcc());
         //buf.append(nodeNr + 1);
+		
+		maxNodeInClade++;
+		buf.append(to_string(maxNodeInClade));
+		
+		
     }
 
-	buf.append(to_string(maxNodeInClade));
-	maxNodeInClade++;
+	
 	
    // buf.append(this->getAcc());
 
@@ -628,7 +632,7 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			dashed_json["y1"] = yscaled;
 			dashed_json["y2"] = yscaled;
 			dashed_json["stroke_width"] = branchWidth/2;
-			dashed_json["stroke"] = "black";
+			dashed_json["stroke"] = "#00000088";
 			dashed_json["stroke_linecap"] = "round";
 			dashed_json["stroke_dasharray"] = "4,7";
 			objs.push_back(dashed_json);

@@ -642,7 +642,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 			if (nsitesInView > AlignmentAPI::getNsitesDisplayed()) nsitesInView = AlignmentAPI::getNsitesDisplayed();
 			double remainder = minWidth * (nsitesInView - std::floor(nsitesInView));
 			alnViewWidth = alnViewWidth - remainder;
-			nsitesInViewInt = std::floor(nsitesInView);
+			nsitesInViewInt = std::round(nsitesInView);
 			Colouring* cols = OptionsAPI::getSelectedColouring();
 			cols->setSiteColourFilter(OptionsAPI::siteColourType->getVal(), AlignmentAPI::getFiltering());
 			//cout << "Using the " << cols->getName() << " scheme" << endl;
@@ -651,7 +651,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
 			// Scaling
 			Scaling* scaling = new Scaling(xdivide2*width, width - remainder /*xdivide2*width + minWidth*nsitesInView*/,
-											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, nsitesInViewInt);
+											OptionsAPI::TOP_MARGIN+OptionsAPI::MARGIN_SIZE, height, 0, std::floor(nsitesInView));
 			scaling->setRowHeight(ntHeight);
 			scaling->setScroll(OptionsAPI::scrollX->getVal(), scrolly, fullAlnWidth, fullHeight);
 
@@ -758,6 +758,9 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 		metaData["x"] = OptionsAPI::MARGIN_SIZE;
 		metaData["y"] = OptionsAPI::MARGIN_SIZE/2;
 		string label = "Showing " + to_string(AlignmentAPI::getNtaxaDisplayed()) + "/" + to_string(AlignmentAPI::getNtaxa()) + " samples";
+		if (nsitesInViewInt > 0){
+			label += " and " + to_string(nsitesInViewInt) + "/" + to_string(AlignmentAPI::getNsites()) + " sites";
+		}
 		metaData["value"] = label;
 		metaData["text_anchor"] = "start";
 		metaData["font_size"] = 9;

@@ -59,7 +59,7 @@ NumericalOption* OptionsAPI::scrollX  = new NumericalOption("scrollX", "General"
 
 // Phylogeny
 DiscreteOption* OptionsAPI::treeMethods;
-NumericalOption* OptionsAPI::branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 20, 0.5);
+NumericalOption* OptionsAPI::branchwidth = new NumericalOption("branchWidth", "Phylogeny", "Branch width", 2, 0.25, 10, 0.25);
 NumericalOption* OptionsAPI::nodeRadius = new NumericalOption("nodeRadius", "Phylogeny", "Node radius", 4, 0, 20, 0.5);
 NumericalOption* OptionsAPI::treeSpacing = new NumericalOption("treeSpacing", "Phylogeny", "Horizontal padding around tree", 5, 0, 50, 5);
 BooleanOption* OptionsAPI::showTaxaOnTree = new BooleanOption("showTaxaOnTree", "Phylogeny", "Indicate taxa on tree", true);

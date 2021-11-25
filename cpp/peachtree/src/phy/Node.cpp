@@ -509,6 +509,10 @@ string Node::getAnnotationColour(double val, double min, double max, vector<stri
 	int blue_ = 255 - blue;
 	*/
 
+	if (min >= max) {
+		return palette.at(0);
+	}
+
 
 	// Scale
 	double scale = (val - min) / (max - min);
@@ -646,6 +650,9 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 	if (shoulderInRange && !this->isLeaf() && nValidChildren > 1) {
 
 
+
+		
+
 		jsonObject shoulder_json;
 		shoulder_json["ele"] = "line";
 		shoulder_json["x1"] = x2Scaled;
@@ -655,7 +662,22 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 		shoulder_json["stroke_width"] = branchWidth;
 		shoulder_json["stroke"] = bcol;
 		shoulder_json["stroke_linecap"] = "round";
+		
+		
+		// Add a black border around the branch so the colour can be seen easier
+		if (branchColourBy != ""){
+			jsonObject shoulder_border_json = shoulder_json;
+			shoulder_border_json["stroke_width"] = branchWidth*2;
+			shoulder_border_json["stroke"] = "black";
+			objs.push_back(shoulder_border_json);
+		}
+
+		
 		objs.push_back(shoulder_json);
+		
+		
+		
+
 
 
 
@@ -680,6 +702,17 @@ double Node::getGraphics(bool isRoot, jsonObject& objs, Filtering* filtering, Sc
 			branch_json["stroke_width"] = branchWidth;
 			branch_json["stroke"] = bcol;
 			branch_json["stroke_linecap"] = "round";
+			
+			
+			// Add a black border around the branch so the colour can be seen easier
+			if (branchColourBy != ""){
+				jsonObject branch_border_json = branch_json;
+				branch_border_json["stroke_width"] = branchWidth*2;
+				branch_border_json["stroke"] = "black";
+				objs.push_back(branch_border_json);
+			}
+			
+			
 			objs.push_back(branch_json);
 
 		}

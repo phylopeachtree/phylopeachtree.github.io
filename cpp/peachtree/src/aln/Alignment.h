@@ -44,6 +44,7 @@ public:
 	static bool isAmbiguousOrGap(string symbol, bool isNT);
 	static void prepareAlignmentChars();
 	static bool isGap(int index, bool isNT);
+	static vector<char> getSymbols(bool isNT);
 	
 
 

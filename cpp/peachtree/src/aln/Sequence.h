@@ -44,6 +44,7 @@ public:
 	json getTaxonGraphics(Scaling* scaling, int seqNum, Filtering* filtering, double textSize, bool showTaxonNumbers, double yshift, bool displayMissingPercentage, string sampleNameAnnotation, bool reportInfections);
 	json getSequenceGraphics(Scaling* scaling, int seqNum, double ntWidth, Colouring* colouring, Filtering* filtering, double textSize, double yshift);
 	int getSymbolInt(int site);
+	char getSymbolChar(int site);
 	string getSymbol(int site);
 	void editSiteInt(int siteNum, int newSymbol);
 	double getY0(int seqNum, Scaling* scaling);

@@ -992,6 +992,30 @@ bool Alignment::isGap(int index, bool isNT){
 }
 
 
+
+/*
+	Get vector of valid symbols
+*/
+vector<char> Alignment::getSymbols(bool isNT){
+	
+	vector<char> symbols;
+	
+	if (isNT){
+		for(std::map<string,int>::iterator it = Alignment::nt_chars.begin(); it != nt_chars.end(); ++it) {
+			symbols.push_back(it->second);
+		}
+	}else{
+		for(std::map<string,int>::iterator it = Alignment::alpha_chars.begin(); it != alpha_chars.end(); ++it) {
+			symbols.push_back(it->second);
+		}
+	}
+
+	
+	return symbols;
+	
+}
+
+
 /**
  * Initialise maps of nucleotides and alphas
  */

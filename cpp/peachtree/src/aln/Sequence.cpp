@@ -67,9 +67,11 @@ void Sequence::prepareArray(){
 
 	//this->sequenceArr.resize(this->seqLen);
 	this->sequenceArr = (char*)malloc(this->seqLen + 1);
+	string site;
+	int val;
+	bool isGap;
 	for (int i = 0; i < this->seqLen; i ++) {
-		string site = this->sequence.substr(i, 1);
-		int val;
+		site = this->sequence.substr(i, 1);
 		
 		if (this->isNucleotide) {
 			val = Alignment::getNucleotideInt(site);
@@ -85,7 +87,7 @@ void Sequence::prepareArray(){
 		
 		
 		
-		bool isGap = Alignment::isGap(val, this->isNucleotide);
+		isGap = Alignment::isGap(val, this->isNucleotide);
 		
 		//System.out.println("putting " + val + " at site " + i + " for symbol " + site);
 		if (val == -1) {
@@ -95,7 +97,7 @@ void Sequence::prepareArray(){
 			return;
 		}
 		//this->sequenceArr.at(i) = val;
-		this->sequenceArr[i] = (char)val;
+		this->sequenceArr[i] = val;
 		
 		// Count ungapped position
 		if (isGap){
@@ -405,6 +407,11 @@ int Sequence::getSymbolInt(int site){
 	return this->sequenceArr[site];
 }
 
+
+char Sequence::getSymbolChar(int site){
+	//return this->sequenceArr.at(site);
+	return this->sequenceArr[site];
+}
 
 string Sequence::getSymbol(int site){
 

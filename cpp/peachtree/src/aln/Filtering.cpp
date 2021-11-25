@@ -128,7 +128,7 @@ void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alig
 			if (alignment->isConstantSite(site)) continue;
 
 			bool includeSite = false;
-			int uniqueSymbol = -1;
+			char uniqueSymbol = '?';
 			for (int taxa = 0; taxa < alignment->getNtaxa(); taxa++) {
 
 				Taxon* taxon = alignment->getSequence(taxa)->getTaxon();
@@ -139,11 +139,11 @@ void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alig
 				Sequence* sequence = alignment->getSequence(taxa);
 
 				// What is the symbol?
-				int symbol = sequence->getSymbolInt(site);
+				char symbol = sequence->getSymbolChar(site);
 				//if (Alignment::isAmbiguousOrGap(symbol, sequence->getIsNucleotide())) continue;
 				if (Alignment::isAmbiguous(symbol, sequence->getIsNucleotide())) continue;
 
-				if (uniqueSymbol == -1) {
+				if (uniqueSymbol == '?') {
 					uniqueSymbol = symbol;
 				}
 				else if (uniqueSymbol != symbol) {
@@ -369,8 +369,8 @@ int Filtering::getNumUniqueSequences(){
 			bool refSeqMatch = true;
 			for (int siteNum : this->sitesToIncludeList) {
 
-				int char1 = sequence->getSymbolInt(siteNum);
-				int char2 = refseq->getSymbolInt(siteNum);
+				char char1 = sequence->getSymbolChar(siteNum);
+				char char2 = refseq->getSymbolChar(siteNum);
 
 				// If the two symbols are identical, or one is ambiguous, then move on to next site
 				if (char1 == char2) continue;
@@ -379,7 +379,6 @@ int Filtering::getNumUniqueSequences(){
 
 
 				// Otherwise the match failed
-				
 				refSeqMatch = false;
 				break;
 
@@ -394,8 +393,8 @@ int Filtering::getNumUniqueSequences(){
 				for (int siteNum : this->sitesToIncludeList) {
 
 
-					int char1 = sequence->getSymbolInt(siteNum);
-					int char2 = refseq->getSymbolInt(siteNum);
+					char char1 = sequence->getSymbolChar(siteNum);
+					char char2 = refseq->getSymbolChar(siteNum);
 					if (Alignment::isAmbiguous(char2, this->isNucleotide) && !Alignment::isAmbiguous(char1, this->isNucleotide)) {
 						refseq->editSiteInt(siteNum, char1);
 					}
@@ -466,48 +465,77 @@ bool Filtering::isMajorOrMinorAllele(string character, int siteNum, bool isMajor
 
 /**
  * Prepare the arrays of major alleles at each site
+ * Can be very slow to run
  */
 void Filtering::prepareMajorAlleles(Alignment* alignment){
 
 
-	cout << "Finding major alleles" << endl;
+	cout << "Finding major alleles " << this->numSites << "/" << this->taxaIDsToInclude.size() << endl;
+	
+	vector<char> validSymbols = Alignment::getSymbols(alignment->getIsNucleotide());
 
 	this->majors.clear();
 	if (numTaxa < 2 || this->sitesToIncludeList.empty()) return;
-	std::map<int, int> freqs;
-	int siteNum, count, character;
+	//std::map<char, int> freqs;
+	vector<int> freqs(validSymbols.size());
+	int siteNum, count, maxCount, symbolNum, major, c;
+	int character;
+	
+	
+	// Build list of taxon indices
+	vector<int> taxonIndices;
+	for (const auto &pair : this->taxaIDsToInclude) {
+		int taxonID = pair.first;
+		int taxonIndex = alignment->getTaxonIndex(taxonID);
+		taxonIndices.push_back(taxonIndex);
+	}
+	int halfWay = taxonIndices.size() / 2 + 1;
+	
+	
 	for (int s = 0; s < this->numSites; s ++) {
 
 
 		siteNum = this->sitesToIncludeList.at(s);
 
 		// List all characters by frequency
-		freqs.clear();
-		for (const auto &pair : this->taxaIDsToInclude) {
+		//freqs.clear();
+		
+		// Reset freq map
+		for (symbolNum = 0; symbolNum < freqs.size(); symbolNum++){
+			freqs.at(symbolNum) = 0;
+		}
+		
+		maxCount = 0;
+		
+		for (int i = 0; i < taxonIndices.size(); i ++) {
 
-			int taxonID = pair.first;
-			int taxonIndex = alignment->getTaxonIndex(taxonID);
-
-			// Count
-			character = alignment->getSequence(taxonIndex)->getSymbolInt(siteNum);
-			if (character == -1) continue;
-			if (freqs.count(character) > 0) {
-				count = freqs[character] + 1;
-			}else {
-				count = 1;
-			}
 			
-			freqs[character] = count;
+			// Count
+			character = alignment->getSequence(taxonIndices.at(i))->getSymbolInt(siteNum);
+			
+			if (Alignment::isAmbiguousOrGap(character, alignment->getIsNucleotide())) continue;
+			
+			
+			count = freqs.at(character) + 1;
+			freqs.at(character) = count;
+			
+			
+			// If a count exceeds 50%, we can stop now (for efficiency)
+			if (count > maxCount) {
+				maxCount = count;
+				if (maxCount >= halfWay){
+					break;
+				}
+			}
 
 		}
 
 
 		// Find major allele at this site
-		int maxCount = 0;
-		int major = -1;
-		for (const auto &pair : freqs) {
-			int c = pair.first;
-			count = freqs[c];
+		maxCount = 0;
+		major = -1;
+		for (c = 0; c < freqs.size(); c++){
+			count = freqs.at(c);
 			//cout << "site " << siteNum << ": count of " << c << " is " << count << endl;
 			if (count > maxCount) {
 				maxCount = count;
@@ -519,6 +547,7 @@ void Filtering::prepareMajorAlleles(Alignment* alignment){
 		this->majors[siteNum] = major;
 
 	}
+	
 
 
 }

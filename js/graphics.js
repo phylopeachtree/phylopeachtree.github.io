@@ -79,27 +79,21 @@ function initGraphics(){
 		// Prevent resizes in short succession from triggering the event
 		clearTimeout($.data(this, 'resizer'));
 		$.data(this, 'resizer', setTimeout(function() {
+			
+			//console.log("resizing");
 
 			
 			if (RESIZING) return;
 
 
+			//console.log("rendering");
+
 			RESIZING = true;
-				//callWasmFunction("scrollABit", [mw], function(val){
-				//cjCall("peachtree.options.OptionsAPI", "scrollABit", mw).then(function(){
         		renderGraphics(function() { 
         			$("#svg").removeClass("resizing");
         			RESIZING = false; 
         		});
-	        		//setTimeout(function() {
-	        			//clearTimeout($.data(this, 'timer'));
-        			
-	        		//}, 100);
-	        		
-	        	//});
 
-
-		 //do something
 		}, 60));
 
 
@@ -1114,6 +1108,8 @@ function saveSvg(svgEl, name) {
 	document.body.appendChild(downloadLink);
 	downloadLink.click();
 	document.body.removeChild(downloadLink);
+	
+	//svgEl.parentNode.removeChild(elem);
 }
 
 
@@ -1140,6 +1136,13 @@ function savePng(svgEl, name){
 	svgEl.attr("height", h);
 	svgEl.removeClass("width");
 	svgEl.removeClass("height");
+	
+	
+	if (w*h > 2e8){
+		//svgEl.parentNode.removeChild(elem);
+		alert("Maximum png size exceeded!");
+		return;
+	}
 	
 	// Generate blob for png
 	var svgStr = $(svgEl).prop('outerHTML');
@@ -1174,6 +1177,9 @@ function savePng(svgEl, name){
 		document.body.appendChild(downloadLink);
 		downloadLink.click();
 		document.body.removeChild(downloadLink);
+		
+		
+		//svgEl.parentNode.removeChild(elem);
 		
         
     }.bind(this);

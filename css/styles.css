@@ -873,9 +873,9 @@ input:checked + .sliderboolean:before {
 
 #about_div{
 	text-align:center;
-	margin-left:15%;
+	margin:auto;
 	margin-top:2em;
-	width:70%;
+	width:1000px;
 }
 
 
@@ -887,16 +887,16 @@ input:checked + .sliderboolean:before {
 	border-width:1.5px;
 	border-radius:1px;
 	padding:0.5em;
-	margin:2em;
-	min-width:600px;
+	margin:auto;
+	margin-top: 4em;
 	
 }
 
 
 #about_div .section .heading{
-	
-	width:50%;
-	margin-left:25%;
+
+	width: 70%;
+	margin:auto;
 	border-style:solid;
 	border-color:#FFDAB9; 
 	border-width:1.5px;
@@ -955,7 +955,7 @@ input:checked + .sliderboolean:before {
 
 #about_div .desc{
 	text-align:left;
-	
+	margin-bottom: 1em;
 }
 
 

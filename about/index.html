@@ -157,12 +157,12 @@
 				</ul>
 
 
-				<img src="../img/Fig1.png" height="400px">
+				
 
 
 				<div id="softwareDescDiv">
-					<b>PEACH Tree</b> is a high-performance web tool for visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogen surveillance. 
-					By default, only segregating alignment sites (i.e. sites which vary among the samples) are displayed, making the program suitable for viewing full genomic data.
+					<b>PEACH Tree</b> is a web tool for rapidly visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogen surveillance. 
+					By default, only segregating alignment sites (i.e. sites which vary among the samples) are displayed, making the program suitable for analysis of complete genomic data in a concise format.
 					A phylogenetic tree can be generated from the alignment or uploaded separately.
 					Epidemiological annotations can be uploaded (such as symptom onset date) and viewed alongside the rest of the data.
 					PEACH Tree is an effort to combine genomic and epidemiological modelling into a unified framework.
@@ -172,6 +172,91 @@
 				</div>
 				
 				
+				
+				
+				
+		
+		
+		
+			<!-- Examples -->
+			<div class="section">
+			
+			
+				<div class="heading">
+					Examples
+				
+				</div>
+				
+				
+				
+				
+				
+						
+				<div class="sectionHeader">
+					SARS-CoV-2 outbreak, Auckland, New Zealand, February 2021
+				</div>
+				
+				
+				
+				<div class="desc">
+					
+
+					The small-and-contained COVID-19 outbreak that occurred around Valentine's day 2021 in New Zealand can be viewed in PEACH Tree by downloading the files below.
+					The sample date and symptom onset date of each case can be displayed as epidemiological metadata.  
+					Note that sympton onset dates have been randomised for privacy protection, and only segregating sites are available in the alignment.
+					In the figure below, the symptom onset dates (minus 2 days, plus 5 days) are indicated by orange bars, and tree nodes are coloured by clade posterior support.
+					The tree is displayed as a transmission tree, where the top child of an internal node is assumed to have infected the bottom child.
+					
+					<br><br>
+					
+					
+					<b>Alignment:</b> <a href="../examples/valentine.fasta">valentine.fasta</a><br>
+					<b>Tree:</b> <a href="../examples/valentine.nexus">valentine.fasta</a><br>
+					<b>Epi:</b> <a href="../examples/valentine.tsv">valentine.tsv</a><br><br>
+					
+					<img src="../img/Fig1.png" width="100%" ><br><br>
+					
+					<i>
+					Douglas, Jordan, et al. "Real-Time Genomics for Tracking Severe Acute Respiratory Syndrome Coronavirus 2 Border Incursions after Virus Elimination, New Zealand." Emerging Infectious Diseases 27.9 (2021): 2361.
+					</i>
+				
+				</div>
+				
+				
+							
+				<div class="sectionHeader">
+					Paramyxovirus polymerase protein
+				</div>
+				
+				
+				
+				<div class="desc">
+					
+
+					An alignment of the the large polymerase protein, and a phylogenetic tree for the alignment can be downloaded below and readily viewed in PEACH Tree.
+					Tree nodes contain annotations summarising the Bayesian posterior distribution of trees.
+					A subset of cases are displayed in the image below, with branches colouured by substitution rate under a relaxed clock model. <br><br>
+					
+					
+					<b>Alignment:</b> <a href="../examples/polymerase.fasta">polymerase.fasta</a><br>
+					<b>Tree:</b> <a href="../examples/polymerase.nexus">polymerase.fasta</a><br><br>
+					
+					
+					<img src="../img/Fig2.png" width="100%" ><br><br>
+					
+					
+					<i>
+					Douglas, Jordan, Alexei J. Drummond, and Richard L. Kingston. "Evolutionary history of cotranscriptional editing in the paramyxoviral phosphoprotein gene." Virus Evolution 7.1 (2021): veab028.
+					</i>
+					
+				
+				</div>
+				
+
+			
+			</div>
+
+
 		
 			
 			<!-- Subsetting tree -->
@@ -283,6 +368,10 @@
 			</div>
 			
 			
+			
+			
+			
+			
 			<!-- Command line -->
 			<div class="section">
 			
@@ -291,7 +380,7 @@
 					Download
 				
 				</div>
-				
+	
 				
 				<div class="desc">
 					
@@ -322,10 +411,17 @@
 
 			
 			</div>
-
+			
+			
+			
+			
+			
 
 
 		</div>
+		
+		
+		
 
 
 

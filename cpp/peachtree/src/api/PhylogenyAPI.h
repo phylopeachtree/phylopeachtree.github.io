@@ -11,6 +11,7 @@
 #include "../phy/ClusterTree.h"
 #include "../epi/Timeline.h"
 #include "../options/ColourOption.h"
+#include <chrono>
 
 using namespace std;
 
@@ -35,6 +36,7 @@ public:
 			string branchColourBy, string nodeColourBy, double fontSize, int rounding, bool transmissionTree, Timeline* timeline, bool displayIncompatibleTransmissions,
 			ColourOption* branchCol, ColourOption* nodeCol);
 	static jsonObject buildTree(Alignment* alignment, LinkType method);
+	static jsonObject resumeTreeBuilding(bool cancel);
 	static void cleanup();
 	static void setOrderingToDirty();
 	static void reorderTree(Timeline* timeline, string symptomDateVar);
@@ -47,6 +49,16 @@ public:
 	static int treeNumber;
 	static bool orderingIsDirty;
 	static bool infectionCountIsDirty;
+
+
+	// Building tree
+	static chrono::time_point<std::chrono::high_resolution_clock> startTimeTree;
+	static ClusterTree* clusterTree;
+	
+	
+	
+	
+	
 
 };
 

@@ -11,7 +11,17 @@
 #include "../aln/Alignment.h"
 #include "../Utils.h"
 
+
+
+
 ClusterTree::ClusterTree(Alignment* alignment, LinkType linkType){
+
+
+	this->N_OPERATIONS_BEFORE_RETURN = 10000;
+	this->finished = false;
+	
+	this->clusterNodes.clear();
+	this->clusterID.clear();
 
 	cout << "Making cluster tree" << endl;
 
@@ -23,10 +33,49 @@ ClusterTree::ClusterTree(Alignment* alignment, LinkType linkType){
 	// Method
 	distanceIsBranchLength = linkType == LinkType::neighborjoining;
 
-	Node* root = buildClusterer();
+
+	// Start building. Will finish later
+	buildClusterer();
 
 
 
+
+}
+
+
+/*
+ * Get the tree if it's ready
+ */
+Tree* ClusterTree::getTree(){
+	
+	
+
+	if (!this->finished) {
+		cout << "Tree is not ready yet" << endl;
+		return nullptr;
+	}
+		
+	int taxonCount = taxaNames.size();
+		
+	Node* root;
+		
+	// Pathological case
+	if (taxonCount == 1) {
+		root = new Node();
+		root->setHeight(1);
+		root->setNr(0);
+	}
+	
+	else {
+		
+		// Get root
+		for (int i = 0; i < taxonCount; i++) {
+			if (this->clusterID.at(i).size() > 0) {
+				root = clusterNodes.at(i)->toNode();
+			}
+		}
+	}
+	
 	this->setRoot(root);
 	
 	
@@ -41,9 +90,9 @@ ClusterTree::ClusterTree(Alignment* alignment, LinkType linkType){
 
 
     this->initArray();
-
-
-
+	
+	return this;
+	
 }
 
 
@@ -68,7 +117,7 @@ LinkType ClusterTree::getLinkType(string val){
 }
 
 
-Node* ClusterTree::buildClusterer(){
+void ClusterTree::buildClusterer(){
 
 
     int taxonCount = taxaNames.size();
@@ -79,68 +128,85 @@ Node* ClusterTree::buildClusterer(){
         Node* node = new Node();
         node->setHeight(1);
         node->setNr(0);
-        return node;
+		
+		this->finished = true;
+		
+        return;
     }
 
     // use array of integer vectors to store cluster indices,
     // starting with one cluster per instance
-    vector<vector<int>> clusterID(taxonCount);// = new ArrayList[taxonCount];
+    this->clusterID.resize(taxonCount);// = new ArrayList[taxonCount];
     for (int i = 0; i < taxonCount; i++) {
-        clusterID.at(i).push_back(i);
+        this->clusterID.at(i).push_back(i);
     }
     // calculate distance matrix
-    int clusters = taxonCount;
+    this->clusters = taxonCount;
 
 
     // used for keeping track of hierarchy
-    vector<NodeX*> clusterNodes(taxonCount);
+    this->clusterNodes.resize(taxonCount);
 
-    // Build the tree
+    
+	/*
     if (linkType == LinkType::neighborjoining) {
-        neighborJoining(clusters, clusterID, clusterNodes);
+        
     } else {
         doLinkClustering(clusters, clusterID, clusterNodes);
     }
+	*/
+	
+	// Build the tree
+	neighborJoining();
 
 
-
-    // move all clusters in m_nClusterID array
-    // & collect hierarchy
-    for (int i = 0; i < taxonCount; i++) {
-        if (clusterID.at(i).size() > 0) {
-            return clusterNodes.at(i)->toNode();
-        }
-    }
-    return nullptr;
 
 }
 
 
-
 /*
- * Use neighbor joining algorithm for clustering
- * This is roughly based on the RapidNJ simple implementation and runs at O(n^3)
+ * Resume the clustering
  */
-void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, vector<NodeX*>& clusterNodes){
+double ClusterTree::resumeClusterer(){
+	
 
-
-
-
+	
+	int expectedNops = clusters*(clusters-1)/2.0 + clusters-1;
 	const int n = taxaNames.size();
+	int nOperations = 0;
+	double d;
 
-	vector<vector<double>> dist(clusters);
-	for (int i = 0; i < clusters; i++) {
-		dist.at(i).resize(clusters);
-	}
-	for (int i = 0; i < clusters; i++) {
-		dist.at(i).at(i) = 0;
-		for (int j = i + 1; j < clusters; j++) {
-			dist.at(i).at(j) = getDistance0(clusterID.at(i), clusterID.at(j));
-			dist.at(j).at(i) = dist.at(i).at(j);
+
+	int i;
+	int j;
+	for (i = this->distanceMatrix_i; i < clusters; i++) {
+		
+		this->dist.at(i).at(i) = 0;
+		for (j = this->distanceMatrix_j; j < clusters; j++) {
+			d = getDistance0(clusterID.at(i), clusterID.at(j));
+			d = d / weightSum;
+			this->dist.at(i).at(j) = d;
+			this->dist.at(j).at(i) = d;
+			nOperations ++;
+			
+			//cout << i << "," << j << ":" << d << endl;
+			
+			
+			if (nOperations >= this->N_OPERATIONS_BEFORE_RETURN) {
+				totalNumberOperations += nOperations;
+				double progress = 1.0*totalNumberOperations/expectedNops;
+				//cout << "Distance matrix returning " << progress << endl;
+				this->distanceMatrix_i = i;
+				this->distanceMatrix_j = j;
+				return progress;
+			}
 		}
+		
+		this->distanceMatrix_j = i+2;
+		
+		
 	}
-
-
+	this->distanceMatrix_i = i;
 
 
 	vector<double> separationSums(n);
@@ -148,9 +214,9 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 	vector<int> nextActive(n);
 
 	//calculate initial separation rows
-	for (int i = 0; i < n; i++) {
+	for (i = 0; i < n; i++) {
 		double sum = 0;
-		for (int j = 0; j < n; j++) {
+		for (j = 0; j < n; j++) {
 			sum += dist.at(i).at(j);
 		}
 		separationSums.at(i) = sum;
@@ -159,8 +225,9 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 	}
 
 
-
 	while (clusters > 2) {
+		
+		
 		// find minimum
 		int min1 = -1;
 		int min2 = -1;
@@ -248,7 +315,52 @@ void ClusterTree::neighborJoining(int clusters, vector<vector<int>>& clusterID, 
 			}
 		}
 	}
+	
+	
+	this->totalNumberOperations = -1;
+	this->finished = true;
+	return this->totalNumberOperations;
 
+}
+
+
+
+
+/*
+ * Use neighbor joining algorithm for clustering
+ * This is roughly based on the RapidNJ simple implementation and runs at O(n^3)
+ */
+void ClusterTree::neighborJoining(){
+
+
+	const int n = taxaNames.size();
+	
+	
+	
+	// Weight sum
+    this->weightSum = 0.0;
+    for (int i = 0; i < alignment->getPatternCount(); i++) {
+        this->weightSum += alignment->getPatternWeight(i);
+	}
+	
+	// Create distance matrix
+	this->dist.resize(clusters);
+	for (int i = 0; i < clusters; i++) {
+		this->dist.at(i).resize(clusters);
+	}
+	
+
+	this->totalNumberOperations = 0;
+	this->distanceMatrix_i = 0;
+	this->distanceMatrix_j = 1;
+	
+	
+	//while (this->totalNumberOperations != -1){
+		//this->resumeClusterer();
+	//}
+	
+
+	
 }
 
 
@@ -365,38 +477,36 @@ double ClusterTree::getDistance0(vector<int> cluster1, vector<int> cluster2){
  */
 double ClusterTree::getDistance(int taxon1, int taxon2){
 
-    int state1, state2;
+    char state1, state2;
 
     int n = alignment->getPatternCount();
 
-
-    double distance, weight;
     double sumDistance = 0.0;
-    double sumWeight = 0.0;
+    //double sumWeight = 0.0;
+	bool isNT = alignment->getIsNucleotide();
 
-
-    vector<int> pattern;
+    vector<char> pattern;
 
 
     for (int i = 0; i < n; i++) {
         pattern = alignment->getPattern(i);
 
         state1 = pattern.at(taxon1);
+		if (Alignment::isAmbiguousOrGap(state1, isNT)) continue;
+		
+		
         state2 = pattern.at(taxon2);
+		if (Alignment::isAmbiguousOrGap(state2, isNT)) continue;
+       
 
-        weight = alignment->getPatternWeight(i);
-
-        if (!Alignment::isAmbiguousOrGap(state1, alignment->getIsNucleotide()) &&
-            !Alignment::isAmbiguousOrGap(state2, alignment->getIsNucleotide()) &&
-                state1 != state2) {
-                    sumDistance += weight;
+        if (state1 != state2) {
+            sumDistance += alignment->getPatternWeight(i);
         }
-        sumWeight += weight;
+        //sumWeight += weight;
     }
 
-    distance = sumDistance / sumWeight;
 
-    return distance;
+    return sumDistance;
 }
 
 
@@ -517,6 +627,8 @@ double ClusterTree::getDistance(vector<vector<double>> distance, vector<int> clu
     }else if (linkType == LinkType::centroid) {
 
 
+			/*
+
     	// finds the distance of the centroids of the clusters
         const int patterns = alignment->getPatternCount();
         vector<double> centroid1(patterns);
@@ -538,6 +650,8 @@ double ClusterTree::getDistance(vector<vector<double>> distance, vector<int> clu
             centroid2.at(j) /= cluster2.size();
         }
         bestDist = getDistance(centroid1, centroid2);
+		
+		*/
 
     }
 

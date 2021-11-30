@@ -154,7 +154,7 @@ Alignment::Alignment(Tree* tree){
  */
 void Alignment::cleanup(){
 
-	for (vector<int> patt : patterns){
+	for (vector<char> patt : patterns){
 		patt.clear();
 	}
 	this->patterns.clear();
@@ -261,6 +261,9 @@ void Alignment::initConstantSites(){
  * Initialise site patterns
  */
 void Alignment::initPatterns(){
+	
+	
+	cout << "initPatterns" << endl;
 
 
 	this->patterns.clear();
@@ -268,38 +271,26 @@ void Alignment::initPatterns(){
 	
 
 	// Get patterns
-	vector<int> site(this->getNtaxa());
+	vector<char> site(this->getNtaxa());
 	for (int siteNum = 0; siteNum < this->getLength(); siteNum ++) {
+		
+		
+		if (isConstantSite(siteNum)) continue;
 
 
 
 		// Get pattern of this column
 		for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
 			Sequence* sequence = this->getSequence(taxonNum);
-			site[taxonNum] = sequence->getSymbolInt(siteNum);
+			site.at(taxonNum) = sequence->getSymbolChar(siteNum);
 		}
 		
-		
-		// Is the column variable?
-		bool variableSite = false;
-		int uniqueSymbol = -1;
-		for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
-			Sequence* sequence = this->getSequence(taxonNum);
-			int symbol = site[taxonNum];
-			if (uniqueSymbol == -1) {
-				uniqueSymbol = symbol;
-			}else if (uniqueSymbol != symbol) {
-				variableSite = true;
-				break;
-			}
-		}
-		this->constantSites.at(siteNum) = !variableSite;
-		
+
 
 		// Check if it is unique
 		int patternMatch = -1;
 		for (int patternNum = 0; patternNum < this->patterns.size(); patternNum ++) {
-			vector<int> pattern = this->patterns.at(patternNum);
+			vector<char> pattern = this->patterns.at(patternNum);
 			bool isUniqueFromThisPattern = false;
 			for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
 				if (site.at(taxonNum) != pattern.at(taxonNum)) {
@@ -319,19 +310,19 @@ void Alignment::initPatterns(){
 
 		// If unique site, then add to list
 		if (patternMatch == -1) {
-			vector<int> siteCpy(site.size());
+			vector<char> siteCpy(site.size());
 			for (int taxonNum = 0; taxonNum < site.size(); taxonNum++) {
-				siteCpy[taxonNum] = site[taxonNum];
+				siteCpy.at(taxonNum) = site.at(taxonNum);
 			}
 
 			this->patterns.push_back(siteCpy);
-			this->patternWeights.push_back(1.0);
+			this->patternWeights.push_back(1);
 		}
 
 		// Otherwise increment the pattern weight
 		else {
-			double weight = this->patternWeights.at(patternMatch);
-			this->patternWeights.at(patternMatch) = weight + 1.0;
+			int weight = this->patternWeights.at(patternMatch);
+			this->patternWeights.at(patternMatch) = weight + 1;
 		}
 
 	}
@@ -754,12 +745,12 @@ int Alignment::getPatternCount(){
 /**
  * Gets the pattern index patternNum
  */
-vector<int> Alignment::getPattern(int patternNum){
+vector<char> Alignment::getPattern(int patternNum){
 	if (this->patterns.size() == 0) this->initPatterns();
 	return this->patterns.at(patternNum);
 }
 
-int Alignment::getPattern(int patternNum, int taxonNum){
+char Alignment::getPattern(int patternNum, int taxonNum){
 	if (this->patterns.size() == 0) this->initPatterns();
 	return this->patterns.at(patternNum).at(taxonNum);
 }
@@ -767,7 +758,7 @@ int Alignment::getPattern(int patternNum, int taxonNum){
 /*
  * Weight of pattern i
 */
-double Alignment::getPatternWeight(int i){
+int Alignment::getPatternWeight(int i){
 	if (this->patterns.size() == 0) this->initPatterns();
 	return this->patternWeights.at(i);
 }

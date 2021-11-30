@@ -325,6 +325,10 @@ function removeUpload(ele){
 	Adds a loading icon
 */
 function addLoader(ele, large=false){
+	
+	
+	if (ele.find(".loader").length > 0) return;
+	
 	ele.parent().addClass("loading");
 	if (large){
 		ele.append(`<div title="Loading..." class="loader large"></div>`);
@@ -337,7 +341,7 @@ function addLoader(ele, large=false){
 
 function removeLoader(ele){
 	ele.parent().removeClass("loading");
-	ele.find(" .loader").remove();
+	ele.find(".loader").remove();
 	$("body").removeClass("loading");
 }
 
@@ -346,6 +350,8 @@ function removeLoader(ele){
 	Display all user options
 */
 function renderOptions(){
+	
+	if (BUILDING_TREE) return;
 	
 	callWasmFunction("getOptions", [], function(options){
 	//cjCall("peachtree.options.OptionsAPI", "getOptions").then(function(options){
@@ -679,29 +685,134 @@ function buildTree(){
 	
 	if (BUILDING_TREE) return;
 	BUILDING_TREE = true;
+	CANCEL_TREE_BUILDING = false;
 	
 	let btnID = "#buildTreeBtn";
 	
 	$(btnID).addClass("disabled");
-	addLoader($("#ctrl_loading_div"));
-	$(btnID).parent().find(".usermsg").html("");
-	$(btnID).parent().find(".usermsg").hide(0);
+	
+
+	
+	// Open a dialog
+	var html = `<div id="treeBuildingDialog">
+					<div>
+						<h3>Building Neighbour Joining Tree</h3>
+						This may take some time...
+						
+						<br><br>
+						
+						<span id="cancelBuildBtn" onclick="cancelTreeBuilding();" class="button" title="Cancel tree building">Cancel</span>
+						
+						<br><br>
+
+						<div id="treeBuildingProgressBar" class="progressBar">
+							<div> </div>
+						</div>
+						<div id="treeBuildingTimer">
+							Initialising site patterns...
+						</div>
+						
+						
+						
+					</div>
+				</div>`;
+	$("body").append(html);
+	$("body").addClass("loading");
+	$("#main").addClass("faded");
+
+	
+	
+	
 	
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {
 		callWasmFunction("buildTree", [], function(results){
-
-			removeLoader($("#ctrl_loading_div"));
-			$(btnID).removeClass("disabled");
-			$(btnID).parent().find(".usermsg").html("Tree built in " + results.time + "ms!").delay(5000).fadeOut();
-			$(btnID).parent().find(".usermsg").show(0);
-			BUILDING_TREE = false;
 			
-			renderGraphics();
+			resumeTreeBuilding(btnID);
+			
 			
 			
 		});
+		
 	}, 10);
+	
+}
+
+
+
+
+/*
+	Cancels tree building
+*/
+function cancelTreeBuilding(){
+	if (BUILDING_TREE) CANCEL_TREE_BUILDING = true;
+}
+
+/*
+	Resumes tree building
+*/
+function resumeTreeBuilding(btnID){
+	
+	
+
+	// Loading
+	callWasmFunction("resumeTreeBuilding", [(CANCEL_TREE_BUILDING ? 1 : 0)], function(results){
+		
+
+		var finished = results.finished;
+		
+	
+		// Update progress
+		var progress = results.progress;
+		var time = Math.round(results.time / 100) / 10;
+		if (progress > 1) progress = 1;
+		
+		
+		// Loading meter
+		var fullWidth = parseFloat($("#treeBuildingProgressBar").width());
+		var loaderWidth = progress*fullWidth;
+		$("#treeBuildingProgressBar").find("div").width(loaderWidth);
+		
+		
+		// Progress update
+		var progressPercentage = Math.round(progress * 1000) / 10;
+		$("#treeBuildingTimer").html(progressPercentage + "% (" + time + "s elapsed)");
+		
+		//console.log("progress", progress, loaderWidth, fullWidth);
+		
+		
+		
+		
+
+		if (finished){
+			
+			console.log("done!");
+
+
+			$(btnID).removeClass("disabled");
+
+			
+			$("#treeBuildingDialog").remove();
+			$("body").removeClass("loading");
+			$("#main").removeClass("faded");
+			
+			
+			BUILDING_TREE = false;
+			CANCEL_TREE_BUILDING = false;
+			
+			renderGraphics();
+			
+		}else{
+			
+
+			resumeTreeBuilding(btnID);
+			
+		}
+		
+
+		
+	});
+	
 	
 }
 

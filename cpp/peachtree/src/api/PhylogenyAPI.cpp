@@ -10,7 +10,7 @@
 #include "EpiAPI.h"
 #include "OptionsAPI.h"
 #include "../error/Error.h"
-#include <chrono>
+
 
 
 using namespace std;
@@ -23,6 +23,8 @@ vector<Tree*> PhylogenyAPI::allTrees;
 int PhylogenyAPI::treeNumber = -1;
 bool PhylogenyAPI::orderingIsDirty;
 bool PhylogenyAPI::infectionCountIsDirty;
+chrono::time_point<std::chrono::high_resolution_clock> PhylogenyAPI::startTimeTree;
+ClusterTree* PhylogenyAPI::clusterTree;
 
 
 void PhylogenyAPI::setTree(Tree* tree){
@@ -197,31 +199,46 @@ int PhylogenyAPI::getNumberOfTrees(){
 
 
 /*
- * Build a tree from the alignment using the specified method
+ * Resume tree building, or cancel it
  */
-jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 
-	auto start = high_resolution_clock::now();
+jsonObject PhylogenyAPI::resumeTreeBuilding(bool cancel){
+	
+	
 	jsonObject j;
-	if (!AlignmentAPI::isMock()){
-		//String str = new String(contents);
-		//cout << "Creating tree " << method << endl;
+	j["finished"] = false;
+	
+	
+	// Cancel?
+	if (cancel || PhylogenyAPI::clusterTree == nullptr) {
+		j["finished"] = true;
+		PhylogenyAPI::clusterTree = nullptr;
+		return j;
+	}
 
-		PhylogenyAPI::cleanup();
-
-
+	double progress = PhylogenyAPI::clusterTree->resumeClusterer();
+	j["progress"] = progress;
+	
+	
+	
+	// Finished
+	if (progress == -1){
 		
-
-
-		// Build tree
-		THE_TREE = new ClusterTree(alignment, method);
+		
+		PhylogenyAPI::cleanup();
+		
+		j["progress"] = 1;
+		j["finished"] = true;
+		THE_TREE = PhylogenyAPI::clusterTree->getTree();
+		
+		
 		
 		PhylogenyAPI::allTrees.push_back(THE_TREE);
 		PhylogenyAPI::treeNumber = 0;
 		
 
 		// Sort taxa by tree
-		sortTaxaByTree(THE_TREE, alignment);
+		sortTaxaByTree(THE_TREE, THE_TREE->getAlignment());
 		AlignmentAPI::setOrderingToDirty();
 		EpiAPI::setEpiAnnotationsToDirty();
 		EpiAPI::addAnnotationsToTree(THE_TREE);
@@ -232,15 +249,46 @@ jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
 		OptionsAPI::prepareTreeAnnotationOptions();
 		OptionsAPI::resetScroll();
 
-	
+
 
 		j["newick"] = THE_TREE->toNewick();
+		
+		
+		PhylogenyAPI::clusterTree = nullptr;
+		
+		
+	}
+	
+	
+	// Timing
+	auto finish = high_resolution_clock::now();
+	auto duration = duration_cast<milliseconds>(finish - PhylogenyAPI::startTimeTree);
+	j["time"] = duration.count();
+	
+	
+	
+	return j;
+	
+}
+
+
+
+
+/*
+ * Build a tree from the alignment using the specified method
+ */
+jsonObject PhylogenyAPI::buildTree(Alignment* alignment, LinkType method) {
+
+	PhylogenyAPI::startTimeTree = high_resolution_clock::now();
+	jsonObject j;
+	if (!AlignmentAPI::isMock()){
+
+		// Initialise tree building
+		PhylogenyAPI::clusterTree = new ClusterTree(alignment, method);
 
 	}
 
-	auto finish = high_resolution_clock::now();
-	auto duration = duration_cast<milliseconds>(finish - start);
-	j["time"] = duration.count();
+
 	
 	return j;
 

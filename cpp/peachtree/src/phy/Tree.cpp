@@ -574,6 +574,11 @@ double Tree::getHeight(){
 }
 
 
+
+Alignment* Tree::getAlignment(){
+	return this->alignment;
+}
+
 /*
  * Apply the taxon filtering
  */

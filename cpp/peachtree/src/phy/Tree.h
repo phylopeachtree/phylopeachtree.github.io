@@ -64,7 +64,7 @@ public:
 	void countInfections();
 	void resetInfections();
 	void normaliseInfections(int numTrees);
-
+	Alignment* getAlignment();
 
 
 protected:

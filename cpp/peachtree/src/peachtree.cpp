@@ -9,6 +9,7 @@
 #include <iostream>
 #include "aln/Alignment.h"
 #include "phy/Tree.h"
+#include "phy/ClusterTree.h"
 #include "epi/Epidemiology.h"
 #include "Utils.h"
 
@@ -278,6 +279,26 @@ int main(int argc, char *argv[]) {
 		
 		
 		}
+		
+		/*
+		// build tree
+		PhylogenyAPI::buildTree(aln, ClusterTree::getLinkType("neighborjoining"));
+		
+		// Is it ready?
+		jsonObject j2 = PhylogenyAPI::resumeTreeBuilding();
+		//double progress = stod(j2["progress"]);
+		//double time = stod(j2["time"]);
+		while (true){
+			
+			cout << j2.dump(0) << endl;
+			j2 = PhylogenyAPI::resumeTreeBuilding();
+			//progress = stod(j2["progress"]);
+			//time = stod(j2["time"]);
+			
+			
+		}
+		*/
+
 		
 		
 		

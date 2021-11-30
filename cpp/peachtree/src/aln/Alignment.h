@@ -67,9 +67,9 @@ public:
 
 	vector<string> getNames();
 	int getPatternCount();
-	vector<int> getPattern(int patternNum);
-	int getPattern(int patternNum, int taxonNum);
-	double getPatternWeight(int i);
+	vector<char> getPattern(int patternNum);
+	char getPattern(int patternNum, int taxonNum);
+	int getPatternWeight(int i);
 	bool selectTaxon(int taxonNum);
 	bool taxonIsSelected(int taxonNum);
 	void selectTaxon(int taxonNum, bool setTo);
@@ -106,8 +106,8 @@ private:
 	vector<Sequence*> sequences;
 	bool isNucleotide;
 	int alignmentLength;
-	vector<vector<int>> patterns;
-	vector<double> patternWeights;
+	vector<vector<char>> patterns;
+	vector<int> patternWeights;
 
 	static int ambiguousNtIndex;
 	static int ambiguousAlphaIndex;

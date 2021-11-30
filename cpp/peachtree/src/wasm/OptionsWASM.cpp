@@ -64,6 +64,22 @@ extern "C" {
 	
 	
 	/**
+	 * Resume tree building, or cancel
+	 */
+	void EMSCRIPTEN_KEEPALIVE resumeTreeBuilding(int cancelInt) {
+
+		jsonObject j = PhylogenyAPI::resumeTreeBuilding(cancelInt != 0);
+		if (Error::wasError()) {
+			return;
+		}
+		WasmAPI::messageFromWasmToJS(j.dump(0));
+
+	}
+	
+	
+	
+	
+	/**
 	 * Reorder children in the transmission tree to improve compatibility with infectious periods
 	 */
 	void EMSCRIPTEN_KEEPALIVE reorderTree() {

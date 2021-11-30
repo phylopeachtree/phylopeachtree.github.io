@@ -242,6 +242,12 @@ void OptionsAPI::setOption(string id, string value){
 		else if (BooleanOption* v = dynamic_cast<BooleanOption*>(option)) {
 
 			bool val = value == "true" || value == "1";
+			
+			// Do not do anything if nothing is highlighted
+			if ((option == OptionsAPI::focusOnClade || option == OptionsAPI::focusOnTaxa)){
+				if (!AlignmentAPI::getHighlighted()) return;
+			}
+				
 
 			// Special case: if focusOnClade is enabled, then enable focusOnTaxa too
 			if (option == OptionsAPI::focusOnClade && val == true) {

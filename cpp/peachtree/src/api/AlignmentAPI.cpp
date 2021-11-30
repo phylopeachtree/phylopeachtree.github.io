@@ -94,6 +94,17 @@ void AlignmentAPI::initFiltering(bool variantSitesOnly, bool focus, bool focusOn
 }
 
 
+/*
+ * Are any samples highlighted? 
+ */
+bool AlignmentAPI::getHighlighted(){
+	
+	for (Sequence* seq : AlignmentAPI::THE_ALIGNMENT->getSequences()){
+		if (seq->getTaxon()->getIsHighlighted()) return true;
+	}
+	
+	return false;
+}
 
 /*
 	Annotate taxa with epidemological information

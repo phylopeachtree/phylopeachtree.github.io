@@ -862,7 +862,7 @@ function resumeTreeBuilding(btnID){
 			BUILDING_TREE = false;
 			CANCEL_TREE_BUILDING = false;
 			
-			renderGraphics();
+			clearSelection();
 			
 		}else{
 			

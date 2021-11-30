@@ -1059,9 +1059,9 @@ input:checked + .sliderboolean:before {
 
 
 .peachWheel{
-	width:15em;
+	width:6em;
 	top:300px;
-	left:0px;
+	left:50px;
 	text-align:center;
 	position:fixed;
 	-webkit-user-select: none; /* Chrome/Safari */        
@@ -1095,7 +1095,7 @@ input:checked + .sliderboolean:before {
 	position:relative;
 	margin:auto;
 	text-align:center;
-	width: 6em;
+	width: 5em;
     height: 0.8em;
 	margin-bottom:-0.1em;
 	
@@ -1108,7 +1108,7 @@ input:checked + .sliderboolean:before {
 	background-color:#b0fb5a;
 	box-shadow: inset 0em -0.3em 0.8em #5ca904;
 	cursor:pointer;
-	font-size:1.2em;
+	font-size:1.1em;
 }
 
 
@@ -1131,7 +1131,7 @@ input:checked + .sliderboolean:before {
 	-webkit-transform: rotate(15deg);
     -ms-transform: rotate(15deg);
     transform: rotate(15deg) skew(50deg);
-	margin-right:-0.2em;
+	margin-right:-0.15em;
 }
 
 
@@ -1141,7 +1141,7 @@ input:checked + .sliderboolean:before {
 	-webkit-transform: rotate(-15deg);
     -ms-transform: rotate(-15deg);
     transform: rotate(-15deg) skew(-50deg);
-	margin-left:-0.2em;
+	margin-left:-0.15em;
 }
 
 .zoomPeach .leafSide.peachRight div{

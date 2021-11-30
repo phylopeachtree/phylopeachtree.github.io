@@ -59,6 +59,8 @@
 					initUtil();
 
 					removeLoader($("#main"));
+					
+					$("#peachWheel").draggable();
 
 				});
 
@@ -82,11 +84,14 @@
 		</div>
 
 
-
-		
 		
 		<div id="upload_div" style="display:none">
 		
+		
+		
+		
+		
+
 		
 
 			<table cellpadding="0">
@@ -168,10 +173,15 @@
 
 			<div id="control_panel_div">
 			
+			
+			
+				
+			
+			
 				
 				<div>
 					<span style="margin:auto;" onclick="reupload();" class="button" title="Go back to the upload screen">Back</span>
-					<span class="usermsg mediumfont"></span>
+					
 				</div>
 				
 				<div> Showing <span id="ntaxadisplayed_span"></span> of <span id="ntaxa_span"></span> samples </div>
@@ -195,44 +205,11 @@
 				<div>
 					<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a neighbour-joining tree">Build tree</span>
 					<!--<span style="margin:auto;" id="reorderTreeBtn" onclick="reorderTree();" class="button" title="Reorder children in the transmission tree to improve compatibility with infectious periods">Transmission</span>-->
-					<span class="usermsg mediumfont"></span>
-				</div>
-
-
-		
-				
-				<!--
-				<div>
-					<span style="margin:auto;" id="minussOneTreeBtn" onclick="moveTree(-1);" class="button" title="Pan left">&leftarrow;</span>
-					Next tree
-					<span style="margin:auto;" id="plusOneTreeBtn" onclick="moveTree(+1);" class="button" title="Pan right">&rightarrow;</span>
-					
-					<span class="usermsg mediumfont"></span>
-				</div>
-				-->
-
-
-				<div>
-					<span style="margin:auto;" id="zoomOutBtn" onclick="zoom(false);" class="button" title="Zoom out  (ctrl + mousewheel down)">&minus;</span>
-					Zoom
-					<span style="margin:auto;" id="zoomInBtn" onclick="zoom(true);" class="button" title="Zoom in  (ctrl + mousewheel up)">&plus;</span>
 					
 				</div>
-				<div>
-					<span style="margin:auto;" id="scrollDownBtn" onclick="scrollVertical(false);" class="button" title="Pan down (mousewheel down)">&downarrow;</span>
-					Scroll
-					<span style="margin:auto;" id="scrollUpBtn" onclick="scrollVertical(true);" class="button" title="Pan up (mousewheel up)">&uparrow;</span>
-				</div>
-				<div>					
-					<span style="margin:auto;" id="scrollLeftBtn" onclick="scrollHorizontal(false);" class="button" title="Pan left">&leftarrow;</span>
-					Scroll
-					<span style="margin:auto;" id="scrollRightBtn" onclick="scrollHorizontal(true);" class="button" title="Pan right">&rightarrow;</span>
-				</div>
-				<div>
-					<span class="usermsg mediumfont"></span>
-				</div>
-				
-			
+
+
+
 				
 				
 				
@@ -272,6 +249,52 @@
 		
 		<div id="graphics_div" style="display:none"/>
 		
+		
+		
+
+				<div id="peachWheel" class="peachWheel">
+		
+					<table class="zoomPeach">
+					
+						<tr>
+							<td title="Zoom out (ctrl + mousewheel down)" > 
+								<div class="leafSide peachLeft" >
+									<div onclick="zoom(false);">&minus;</div>
+								</div>
+							</td>
+							<td title="Zoom in (ctrl + mousewheel up)" >
+								<div class="leafSide peachRight" >
+									<div onclick="zoom(true);">&plus;</div>
+								</div>
+							</td>
+						
+						</tr>
+
+					</table>
+				
+	
+				
+					<div class="arrowwheelOuter">
+				
+						<ul class="arrowwheel wheel">
+							<li title="Scroll up (mousewheel down, or &uparrow;, or ctrl + &uparrow; for fast scroll)" >
+								<div class="text" onclick="scrollVertical(true);">&uparrow;</div>
+							</li>
+							<li title="Scroll right (&rightarrow;, or ctrl + &rightarrow; for fast scroll)" >
+								<div class="text" onclick="scrollHorizontal(true);">&uparrow;</div>
+							</li>
+							<li title="Scroll down (mousewheel down, or &downarrow;, or ctrl + &downarrow; for fast scroll)" >
+								<div class="text" onclick="scrollVertical(false);">&uparrow;</div>
+							</li>
+							<li title="Scroll left (&leftarrow;, or ctrl + &leftarrow; for fast scroll)">
+								<div class="text"  onclick="scrollHorizontal(false);">&uparrow;</div>
+							</li>
+
+						</ul>
+						
+					</div>
+				</div>
+		
 			<hr>
 			<div id="svgouter">
 				<svg id="svg">
@@ -282,10 +305,14 @@
 			</div>
 
 
+		
 
 
 			
 			<div id="options_div"/>
+			
+			
+			
 
 				<ul id="options_tabs" class="tabs">
 

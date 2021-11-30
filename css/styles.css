@@ -33,6 +33,8 @@ body {
 }
 
 
+
+
 #treeBuildingDialog{
 	
 
@@ -248,8 +250,8 @@ body.loading{
 	
 	padding: 2em;
 	width:80%;
-	min-width:600px;
-	margin:auto;
+	min-width:1000px;
+	margin-left:150px;
 	
 }
 
@@ -1053,5 +1055,193 @@ input:checked + .sliderboolean:before {
 	margin: 0.5em;
 	
 }
+
+
+
+.peachWheel{
+	width:15em;
+	top:300px;
+	left:0px;
+	text-align:center;
+	position:fixed;
+	-webkit-user-select: none; /* Chrome/Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+ */
+	z-index:10;
+	
+	cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+	
+}
+
+
+.peachWheel.loading {
+	animation: spin 2.5s linear infinite;
+}
+
+
+.wheel{
+	position: relative;
+	padding: 0;
+    margin: 0.1em auto;
+	list-style: none;
+    overflow: hidden;
+}
+
+
+.zoomPeach{
+	position:relative;
+	margin:auto;
+	text-align:center;
+	width: 6em;
+    height: 0.8em;
+	margin-bottom:-0.1em;
+	
+}
+
+.zoomPeach .leafSide{
+	border-style:solid;
+	border-color:black;
+	border-width:0.5px;
+	background-color:#b0fb5a;
+	box-shadow: inset 0em -0.3em 0.8em #5ca904;
+	cursor:pointer;
+	font-size:1.2em;
+}
+
+
+.peachWheel.loading .zoomPeach .leafSide{
+	background-color:#696969;
+	box-shadow: none;
+}
+
+
+
+.zoomPeach .leafSide:hover{
+	background-color:white;
+	color:black;
+	box-shadow: none;
+}
+
+
+.zoomPeach .peachLeft{
+	border-radius: 110% 148% 223% 138%;
+	-webkit-transform: rotate(15deg);
+    -ms-transform: rotate(15deg);
+    transform: rotate(15deg) skew(50deg);
+	margin-right:-0.2em;
+}
+
+
+
+.zoomPeach .leafSide.peachRight{
+	border-radius:  148% 110% 138% 223%;
+	-webkit-transform: rotate(-15deg);
+    -ms-transform: rotate(-15deg);
+    transform: rotate(-15deg) skew(-50deg);
+	margin-left:-0.2em;
+}
+
+.zoomPeach .leafSide.peachRight div{
+	%transform: rotate(20deg) skew(50deg);
+}
+
+
+.arrowwheelOuter{
+	border-radius: 40% 40% 80% 80%; 
+	border-style:solid;
+	
+	border-width:0.2px;
+	width: 4em;
+    height: 4em;
+	margin:auto;
+	
+	background-color:#ff973a;
+	box-shadow: inset 4em 0em 1.2em -2.2em #FFDAB9;
+	border-color: black;
+	border-style:solid;
+	border-width:0.2px;
+}
+
+
+.peachWheel.loading .arrowwheelOuter{
+	background-color:#d3d3d3;
+	box-shadow: none;
+}
+
+
+.arrowwheel {
+	
+	width:100%;
+	height:100%;
+
+	
+}
+.wheel li {
+	overflow: hidden;
+	position: absolute;
+	top: 0; right: 0;
+	width: 50%; 
+	height: 50%;
+	transform-origin: 0% 100%;  
+	
+
+}
+.wheel .text {
+	position: absolute;
+	text-align: center;
+	cursor:pointer;
+	
+}
+
+
+
+
+.arrowwheel .text {
+	text-align:center;
+	left: -100%;
+	width: 200%; 
+	height: 200%;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    font-size:1.3em;
+	color:black;
+
+	
+}
+
+
+.arrowwheel .text:hover {
+	color:white;
+}
+
+
+
+.arrowwheel li:first-child {
+    -webkit-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+	transform: rotate(-45deg);     
+}
+.arrowwheel li:nth-child(2) {
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+	transform: rotate(45deg);     
+}
+.arrowwheel li:nth-child(3) {
+    -webkit-transform: rotate(135deg);
+    -ms-transform: rotate(135deg);    
+	transform: rotate(135deg);    
+}
+.arrowwheel li:nth-child(4) {
+    -webkit-transform: rotate(225deg);
+    -ms-transform: rotate(225deg);
+	transform: rotate(225deg);    
+}
+
+
+
 
 

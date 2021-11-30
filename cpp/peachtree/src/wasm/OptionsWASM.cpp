@@ -219,9 +219,14 @@ extern "C" {
 	/**
 	 * Scroll up/down slightly
 	*/
-	void EMSCRIPTEN_KEEPALIVE scrollABitVertical(int dir) {
+	void EMSCRIPTEN_KEEPALIVE scrollABitVertical(int dir, int bigScrollInt) {
 		double y1 = OptionsAPI::scrollY->getVal();
-		double relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNtaxaDisplayed();
+		double relativeScrollAmnt;
+		if (bigScrollInt == 0){
+			relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNtaxaDisplayed();
+		}else{
+			relativeScrollAmnt = 3*OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNtaxaDisplayed();
+		}
 		double y2 = y1 + dir*relativeScrollAmnt;
 		OptionsAPI::scrollY->setVal(y2);
 		//cout << "scrolling " << y1 << " -> " << y2 << " / " << OptionsAPI::scrollY->getVal() << endl;
@@ -238,9 +243,14 @@ extern "C" {
 	/**
 	 * Scroll left/right slightly
 	*/
-	void EMSCRIPTEN_KEEPALIVE scrollABitHorizontal(int dir) {
+	void EMSCRIPTEN_KEEPALIVE scrollABitHorizontal(int dir, int bigScrollInt) {
 		double x1 = OptionsAPI::scrollX->getVal();
-		double relativeScrollAmnt = OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNsitesDisplayed();
+		double relativeScrollAmnt;
+		if (bigScrollInt == 0){
+			relativeScrollAmnt= OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNsitesDisplayed();
+		}else{
+			relativeScrollAmnt= 3*OptionsAPI::SCROLL_Y_NROWS/AlignmentAPI::getNsitesDisplayed();
+		}
 		double x2 = x1 + dir*relativeScrollAmnt;
 		OptionsAPI::scrollX->setVal(x2);
 
@@ -259,7 +269,7 @@ extern "C" {
 		/**
 	 * Zoom in/out slightly
 	*/
-	void EMSCRIPTEN_KEEPALIVE zoomABit(int dir) {
+	void EMSCRIPTEN_KEEPALIVE zoomABit(int dir, int bigScrollInt) {
 		double y1 = OptionsAPI::zoomScale->getVal();
 		double y2 = y1 + dir*OptionsAPI::zoomScale->getStepSize();
 		OptionsAPI::zoomScale->setVal(y2);

@@ -4,6 +4,8 @@
 function initUtil(){
 	
 
+	STOP_LOADING = false;
+
 	$("#control_panel_div").hide(0);
 	$("#graphics_div").hide(0);
 	$("#upload_div").show(0);
@@ -11,18 +13,55 @@ function initUtil(){
 
 	// Is shift key down right now
 	SHIFT_KEY_IS_DOWN = false;
+	CTRL_KEY_IS_DOWN = false;
 
 	window.onkeyup = function(e) { 
 		if (SHIFT_KEY_IS_DOWN && e.keyCode == 16) {
 			//console.log("shift up");
 			SHIFT_KEY_IS_DOWN = false;
 		}
+		
+		if (CTRL_KEY_IS_DOWN && e.ctrlKey) {
+			//console.log("ctrl up");
+			CTRL_KEY_IS_DOWN = false;
+		}
+		
 	}
 	window.onkeydown = function(e) { 
 		if (!SHIFT_KEY_IS_DOWN && e.keyCode == 16) {
 			//console.log("shift down");
 			SHIFT_KEY_IS_DOWN = true;
 		}
+		
+		
+		if (!CTRL_KEY_IS_DOWN && e.ctrlKey){
+			CTRL_KEY_IS_DOWN = true;
+		}
+
+		if (!SHIFT_KEY_IS_DOWN && !$("#taxon_search_input").is(":focus")){
+			
+			// Left
+			if (e.keyCode == 37) {
+				scrollHorizontal(false, CTRL_KEY_IS_DOWN);
+			}
+			
+			// Right
+			else if (e.keyCode == 39) {
+				scrollHorizontal(true, CTRL_KEY_IS_DOWN);
+			}
+			
+			// Up
+			else if (e.keyCode == 38) {
+				scrollVertical(true, CTRL_KEY_IS_DOWN);
+			}
+			
+			// Down
+			else if (e.keyCode == 40) {
+				scrollVertical(false, CTRL_KEY_IS_DOWN);
+			}
+		
+		}
+		
 	}
 		
 
@@ -318,6 +357,28 @@ function removeUpload(ele){
 
 
 
+}
+
+
+/*
+ * Cause the navigation peach to start spinning, and the cursor to start loading
+ */
+function startLoading(){
+	
+	
+	// Only add loading if it takes a while
+	//setTimeout(function() {
+		//if (STOP_LOADING) return;
+		//STOP_LOADING=false;
+		//if (!$("#peachWheel").hasClass("loading")) $("#peachWheel").addClass("loading");
+		if (!$("body").hasClass("loading")) $("body").addClass("loading");
+	//}, 50);
+}
+
+function stopLoading(){
+	//STOP_LOADING=true;
+	//$("#peachWheel").removeClass("loading");
+	$("body").removeClass("loading");
 }
 
 
@@ -718,6 +779,7 @@ function buildTree(){
 				</div>`;
 	$("body").append(html);
 	$("body").addClass("loading");
+	
 	$("#main").addClass("faded");
 
 	
@@ -828,15 +890,15 @@ function reorderTree(){
 	let btnID = "#reorderTreeBtn";
 	
 	$(btnID).addClass("disabled");
-	addLoader($("#ctrl_loading_div"));
-	$(btnID).parent().find(".usermsg").html("");
-	$(btnID).parent().find(".usermsg").hide(0);
+	//addLoader($("#ctrl_loading_div"));
+	startLoading();
 	
 	// Asynchronous call to allow dom to update
 	setTimeout(function() {
 		callWasmFunction("reorderTree", [], function(results){
 
-			removeLoader($("#ctrl_loading_div"));
+			//removeLoader($("#ctrl_loading_div"));
+			stopLoading();
 			$(btnID).removeClass("disabled");
 			BUILDING_TREE = false;
 			
@@ -979,10 +1041,12 @@ function clearSelection(){
 	//if ($("#svg .taxon.selected").length == 0) return;
 	$("#svg").find(".taxon.selected").removeClass("selected");
 	updateSelectionCSS();
-	addLoader($("#ctrl_loading_div"));
+	//addLoader($("#ctrl_loading_div"));
+	startLoading();
 	callWasmFunction("clearSelection", [], function(val) {
 		renderGraphics(function(){
-			removeLoader($("#ctrl_loading_div"));
+			//removeLoader($("#ctrl_loading_div"));
+			stopLoading();
 		});
 		
 	});
@@ -998,8 +1062,12 @@ function clearSelection(){
 function focusSelection() {
 	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing selection...");
-	addLoader($("#ctrl_loading_div"));
-	setOptionToVal("focusOnTaxa", "true", function() { removeLoader($("#ctrl_loading_div")); });
+	//addLoader($("#ctrl_loading_div"));
+	startLoading();
+	setOptionToVal("focusOnTaxa", "true", function() { 
+		//removeLoader($("#ctrl_loading_div"));
+		stopLoading();
+	});
 }
 
 /*
@@ -1008,8 +1076,12 @@ function focusSelection() {
 function cladeSelection() {
 	//if ($("#svg .taxon.selected").length == 0) return;
 	console.log("Focusing clade...");
-	addLoader($("#ctrl_loading_div"));
-	setOptionToVal("focusOnClade", "true", function() { removeLoader($("#ctrl_loading_div")); });
+	//addLoader($("#ctrl_loading_div"));
+	startLoading();
+	setOptionToVal("focusOnClade", "true", function() { 
+		//removeLoader($("#ctrl_loading_div")); 
+		stopLoading();
+	});
 }
 
 

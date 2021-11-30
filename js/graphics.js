@@ -147,7 +147,8 @@ function renderGraphics(resolve = function() {}){
 		
 		
 	
-		addLoader($("#upload_loading_div"));
+		//addLoader($("#upload_loading_div"));
+		startLoading();
 		$("#renderBtn").hide();
 
 
@@ -571,7 +572,8 @@ function plotNextObject(svgBtm, svgMid, svgTop, iteration = 0, drawCanvas, resol
 			
 			if (objects.length == 0){
 			
-				removeLoader($("#ctrl_loading_div"));
+				//removeLoader($("#ctrl_loading_div"));
+				stopLoading();
 				$("#svg").removeClass("resizing");
 				
 				// Taxon selection
@@ -987,7 +989,8 @@ function downloadImage(format = "svg"){
 
 		if (!ready || DOWNLOADING) return;
 
-		addLoader($("#ctrl_loading_div"));
+		//addLoader($("#ctrl_loading_div"));
+		startLoading();
 
 		var divID = "downloadSVG_DIV";
 		var svgID = "downloadSVG";
@@ -1004,7 +1007,8 @@ function downloadImage(format = "svg"){
 			}
 			
 			DOWNLOADING = false;
-			removeLoader($("#ctrl_loading_div"));
+			//removeLoader($("#ctrl_loading_div"));
+			stopLoading();
 		};
 
 
@@ -1243,10 +1247,11 @@ function moveTree(plus){
 /*
 	Scroll up/down slightly
 */
-function scrollVertical(goingUp){
+function scrollVertical(goingUp, bigScroll=false){
 	
 	
 	let goingUpInt = goingUp ? -1 : 1;
+	let bigScrollInt = bigScroll ? 1 : 0;
 
 	clearTimeout($.data(this, 'timer'));
 	$.data(this, 'timer', setTimeout(function() {
@@ -1259,7 +1264,7 @@ function scrollVertical(goingUp){
 
 
 		
-		callWasmFunction("scrollABitVertical", [goingUpInt], function(result){
+		callWasmFunction("scrollABitVertical", [goingUpInt, bigScrollInt], function(result){
 			if (result.changed) {
 				SCROLLING = true;
 				CANCEL_GRAPHICS = true;
@@ -1279,10 +1284,11 @@ function scrollVertical(goingUp){
 /*
 	Scroll left/right slightly
 */
-function scrollHorizontal(goingRight){
+function scrollHorizontal(goingRight, bigScroll=false){
 	
 	
 	let goingRightInt = goingRight ? 1 : -1;
+	let bigScrollInt = bigScroll ? 1 : 0;
 
 	clearTimeout($.data(this, 'timer'));
 	$.data(this, 'timer', setTimeout(function() {
@@ -1294,7 +1300,7 @@ function scrollHorizontal(goingRight){
 
 
 		
-		callWasmFunction("scrollABitHorizontal", [goingRightInt], function(result){
+		callWasmFunction("scrollABitHorizontal", [goingRightInt, bigScrollInt], function(result){
 			if (result.changed) {
 				SCROLLING = true;
 				CANCEL_GRAPHICS = true;

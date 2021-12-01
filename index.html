@@ -78,10 +78,13 @@
   
 	<div id="main">
 	
+		
 		<div id="mainHeader"  style="text-align:center">
-			<h1> PEACH Tree </h1>
+			<h1> PEACH Tree </h1> 
 			<h4> <b>P</b>lotting <b>E</b>pidemiological and <b>A</b>lignment <b>CH</b>aracters onto phylogenetic <b>Tree</b>s </h4>
 		</div>
+		
+		
 
 
 		
@@ -90,7 +93,28 @@
 		
 		
 		
-		
+			
+			<table id="mainHeaderLeaf">
+			
+				<tr>
+					<td > 
+						
+						<div class="leafSide headerLeft" >
+							
+						</div>
+						
+					</td>
+					<td >
+						
+						<div class="leafSide headerRight" >
+							
+						</div>
+					
+					</td>
+				
+				</tr>
+			
+			</table>
 
 		
 
@@ -103,7 +127,7 @@
 					
 						<div id="aln_upload" class="uploader top"  title="Accepted format: fasta">
 							<div id="aln_upload_title">Drag and drop a multiple sequence alignment (.fasta)</div>
-							<div style="display:none" class="usermsg mediumfont"></div>
+							<span style="display:none" class="usermsg mediumfont"></span>
 							<!--<div class="smallfont">(And we will make a tree for you!)</div>-->
 							
 						</div>
@@ -118,7 +142,7 @@
 				
 						<div id="phy_upload" class="uploader left side" title="Accepted formats: nexus, newick">
 							<div id="phy_upload_title">Drag and drop a phylogenetic tree (.newick or .nexus) </div>
-							<div style="display:none" class="usermsg mediumfont"></div>
+							<span style="display:none" class="usermsg mediumfont"></span>
 						</div>
 
 					</td> 
@@ -128,7 +152,7 @@
 
 						<div id="epi_upload" class="uploader right side" title="Accepted formats: csv, tsv">
 							<div id="epi_upload_title">Drag and drop epidemiological annotations (.csv or .tsv) </div>
-							<div style="display:none" class="usermsg mediumfont"></div>
+							<span style="display:none" class="usermsg mediumfont"></span>
 						</div>
 
 					</td> 
@@ -137,7 +161,7 @@
 				
 			</table>
 
-			<br><br>Upload one or more of the above to begin
+			<br><br>Upload an alignment and/or tree to begin
 			<br><br>
 			
 				<span id="renderBtn" onclick="renderGraphics();" class="button large disabled" title="Upload an alignment and/or tree to begin">Display</span>
@@ -153,7 +177,7 @@
 								
 			
 
-
+				<br><br>
 				<div id="softwareDescDiv">
 					<b>PEACH Tree</b> is a web tool for rapidly visualising multiple sequence alignments, and is specifically designed for epidemiological domains, such as SARS-CoV-2 pathogen surveillance. 
 					By default, only segregating alignment sites (i.e. sites which vary among the samples) are displayed, making the program suitable for analysis of complete genomic data in a succinct format.

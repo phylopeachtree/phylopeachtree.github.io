@@ -88,11 +88,12 @@ body {
 .usermsg{
 	background-color:#fffffffe;
 	border-style:solid;
-
-	border-width:0.05px;
-	border-radius:5px;
-	margin-left:20%;
-	width:60%;
+	border-width:0.5px;
+	border-radius:2px;
+	border-color:#696969;
+	padding:2px;
+	margin:auto;
+	%width:60%;
 
 }
 
@@ -106,27 +107,36 @@ body.loading{
 	peach pink #FFDAB9
 */
 
+
+
+
+
 #mainHeader{
-	background-color:#b0fb5aaa;
-	color:#333;
-	width:55%;
+	%background-color:#ff973a44;
+	color:white;
+	width:800px;
 	margin:auto;
 	font-weight: bold;
-	border-radius:0em 0em 10em 10em;
-	border-width:0.05em;
-	border-color:black;
-	border-style:solid;
+	%border-radius:0em 0em 3em 3em;
+	%border-width:0.1em;
+	%border-color:#ff973a;
+	%border-style:solid;
 	margin-bottom: -1em;
-	padding: 0.5em;
-	box-shadow: inset 0em -4em 4em #5ca904aa; 
+	padding: 0.1em;
+	%box-shadow: inset 0em -4em 4em #FFDAB944; 
 
 }
 
 
 #mainHeader h1{
-	font-size:2.5em;
+	font-size:3em;
+	color:#FFDAB9;
 	margin:0em;
 	margin-bottom:-0.2em;
+	 text-shadow: -1px 1px 0 #000,
+                          1px 1px 0 #000,
+                         1px -1px 0 #000,
+                        -1px -1px 0 #000;
 }
 
 #mainHeader h4{
@@ -135,12 +145,18 @@ body.loading{
 	margin-left:2em;
 	margin-right:2em;
 	margin-bottom:0.5em;
-	%color:black;
+	color:#333;
 }
 
 #mainHeader h4 b{
 	%color:white;
-	font-size:1.1em;
+	font-size:1em;
+	color:#FFDAB9;
+	margin-right:0.05em;
+	text-shadow: -1px 1px 0 #000,
+                          1px 1px 0 #000,
+                         1px -1px 0 #000,
+                        -1px -1px 0 #000;
 }
 
 
@@ -161,22 +177,26 @@ body.loading{
 }
 
 
+
+
+
 #upload_div table{
 	text-align:center; 
 	margin:auto; 
-	width:50%
+	width:600px
 }
 
 
 .uploader {
-	height:15em;
+	height:13em;
 	border-style:dashed;
-	border-width: 0.1em;
+	border-width: 0.15em;
 	color:#333;
-	border-color:black;
+	border-color:#696969;
 	text-align:center;
 	vertical-align:middle;
 	margin: 0.1em;
+	cursor:pointer;
 }
 
 
@@ -189,11 +209,11 @@ body.loading{
 }
 
 .uploader.left{
-	border-radius: 0em 0em 8em 10em;
+	border-radius: 0em 0em 5em 8em;
 }
 
 .uploader.right{
-	border-radius: 0em 0em 10em 8em;
+	border-radius: 0em 0em 8em 5em;
 
 }
 
@@ -212,15 +232,17 @@ body.loading{
 
 
 .uploader.top.dz-drag-hover, .uploader.top:hover {
-	background-color:#5ca904;
-	box-shadow: inset 0 -10em 10em #b0fb5a;
+	background-color:white;
+	box-shadow:none;
+	%box-shadow: inset 0 -10em 10em #b0fb5a;
 }
 
 
 
 .uploader.side.dz-drag-hover, .uploader.side:hover {
-	background-color:#b0fb5a;
-	box-shadow: inset 0 -3em 3em #5ca904;
+	background-color:white;
+	box-shadow:none;
+	%box-shadow: inset 0 -3em 3em #5ca904;
 }
 
 
@@ -229,7 +251,7 @@ body.loading{
 
 .uploader > div {
 	text-size-adjust:150%;
-	font-size:140%;
+	font-size:120%;
 	margin-top: 2.5em;
 	padding: 0.25em;
 }
@@ -248,10 +270,9 @@ body.loading{
 
 #main {
 	
-	padding: 2em;
 	width:80%;
 	min-width:1000px;
-	margin-left:150px;
+	margin-left:200px;
 	
 }
 
@@ -294,9 +315,14 @@ body.loading{
     display: none;
 }
 
-#upload_div, #graphics_div{
+#graphics_div{
 	text-align:center;
 	margin: 1em 0em;
+}
+
+#upload_div{
+	text-align:center;
+	margin-top: 3em;
 }
 
 #graphics_div{
@@ -1057,6 +1083,49 @@ input:checked + .sliderboolean:before {
 
 
 
+#mainHeaderLeaf{
+	text-align:center;
+	margin:auto;
+	padding:0.5em;
+	margin-bottom:-2.5em;
+}
+
+
+
+
+#mainHeaderLeaf .leafSide{
+	border-style:solid;
+	border-color:black;
+	border-width:0.5px;
+	background-color:#b0fb5a;
+	box-shadow: inset 0em -0.3em 0.8em #5ca904;
+	height:5em;
+	width:17em;
+	margin:auto;
+}
+
+
+
+#mainHeaderLeaf .leafSide.headerLeft{
+	border-radius: 110% 148% 223% 138%;
+	-webkit-transform: rotate(16deg);
+    -ms-transform: rotate(16deg);
+    transform: rotate(16deg) skew(50deg);
+	margin-right:-1.0em;
+}
+
+
+
+#mainHeaderLeaf .leafSide.headerRight{
+	border-radius:  148% 110% 138% 223%;
+	-webkit-transform: rotate(-16deg);
+    -ms-transform: rotate(-16deg);
+    transform: rotate(-16deg) skew(-50deg);
+	margin-left:-1.0em;
+}
+
+
+
 .peachWheel{
 	width:6em;
 	top:300px;
@@ -1144,7 +1213,7 @@ input:checked + .sliderboolean:before {
 }
 
 
-.zoomPeach .peachLeft{
+.zoomPeach .leafSide.peachLeft{
 	border-radius: 110% 148% 223% 138%;
 	-webkit-transform: rotate(12deg);
     -ms-transform: rotate(12deg);

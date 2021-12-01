@@ -135,7 +135,7 @@ extern "C" {
 	 * @param taxonNum
 	 */
 	void EMSCRIPTEN_KEEPALIVE selectTaxon(int taxonNum) {
-		//cout << "selecting " << taxonNum << endl;
+		cout << "selecting " << taxonNum << endl;
 		
 		AlignmentAPI::mostRecentlySelectedTaxon = taxonNum;
 		AlignmentAPI::THE_ALIGNMENT->selectTaxon(taxonNum);
@@ -148,12 +148,17 @@ extern "C" {
 	void EMSCRIPTEN_KEEPALIVE selectUpToTaxon(int newTaxonNum) {
 
 
+		//cout << "selecting from " << AlignmentAPI::mostRecentlySelectedTaxon << " to " << newTaxonNum << endl;
+
 		jsonObject toColour = json::array();
 
 		if (AlignmentAPI::mostRecentlySelectedTaxon == -1) {
 			WasmAPI::messageFromWasmToJS(toColour.dump(0));
+			return;
 		}
 
+		
+		
 		
 
 
@@ -167,41 +172,61 @@ extern "C" {
 		}
 		else {
 			
+						
+			//int newTaxonIndex = AlignmentAPI::THE_ALIGNMENT->getTaxonIndex(newTaxonNum);
+			//int prevTaxonIndex = AlignmentAPI::THE_ALIGNMENT->getTaxonIndex(AlignmentAPI::mostRecentlySelectedTaxon);
 			
 			
-			int newTaxonIndex = AlignmentAPI::THE_ALIGNMENT->getTaxonIndex(newTaxonNum);
-			int prevTaxonIndex = AlignmentAPI::THE_ALIGNMENT->getTaxonIndex(AlignmentAPI::mostRecentlySelectedTaxon);
+			int newTaxonDisplayIndex = AlignmentAPI::filtering->getIndexByTaxonID(newTaxonNum);
+			int prevTaxonDisplayIndex = AlignmentAPI::filtering->getIndexByTaxonID(AlignmentAPI::mostRecentlySelectedTaxon);
+			
+
+			
+			if (newTaxonDisplayIndex == -1) cout << "newTaxonDisplayIndex=-1; " << newTaxonNum << endl;
+			if (prevTaxonDisplayIndex == -1) cout << "prevTaxonDisplayIndex=-1; " << AlignmentAPI::mostRecentlySelectedTaxon << endl;
+			
+			
+			// Build list of taxa in range
+			vector<int> taxonIDs;
+			if (newTaxonDisplayIndex > prevTaxonDisplayIndex) {
+				for (int i = prevTaxonDisplayIndex; i <= newTaxonDisplayIndex; i ++ ) {
+					int taxonID = AlignmentAPI::filtering->getTaxonIDByIndex(i);
+					
+					if (taxonID == -1) cout << i << "->" << -1 << endl;
+					
+					taxonIDs.push_back(taxonID);
+					
+					//cout << "taxon id " << taxonID << " from display index " << i << endl;
+					
+				}
+			}else {
+				for (int i = prevTaxonDisplayIndex; i >= newTaxonDisplayIndex; i -- ) {
+					int taxonID = AlignmentAPI::filtering->getTaxonIDByIndex(i);
+					if (taxonID == -1) cout << i << "->" << -1 << endl;
+					taxonIDs.push_back(taxonID);
+					//cout << "taxon id " << taxonID << " from display index " << i << endl;
+				}
+	
+			}
+			
+
 			
 			
 			// Are they all in the same state?
 			bool setTo = true;
 			bool thereExistsSelected = false;
 			bool thereExistsDeselected = false;
-			if (newTaxonIndex > prevTaxonIndex) {
-				for (int i = prevTaxonIndex; i <= newTaxonIndex; i ++ ) {
-
-					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxonFromIndex(i);
-					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
-					if (taxon->getIsSelected()) thereExistsSelected = true;
-					else thereExistsDeselected = true;
-					
-					if (thereExistsSelected && thereExistsDeselected) break;
-				}
-			}else {
-				for (int i = prevTaxonIndex; i >= newTaxonIndex; i -- ) {
-
-					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxonFromIndex(i);
-					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
-					if (taxon->getIsSelected()) thereExistsSelected = true;
-					else thereExistsDeselected = true;
-					
-					if (thereExistsSelected && thereExistsDeselected) break;
-					
-				}
+			for (int i : taxonIDs) {
 				
 				
 				
+				Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
+				if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
+				if (taxon->getIsSelected()) thereExistsSelected = true;
+				else thereExistsDeselected = true;
+				if (thereExistsSelected && thereExistsDeselected) break;
 			}
+			
 			
 			// If all are the same state, then toggle all
 			if (thereExistsSelected != thereExistsDeselected) {
@@ -217,10 +242,9 @@ extern "C" {
 			
 			
 
-			if (newTaxonIndex > prevTaxonIndex) {
-				for (int i = prevTaxonIndex; i <= newTaxonIndex; i ++ ) {
+			for (int i : taxonIDs) {
 
-					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxonFromIndex(i);
+					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxon(i);
 					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
 
 					AlignmentAPI::THE_ALIGNMENT->selectTaxon(i, setTo);
@@ -228,20 +252,8 @@ extern "C" {
 					obj["i"] = i;
 					obj["select"] = setTo;
 					toColour.push_back(obj);
-				}
-			}else {
-				for (int i = prevTaxonIndex; i >= newTaxonIndex; i -- ) {
-
-					Taxon* taxon = AlignmentAPI::THE_ALIGNMENT->getTaxonFromIndex(i);
-					if (AlignmentAPI::filtering != nullptr && !AlignmentAPI::filtering->includeTaxon(taxon)) continue;
-
-					AlignmentAPI::THE_ALIGNMENT->selectTaxon(i, setTo);
-					jsonObject obj;
-					obj["i"] = i;
-					obj["select"] = setTo;
-					toColour.push_back(obj);
-				}
 			}
+			
 			
 			if (setTo == false) AlignmentAPI::mostRecentlySelectedTaxon = -1;
 			

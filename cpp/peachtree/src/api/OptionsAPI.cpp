@@ -364,7 +364,7 @@ jsonObject OptionsAPI::initGraphics(double maxH, double maxW, int downloadInt){
 
 
 	// Reset active selection on redraw
-	AlignmentAPI::mostRecentlySelectedTaxon = -1;
+	//AlignmentAPI::mostRecentlySelectedTaxon = -1;
 	
 
 

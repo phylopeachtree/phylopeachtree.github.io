@@ -36,6 +36,8 @@ public:
 	Filtering(bool variantSitesOnly, bool focus, bool focusOnClade, Alignment* alignment,  Tree* tree);
 	void init(bool variantSitesOnly, bool focus, bool focusOnClade, Alignment* alignment, Tree* tree);
 
+	void updateOrdering(Alignment* alignment);
+
 	bool includeTaxon(Taxon* taxon);
 	Node* getSubtreeRoot();
 	bool getVariantSitesOnly();
@@ -53,6 +55,8 @@ public:
 	int getNumUniqueSequences();
 	void prepareMajorAlleles(Alignment* alignment);
 	void cleanup();
+	int getTaxonIDByIndex(int index);
+	int getIndexByTaxonID(int taxonID);
 
 private:
 
@@ -66,6 +70,7 @@ private:
 	std::map<int, bool> taxaIDsToInclude;
 	std::map<int, bool> sitesToIncludeMap;
 	vector<int> sitesToIncludeList;
+	vector<int> taxonIDsIncludeList;
 	Alignment* alignment;
 	int numUniqueSeqs;
 

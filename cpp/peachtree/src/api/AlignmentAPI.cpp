@@ -212,7 +212,7 @@ bool AlignmentAPI::isMock(){
 }
 
 void AlignmentAPI::setSelectionToDirty(){
-	cout << "setSelectionToDirty" << endl;
+	//cout << "setSelectionToDirty" << endl;
 	AlignmentAPI::selectionIsDirty = true;
 }
 

@@ -135,6 +135,7 @@ extern "C" {
 			//AlignmentAPI::THE_ALIGNMENT->recalculateTaxonIndices();
 			//PhylogenyAPI::prepareLabelling(AlignmentAPI::getAlignment());
 			PhylogenyAPI::sortTaxaByTree(PhylogenyAPI::THE_TREE, AlignmentAPI::getAlignment());
+			AlignmentAPI::filtering->updateOrdering(AlignmentAPI::getAlignment());
 		}
 		WasmAPI::messageFromWasmToJS("{}");
 

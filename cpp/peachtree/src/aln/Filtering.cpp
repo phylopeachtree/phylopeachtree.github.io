@@ -101,6 +101,7 @@ void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alig
 		Taxon* taxon = seq->getTaxon();
 		if (!focus || taxon->getIsSelected()) {
 			this->taxaIDsToInclude[taxon->getID()] = true;
+			this->taxonIDsIncludeList.push_back(taxon->getID());
 			//taxaIDsToInclude.put(taxon.getID(), true);
 		}
 	}
@@ -112,6 +113,7 @@ void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alig
 			Taxon* taxon = seq->getTaxon();
 			//taxaIDsToInclude.put(taxon.getID(), true);
 			this->taxaIDsToInclude[taxon->getID()] = true;
+			this->taxonIDsIncludeList.push_back(taxon->getID());
 		}
 		numTaxa = taxaIDsToInclude.size();
 	}
@@ -187,6 +189,26 @@ void Filtering::init(bool variantSitesOnly, bool focus,  bool focusOnClade, Alig
 }
 
 
+
+/*
+ * Update the ordering of the taxa based on the new alignment ordering
+ *
+ */
+void Filtering::updateOrdering(Alignment* alignment){
+	this->taxonIDsIncludeList.clear();
+	
+	for (Sequence* seq : alignment->getSequences()) {
+		Taxon* taxon = seq->getTaxon();
+		//taxaIDsToInclude.put(taxon.getID(), true);
+		if (this->taxaIDsToInclude.count(taxon->getID()) > 0){
+			this->taxonIDsIncludeList.push_back(taxon->getID());
+		}			
+		
+	}
+	
+}
+
+
 /**
  * Should this taxon be included?
  * @param acc
@@ -197,6 +219,39 @@ bool Filtering::includeTaxon(Taxon* taxon){
 	return this->taxaIDsToInclude.count(taxon->getID()) > 0;
 }
 
+
+
+/**
+ * Get the display index of the taxon by its ID
+ *
+ */
+int Filtering::getIndexByTaxonID(int taxonID){
+	
+	if (taxaIDsToInclude.empty()) return -1;
+	
+	int index = 0;
+	for (int t : this->taxonIDsIncludeList) {
+		if (t == taxonID) return index;
+		index++;
+	}
+	
+	return -1;
+	
+}
+
+
+/**
+ * Get the taxon by its display index
+ *
+ */
+int Filtering::getTaxonIDByIndex(int index){
+	
+	if (index < 0 || index >= this->taxonIDsIncludeList.size()) return -1;
+	return this->taxonIDsIncludeList.at(index);
+
+	
+	
+}
 
 
 
@@ -262,6 +317,7 @@ void Filtering::cleanup(){
 	this->subtree = nullptr;
 	this->tree = nullptr;
 	this->taxaIDsToInclude.clear();
+	this->taxonIDsIncludeList.clear();
 	this->sitesToIncludeMap.clear();
 	this->sitesToIncludeList.clear();
 	this->majors.clear();

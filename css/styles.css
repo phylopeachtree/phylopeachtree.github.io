@@ -300,7 +300,7 @@ body.loading{
 }
 
 #graphics_div{
-	margin-top: 3em;
+	margin-top: 0.5em;
 	min-width: 600px;
 	overflow:hidden;
 }
@@ -360,7 +360,6 @@ body.loading{
 
 .dropbtn{
 	transition: all 0.1s ease 0s;
-	font-size:110%;
 	border: none;
 	-webkit-user-select: none; /* Chrome/Safari */        
 	-moz-user-select: none; /* Firefox */
@@ -1074,6 +1073,24 @@ input:checked + .sliderboolean:before {
     cursor: -moz-grab;
     cursor: -webkit-grab;
 	
+	border-style:solid;
+	border-width:0.8px;
+	border-radius:5%;
+	background-color:#d3d3d388;
+	padding:0.5em;
+	
+}
+
+.peachWheel .sect{
+	margin-bottom:0.5em;
+}
+
+.peachWheel .button{
+	font-size:0.9em;
+}
+
+.peachWheel .dropdown{
+	font-size:0.8em;
 }
 
 
@@ -1095,7 +1112,7 @@ input:checked + .sliderboolean:before {
 	position:relative;
 	margin:auto;
 	text-align:center;
-	width: 5em;
+	width: 4.5em;
     height: 0.8em;
 	margin-bottom:-0.1em;
 	
@@ -1115,6 +1132,7 @@ input:checked + .sliderboolean:before {
 .peachWheel.loading .zoomPeach .leafSide{
 	background-color:#696969;
 	box-shadow: none;
+
 }
 
 
@@ -1128,20 +1146,20 @@ input:checked + .sliderboolean:before {
 
 .zoomPeach .peachLeft{
 	border-radius: 110% 148% 223% 138%;
-	-webkit-transform: rotate(15deg);
-    -ms-transform: rotate(15deg);
-    transform: rotate(15deg) skew(50deg);
-	margin-right:-0.15em;
+	-webkit-transform: rotate(12deg);
+    -ms-transform: rotate(12deg);
+    transform: rotate(12deg) skew(50deg);
+	margin-right:-0.12em;
 }
 
 
 
 .zoomPeach .leafSide.peachRight{
 	border-radius:  148% 110% 138% 223%;
-	-webkit-transform: rotate(-15deg);
-    -ms-transform: rotate(-15deg);
-    transform: rotate(-15deg) skew(-50deg);
-	margin-left:-0.15em;
+	-webkit-transform: rotate(-12deg);
+    -ms-transform: rotate(-12deg);
+    transform: rotate(-12deg) skew(-50deg);
+	margin-left:-0.12em;
 }
 
 .zoomPeach .leafSide.peachRight div{

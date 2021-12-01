@@ -188,58 +188,17 @@
 				<div class="alignmentSummary"> Showing <span id="nsitesdisplayed_span"></span> of <span id="nsites_span"></span> sites </div>
 				<div class="alignmentSummary" title="Number of unique sequences. Ambiguous characters do not increase the count."> <span id="nuniqueseqs_span"></span> unique sequences </div>
 				
+				<!--
 				<div> <b>Sample selection: </b>
-					<span id="btn_focus" onClick="focusSelection()" class="button selectBtn" title="Focus on taxa selection (click on a label below to select)">Focus</span>
-					<span id="btn_clade" onClick="cladeSelection()" class="button selectBtn" title="Focus on selected clade (only applicable if there is a tree)">Subtree</span>
-					<span id="btn_clear" onClick="clearSelection()" class="button selectBtn" title="Clear selection">Clear</span> 
+
 				</div>
-				
+				-->
 				
 				<div> 
 					<label for="taxon_search_input"><b>Search:</b></label>
 					<input id="taxon_search_input">
 				</div>
-				
-				
-			
-				<div>
-					<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a neighbour-joining tree">Build tree</span>
-					<!--<span style="margin:auto;" id="reorderTreeBtn" onclick="reorderTree();" class="button" title="Reorder children in the transmission tree to improve compatibility with infectious periods">Transmission</span>-->
-					
-				</div>
 
-
-
-				
-				
-				
-				<div>
-					
-				
-					<span class="dropdown">
-					<button class="dropbtn">Download &#x25BC;</button>
-					  <div class="dropdown-content">
-						<a id="downloadImageSVGBtn" onclick="downloadImage('svg')" title="Download the image in svg format">Image (.svg)</a>
-						<a id="downloadImagePNGBtn" onclick="downloadImage('png')" title="Download the image in png format">Image (.png)</a>
-						<a id="downloadSamplesBtn" onclick="downloadSamples()" title="Download the displayed samples and any metadata they display">Samples (.csv)</a>
-						<a id="downloadAlignmentBtn" onclick="downloadAlignment()" title="Download the displayed samples and sites in fasta format">Alignment (.fasta)</a>
-						<a id="downloadSitesBtn" onclick="downloadSites()" title="Download the list of site numbers in the display">Site numbers (.txt)</a>
-						<a id="downloadTreeBtn" onclick="downloadTree()" title="Download the displayed tree in nexus format">Tree (.nexus)</a>
-					  </div>
-					</span>
-					
-					
-					
-									
-				
-				</div>
-				
-				
-				<span id="ctrl_loading_div"> </span>
-				
-				<br>
-
-			
 			
 			
 			
@@ -253,7 +212,7 @@
 		
 		
 
-				<div id="peachWheel" class="peachWheel">
+				<div id="peachWheel" class="peachWheel" title="Drag me to move me!">
 		
 					<table class="zoomPeach">
 					
@@ -294,6 +253,39 @@
 						</ul>
 						
 					</div>
+					<br>
+					
+
+					<div class="sect">
+						<span style="margin:auto;" id="buildTreeBtn" onclick="buildTree();" class="button" title="Build a neighbour-joining tree">Build tree</span> 
+					</div>
+					
+					<div class="sect">
+						<span id="btn_clade" onClick="cladeSelection()" class="button selectBtn" title="Focus on selected monophyletic group (click on a label to select)">Subtree</span> 
+					</div>
+					<div class="sect">
+						<span id="btn_focus" onClick="focusSelection()" class="button selectBtn" title="Focus on sample selection (click on a label to select)">Focus</span> 
+					</div>
+					<div class="sect">
+						<span id="btn_clear" onClick="clearSelection()" class="button selectBtn" title="Clear selection">Clear</span> 
+					</div>
+					
+					<span class="dropdown">
+						<button class="dropbtn">Download &#x25BC;</button>
+					  <div class="dropdown-content">
+						<a id="downloadImageSVGBtn" onclick="downloadImage('svg')" title="Download the image in svg format">Image (.svg)</a>
+						<a id="downloadImagePNGBtn" onclick="downloadImage('png')" title="Download the image in png format">Image (.png)</a>
+						<a id="downloadSamplesBtn" onclick="downloadSamples()" title="Download the displayed samples and any metadata they display">Samples (.csv)</a>
+						<a id="downloadAlignmentBtn" onclick="downloadAlignment()" title="Download the displayed samples and sites in fasta format">Alignment (.fasta)</a>
+						<a id="downloadSitesBtn" onclick="downloadSites()" title="Download the list of site numbers in the display">Site numbers (.txt)</a>
+						<a id="downloadTreeBtn" onclick="downloadTree()" title="Download the displayed tree in nexus format">Tree (.nexus)</a>
+					  </div>
+					</span>
+					
+					
+					
+					
+					
 				</div>
 		
 			<hr>

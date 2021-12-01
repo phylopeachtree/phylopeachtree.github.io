@@ -51,6 +51,7 @@ public:
 	static void annotateTaxa(Epidemiology* epi);
 	static void annotateTaxa(Tree* tree);
 	static string downloadSamples(string sampleNameAnnotation, bool displayMissingPercentage, bool reportInfections);
+	static string downloadSites();
 	static bool getHighlighted();
 	
 

@@ -948,38 +948,6 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
 
 /*
-	Download the alignment
-*/
-function downloadAlignment(){
-	callWasmFunction("downloadAlignment", [], function(result){
-		download("peachtree.fasta", result.contents);
-	});
-}
-
-
-
-/*
-	Download the samples
-*/
-function downloadSamples(){
-	callWasmFunction("downloadSamples", [], function(result){
-		download("peachtree.csv", result.contents);
-	});
-}
-
-
-/*
-	Download the tree
-*/
-function downloadTree(){
-	callWasmFunction("downloadTree", [], function(result){
-		download("peachtree.nexus", result.contents);
-	});
-}
-
-
-
-/*
 	Download the svg
 */
 function downloadImage(format = "svg"){

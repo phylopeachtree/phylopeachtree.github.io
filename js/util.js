@@ -612,7 +612,7 @@ function renderOptions(){
 					$("#downloadAlignmentBtn").show(0);
 				}
 				else {
-					$("#downloadAlignmentBtn").hide(0);
+					$("#downloadAlignment").hide(0);
 				}
 				
 				if (result.ready || result2.mock){
@@ -758,7 +758,7 @@ function buildTree(){
 	var html = `<div id="treeBuildingDialog">
 					<div>
 						<h3>Building Neighbour Joining Tree</h3>
-						This may take some time...
+						This could take some time...
 						
 						<br><br>
 						
@@ -975,7 +975,7 @@ function toggleTaxon(ele){
 	
 	// Inform the model
 	let index = parseFloat(ele.attr("i"));
-	console.log("selecting", index);
+	//console.log("selecting", index);
 	callWasmFunction("selectTaxon", [index]);
 	//cjCall("peachtree.aln.AlignmentAPI", "selectTaxon", index);
 	
@@ -1170,4 +1170,48 @@ function searchForTaxon(){
 function goToDocumentation(){
 	window.location.href = '/about';
 }
+
+
+
+
+/*
+	Download the alignment
+*/
+function downloadAlignment(){
+	callWasmFunction("downloadAlignment", [], function(result){
+		download("peachtree.fasta", result.contents);
+	});
+}
+
+
+
+/*
+	Download list of displayed sites
+*/
+function downloadSites(){
+	callWasmFunction("downloadSites", [], function(result){
+		download("sites.txt", result.contents);
+	});
+}
+
+
+/*
+	Download the samples
+*/
+function downloadSamples(){
+	callWasmFunction("downloadSamples", [], function(result){
+		download("peachtree.csv", result.contents);
+	});
+}
+
+
+/*
+	Download the tree
+*/
+function downloadTree(){
+	callWasmFunction("downloadTree", [], function(result){
+		download("peachtree.nexus", result.contents);
+	});
+}
+
 

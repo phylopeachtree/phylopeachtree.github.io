@@ -295,6 +295,23 @@ extern "C" {
 		WasmAPI::messageFromWasmToJS(contents.dump(0));
 		
 	}
+	
+	
+	
+	
+	/**
+	 * Download the displayed sites
+	 */
+	void EMSCRIPTEN_KEEPALIVE downloadSites() {
+		
+		jsonObject contents;
+		if (AlignmentAPI::THE_ALIGNMENT != nullptr){
+			contents["contents"] = AlignmentAPI::downloadSites();
+		}
+		WasmAPI::messageFromWasmToJS(contents.dump(0));
+		
+	}
+	
 
 
 

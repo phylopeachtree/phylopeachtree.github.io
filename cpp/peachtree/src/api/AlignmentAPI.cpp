@@ -134,6 +134,22 @@ string AlignmentAPI::downloadSamples(string sampleNameAnnotation, bool displayMi
 }
 
 
+/**
+	 * Download the displayed sites
+ */
+string AlignmentAPI::downloadSites(){
+	
+	string output = "sites\n";
+	for (int siteIndex : filtering->getSites()){
+		int siteNum = siteIndex+1;
+		output += to_string(siteNum) + "\n";
+	}
+
+	return output;
+	
+	
+}
+
 
 /*
  * Get the taxon object

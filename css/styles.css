@@ -632,8 +632,7 @@ ul.tabs li.active:hover::after {
 }
 
 .optionsSlideIn {
-	background-color:#b0fb5aee;
-	box-shadow: inset 0 -7em 7em white;
+	background-color:white;
 	transition: visibility 0s 0.6s;
 	position: fixed;
 	bottom: 0;
@@ -641,24 +640,31 @@ ul.tabs li.active:hover::after {
 	left: 10%;
 	transition: transform 0.3s 0s;
 	transform: translateY(-50px);
-	
+	color:black;
 	border: solid #333;
 	border-radius: 0.1em;
-	border-width:0.05em;
+	border-width:0.1em;
   
 	
 	%height:200px;
-	padding:5px;
-	z-index:100;
+	padding-left:1em;
+	padding-right:1em;
+	z-index:2;
 
 }
 
-
+.optionsSlideIn h2 {
+	%color:#FFDAB9;
+	%text-shadow: -1px 1px 0 #000,
+                          1px 1px 0 #000,
+                         1px -1px 0 #000,
+                        -1px -1px 0 #000;
+}
 
 .optionsBox{
 	max-width: 220px;
 	text-align:center;
-	margin-right: 25px;
+	margin-right: 1em;
 }
 
 .optionsBox.small{
@@ -666,11 +672,7 @@ ul.tabs li.active:hover::after {
 }
 
 .optionsSlideIn div {
-	
-	width:100%;
-	padding-left: 2em;
 	text-align:left;
-	
 }
 
 .optionsSlideIn div div {
@@ -743,11 +745,18 @@ ul.tabs li.active:hover::after {
 
 
 
+
+
 .dropdown{
 	border: 1px solid black;
 	border-radius: 5px;
+	
 	padding:5;
 	background-color:white;
+}
+
+.optionsSlideIn .dropdown{
+	width:200px;
 }
 
 
@@ -881,7 +890,7 @@ input:checked + .sliderboolean:before {
 	display: flex;
 	flex-wrap: wrap;
 	align-items:flex-start;
-	padding-top:5em;
+	padding-top:1em;
 	%padding-bottom:5em;
 }
 

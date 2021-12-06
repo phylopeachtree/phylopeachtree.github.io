@@ -150,6 +150,9 @@ function renderGraphics(resolve = function() {}){
 		//addLoader($("#upload_loading_div"));
 		startLoading();
 		$("#renderBtn").hide();
+		
+		
+
 
 
 		// Get width and height

@@ -37,7 +37,7 @@ public:
 	Node* toNode();
 
 private:
-	const double EPSILON = 1e-10;
+	const double EPSILON = 0; //1e-10;
 	vector<string> taxaNames;
 
 	NodeX* left;

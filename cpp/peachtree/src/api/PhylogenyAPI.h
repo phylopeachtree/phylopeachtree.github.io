@@ -49,6 +49,7 @@ public:
 	static int treeNumber;
 	static bool orderingIsDirty;
 	static bool infectionCountIsDirty;
+	static bool treeIsMadeFromData;
 
 
 	// Building tree

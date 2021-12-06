@@ -365,17 +365,19 @@ function removeUpload(ele){
  */
 function startLoading(){
 	
-	
+	//console.log("startLoading");
 	// Only add loading if it takes a while
 	//setTimeout(function() {
 		//if (STOP_LOADING) return;
 		//STOP_LOADING=false;
 		//if (!$("#peachWheel").hasClass("loading")) $("#peachWheel").addClass("loading");
-		if (!$("body").hasClass("loading")) $("body").addClass("loading");
+		//if (!$("body").hasClass("loading")) 
+		$("body").addClass("loading");
 	//}, 50);
 }
 
 function stopLoading(){
+	//console.log("stopLoading");
 	//STOP_LOADING=true;
 	//$("#peachWheel").removeClass("loading");
 	$("body").removeClass("loading");

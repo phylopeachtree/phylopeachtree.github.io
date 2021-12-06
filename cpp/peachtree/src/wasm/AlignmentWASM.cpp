@@ -59,6 +59,8 @@ extern "C" {
 
 
 		cout << "uploading alignment " << strlen(str) << endl;
+		
+	
 
 
 		string fasta(str);
@@ -70,6 +72,10 @@ extern "C" {
 
 
 		// If tree has been uploaded, check the alignment matches the tree
+			
+		if (!PhylogenyAPI::treeIsMadeFromData) PhylogenyAPI::cleanup();
+
+		
 		PhylogenyAPI::setOrderingToDirty();
 		PhylogenyAPI::prepareLabelling(AlignmentAPI::THE_ALIGNMENT);
 		EpiAPI::setEpiAccessionsToDirty();

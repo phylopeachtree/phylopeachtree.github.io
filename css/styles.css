@@ -17,7 +17,7 @@ body {
 	color:#222;
 	width:100%;
 	min-width:500px;
-	%height:100%;
+	height:100vh;
 	margin:0;
 	padding:0;
 	
@@ -335,7 +335,7 @@ body.loading{
 
 .button{
 	transition: all 0.1s ease 0s;
-	border-radius:0.2em;
+	border-radius:0em;
 	font-size:110%;
 	padding: 0.1em;
 	margin: 0.1em;
@@ -403,7 +403,7 @@ body.loading{
 	border-color:black;
 	border-style:solid;
 	border-width:1px;
-	border-radius:0.2em;
+	border-radius:0em;
 	background-color: #5ca904;
 
 }

@@ -25,6 +25,7 @@ bool PhylogenyAPI::orderingIsDirty;
 bool PhylogenyAPI::infectionCountIsDirty;
 chrono::time_point<std::chrono::high_resolution_clock> PhylogenyAPI::startTimeTree;
 ClusterTree* PhylogenyAPI::clusterTree;
+bool PhylogenyAPI::treeIsMadeFromData = false;
 
 
 void PhylogenyAPI::setTree(Tree* tree){
@@ -226,6 +227,7 @@ jsonObject PhylogenyAPI::resumeTreeBuilding(bool cancel){
 		
 		
 		PhylogenyAPI::cleanup();
+		PhylogenyAPI::treeIsMadeFromData = false;
 		
 		j["progress"] = 1;
 		j["finished"] = true;

@@ -66,7 +66,7 @@ extern "C" {
 		PhylogenyAPI::allTrees = Tree::parseTrees(contents);
 		PhylogenyAPI::treeNumber = PhylogenyAPI::allTrees.size() - 1;
 		PhylogenyAPI::THE_TREE = PhylogenyAPI::allTrees.at(PhylogenyAPI::treeNumber);
-
+		PhylogenyAPI::treeIsMadeFromData = true;
 
 		
 		

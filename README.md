@@ -15,3 +15,8 @@ PEACH Tree enables communication between genomic and epidemiological modelling e
 PEACH Tree runs in the web-browser at https://phylopeachtree.github.io/
 
 
+
+
+![](img/Fig1.png)
+
+![](img/Fig2.png)

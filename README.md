@@ -1,6 +1,6 @@
 # PEACH Tree
 
-## Plotting Rpidemiology and Alignment CHaracters onto Trees
+## Plotting Epidemiological and Alignment CHaracters onto Trees
 
 
 

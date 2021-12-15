@@ -236,7 +236,9 @@ void AlignmentAPI::setSelectionToDirty(){
 bool AlignmentAPI::colouringIsApplicable(Colouring* colouring){
 	if (AlignmentAPI::THE_ALIGNMENT == nullptr) return true;
 	if (colouring == nullptr) return true;
-	return AlignmentAPI::THE_ALIGNMENT->getIsNucleotide() == colouring->isNucleotide();
+	if ( AlignmentAPI::THE_ALIGNMENT->getIsNucleotide() && colouring->isNucleotide()) return true;
+	if (!AlignmentAPI::THE_ALIGNMENT->getIsNucleotide() && colouring->isAlpha()) return true;
+	return false;
 }
 
 

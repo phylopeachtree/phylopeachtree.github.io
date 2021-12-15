@@ -39,6 +39,11 @@ bool Colouring::isNucleotide(){
 	return false;
 }
 
+
+bool Colouring::isAlpha(){
+	return false;
+}
+
 string Colouring::getDefaultCol(){
 	return "white";
 }

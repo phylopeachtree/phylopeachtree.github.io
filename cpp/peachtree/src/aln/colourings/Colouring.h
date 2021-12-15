@@ -34,6 +34,7 @@ public:
 
 	virtual string getName();
 	virtual bool isNucleotide();
+	virtual bool isAlpha();
 
 	void init();
 	void setSiteColourFilter(SiteColourFilter val, Filtering* filtering);

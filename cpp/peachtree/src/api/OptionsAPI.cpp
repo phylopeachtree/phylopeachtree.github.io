@@ -15,6 +15,7 @@
 #include "../aln/colourings/JalView.h"
 #include "../aln/colourings/Drums.h"
 #include "../aln/colourings/ClustalAmino.h"
+#include "../aln/colourings/AlphaAmino.h"
 #include "../phy/ClusterTree.h"
 #include "../epi/Timeline.h"
 
@@ -185,7 +186,7 @@ void OptionsAPI::init(){
 	OptionsAPI::colouringClasses.push_back(new JalView());
 	OptionsAPI::colouringClasses.push_back(new AliView());
 	OptionsAPI::colouringClasses.push_back(new Drums());
-	
+	OptionsAPI::colouringClasses.push_back(new AlphaAmino());
 
 
 	

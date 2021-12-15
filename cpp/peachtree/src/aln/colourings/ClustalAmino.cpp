@@ -46,6 +46,6 @@ string ClustalAmino::getName(){
 }
 
 
-bool ClustalAmino::isNucleotide(){
-	return false;
+bool ClustalAmino::isAlpha(){
+	return true;
 }
